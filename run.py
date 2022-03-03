@@ -97,14 +97,14 @@ class Run :
         fpss     = []
         avg_fps  = 0
         fps_time = get_time()
-        fps_font = pygame.font.SysFont('arial', 20)
+        fps_font = pygame.font.SysFont('arial', round(20/1280*wi))
 
         offset = 0
         
         acc       = []
         acc_check = False
         accuracy  = 0
-        acc_font  = pygame.font.SysFont('segoeuisemibold', 30)
+        acc_font  = pygame.font.SysFont('segoeuisemibold', round(30/1280*wi))
 
         debut       = get_time()
         paused_time = 0
@@ -184,8 +184,7 @@ class Run :
                         a_c_rescale = a_c_s*1/u[2]
 
                         u[3]  = pygame.transform.scale(a_circle,(a_c_rescale,a_c_rescale))
-                        u[3].set_alpha(100/6/u[2])
-                        print(u[2])
+                        u[3].set_alpha(255*u[2]/3)
                         u[2] += 6/my_settings.frequence
                         u[2]  = round(u[2],2)
 
@@ -310,7 +309,7 @@ def menu() :
     pygame.mouse.set_visible(True)
 
     noir = load('images\\noir.png',(wi,he))
-    font = pygame.font.Font('assets\\fonts\\shippori.ttf', 30)
+    font = pygame.font.Font('assets\\fonts\\shippori.ttf', round(30/1280*wi))
 
     my_settings.screen.blit(noir,(0,0))
     
