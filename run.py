@@ -1,4 +1,3 @@
-#caca mdr
 import pygame
 import glob
 import os
