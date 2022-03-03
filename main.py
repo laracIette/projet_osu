@@ -4,4 +4,3 @@ from run import menu
 pygame.init()
 
 menu()
-#caca
