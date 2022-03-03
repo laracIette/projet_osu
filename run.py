@@ -184,6 +184,7 @@ class Run :
                         a_c_rescale = a_c_s*1/u[2]
 
                         u[3]  = pygame.transform.scale(a_circle,(a_c_rescale,a_c_rescale))
+                        u[3].set_alpha(round(255*(u[2]-1)/2,2))
                         u[2] += 6/my_settings.frequence
                         u[2]  = round(u[2],2)
 
