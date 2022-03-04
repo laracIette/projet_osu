@@ -90,7 +90,7 @@ class Run :
         a_c_s    = c_s*4
         a_circle = load(f'skins\\{skin}\\approachcircle.png',(a_c_s,a_c_s))
 
-        numbers  = glob.glob(f'assets\\skins\\{skin}\\numbers\\*.png')
+        number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf', round(c_s/2))
 
         cursor       = load(f'skins\\{skin}\\cursor.png',(c_s,c_s))
         t_s          = c_s/4
@@ -142,11 +142,11 @@ class Run :
                     coor        = [circles[e][0]/512*wi*3/4*0.86+240/1280*wi,circles[e][1]/384*he*0.86+50/1280*wi]
 
                     if circles[e][3] == 1 :
-                        numberss = 1
+                        numbers = 1
                     else :
-                        numberss += 1
+                        numbers += 1
 
-                    number = load(f'skins\\{skin}\\numbers\\{os.path.basename(numbers[numberss])}',(c_s/2,c_s/2))
+                    number = number_font.render(f'{numbers}',False,(255,255,255)).convert()
 
                     show_circles.append([create_time,0,1,a_circle,coor,circles[e][2],number,circle])
 
@@ -184,8 +184,8 @@ class Run :
 
                     if u[1] < ar :
                         my_settings.screen.blit(u[3],(u[4][0]-a_c_width/2+1,u[4][1]-a_c_width/2+1))
-                        my_settings.screen.blit(u[6],(u[4][0]-c_s/4,u[4][1]-c_s/4))
                         my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
+                        my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+2*1920/wi,u[4][1]-u[6].get_height()/2+7*1920/wi))
 
                     if u[1] >= 2*ar :
                         show_circles.pop(0)
@@ -200,7 +200,7 @@ class Run :
 
                 accuracy /= len(acc)
 
-            acc_txt = acc_font.render(f'{round(accuracy,2)}%',False,(255,255,255))
+            acc_txt = acc_font.render(f'{round(accuracy,2)}%',False,(255,255,255)).convert()
             my_settings.screen.blit(acc_txt,(1170/1280*wi,5/1280*wi))
             
             accuracy = 0
@@ -216,7 +216,7 @@ class Run :
 
             avg_fps /= len(fpss)
 
-            fps_txt = fps_font.render(f'{round(avg_fps)}fps',False,(255,255,255)).convert_alpha()
+            fps_txt = fps_font.render(f'{round(avg_fps)}fps',False,(255,255,255)).convert()
             my_settings.screen.blit(fps_txt,(0,0))
             
             avg_fps  = 0
@@ -224,8 +224,8 @@ class Run :
             
             pos = pygame.mouse.get_pos()
 
-            trail_count += 5000 / fps
-            if trail_count > 100:
+            trail_count += round(5000 / fps)
+            if trail_count > 100 :
 
                 trail_pos.append([pos,cursor_trail,255])
                 trail_count = 0
@@ -360,7 +360,7 @@ def menu() :
                         diffs = songs[ii][3]
                         for i in range(len(diffs)) :
                     
-                            diff = font.render(diffs[i],False,(255,255,255))
+                            diff = font.render(diffs[i],False,(255,255,255)).convert()
                             my_settings.screen.blit(diff,(wi/5,he/20*i+he/5*ii))
                         
                         loop2 = True
@@ -378,7 +378,7 @@ def menu() :
                                     diffs = songs[ii][3]
                                     for i in range(len(diffs)) :
                                 
-                                        diff = font.render(diffs[i],False,(255,255,255))
+                                        diff = font.render(diffs[i],False,(255,255,255)).convert()
 
                                         diff_rect   = diff.get_rect()
                                         diff_rect.x = wi/5
