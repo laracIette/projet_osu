@@ -115,10 +115,20 @@ class Run :
         pause_time  = 0
         end_time    = inf
 
+        combo      = 0
+        combo_font = pygame.font.SysFont('segoeuisemibold', round(60/1280*wi))
+        
+        hit_sound = pygame.mixer.Sound(f'assets\\skins\\{skin}\\hit.ogg')
+        hit_sound.set_volume(0.5)
+        
+        miss_sound = pygame.mixer.Sound(f'assets\\skins\\{skin}\\miss.ogg')
+        miss_sound.set_volume(1)
+
         music_start = get_time() + 3000
         playing = False
 
         pygame.mixer.music.load(songs[ii][1])
+        pygame.mixer.music.set_volume(1)
 
         e = 0
 
@@ -193,6 +203,10 @@ class Run :
                         if acc_check == False :
                             acc.append(0)
 
+                            if combo >= 20 :
+                                miss_sound.play()
+                            combo = 0
+
             if len(acc) != 0 :
 
                 for w in acc :
@@ -242,6 +256,9 @@ class Run :
 
             my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
 
+            combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
+            my_settings.screen.blit(combo_txt,(20*1920/wi,960*1080/he))
+
             pygame.mouse.set_visible(False)
             pygame.display.flip()
 
@@ -276,8 +293,15 @@ class Run :
                                         if difference > 100 :
                                             acc.append(16.67)
 
+                                        hit_sound.play()
+                                        combo += 1
+
                                     else :
                                         acc.append(0)
+
+                                        if combo >= 20 :
+                                            miss_sound.play()
+                                        combo = 0
 
                                     show_circles.pop(v)
 
