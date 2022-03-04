@@ -9,6 +9,6 @@ class Settings :
         self.clock      = pygame.time.Clock()
         self.frequence  = 160
         self.resolution = pygame.display.Info()
-        self.width      = 1920
-        self.height     = 1080
+        self.width      = self.resolution.current_w
+        self.height     = self.resolution.current_h
         self.screen     = pygame.display.set_mode((self.width, self.height))

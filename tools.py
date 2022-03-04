@@ -13,7 +13,7 @@ def load(name,size) :
 
     return image
 
-def SkinSelect(font,skin) :
+def SkinSelect(font,skin,sounds) :
 
     skins0 = []
     skins  = glob.glob('assets\\skins\\*')
@@ -48,6 +48,8 @@ def SkinSelect(font,skin) :
 
                     if skin1_rect.collidepoint(pos) :
                         loop = False
+
+                        play(sounds,'click',1)
                         
                         skin = skins0[w]
 
@@ -120,3 +122,25 @@ def Score(accuracy) :
 
 def get_time():
     return int(round(time.time() * 1000))
+
+def import_sounds(skin) :
+    sounds = {
+        'click': pygame.mixer.Sound(f'assets\\skins\\{skin}\\click.ogg'),
+        'fail': pygame.mixer.Sound(f'assets\\skins\\{skin}\\fail.ogg'),
+        'hit': pygame.mixer.Sound(f'assets\\skins\\{skin}\\hit.ogg'),
+        'miss': pygame.mixer.Sound(f'assets\\skins\\{skin}\\miss.ogg'),
+        'spinnerspin': pygame.mixer.Sound(f'assets\\skins\\{skin}\\spinnerspin.ogg'),
+        'spinnerbonus': pygame.mixer.Sound(f'assets\\skins\\{skin}\\spinnerbonus.ogg')
+    }
+    return sounds
+
+def play(sounds,name,volume) :
+    sounds[name].set_volume(volume)
+    sounds[name].play()
+
+def rs(number,way):
+    if way == '/' :
+        number = number/1920*my_settings.width
+    elif way == '*' :
+        number = number*1920/my_settings.width
+    return number

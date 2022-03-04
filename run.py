@@ -1,9 +1,7 @@
 import pygame
-import glob
-import os
 from settings import Settings
 from math import inf
-from tools import load,SkinSelect,SongSelect,Score,get_time
+from tools import load,SkinSelect,SongSelect,Score,get_time,import_sounds,play,rs
 
 my_settings = Settings()
 wi = my_settings.width
@@ -11,7 +9,7 @@ he = my_settings.height
 
 class Run :
 
-    def __init__(self,ii,diff,songs,skin) :
+    def __init__(self,ii,diff,songs,skin,sounds) :
 
         circles0,circles = [],[]
         show_circles     = []
@@ -49,10 +47,16 @@ class Run :
                 else :
                     circles0.append(i)
 
+            cycle = 1
+            for c in circles0[0] :
+                if c == ',' :
+                        cycle += 1
+
             tab = []
             for j in circles0 :
 
                 for k in j :
+
                     if k != ',' and k != '\n' :
                         tab.append(k)
 
@@ -68,29 +72,28 @@ class Run :
         num     = 0
         circles = []
 
-        for i in range(int(len(circles0)/4)) :
-            circles0[i*4+2] += 3000
+        for i in range(int(len(circles0)/cycle)) :
+            circles0[i*cycle+2] += 3000
 
-            for j in range(4) :
+            for j in range(cycle) :
 
                 tab.append(circles0[num])
                 num += 1
 
             circles.append(tab)
-
             tab = []
+
+        od = 200
         
         pause_screen = load('images\\pause_screen.png',(wi,he))
         dim          = load('images\\noir93.png',(wi,he))
         bg           = pygame.transform.scale(songs[ii][0],(wi,he))
         
-        c_s     = 121/cs*4.9/1920*wi
+        c_s     = rs(121/cs*4.9,'/')
         circle  = load(f'skins\\{skin}\\hitcircle.png',(c_s,c_s))
 
         a_c_s    = c_s*4
         a_circle = load(f'skins\\{skin}\\approachcircle.png',(a_c_s,a_c_s))
-
-        number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf', round(c_s/2))
 
         cursor       = load(f'skins\\{skin}\\cursor.png',(c_s,c_s))
         t_s          = c_s/4
@@ -101,14 +104,14 @@ class Run :
         fpss     = []
         avg_fps  = 0
         fps_time = get_time()
-        fps_font = pygame.font.SysFont('arial', round(20/1280*wi))
+        fps_font = pygame.font.SysFont('arial',round(rs(30,'/')))
 
-        offset = 0
+        number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf',round(c_s/2))
         
         acc       = []
         acc_check = False
         accuracy  = 0
-        acc_font  = pygame.font.SysFont('segoeuisemibold', round(30/1280*wi))
+        acc_font  = pygame.font.SysFont('segoeuisemibold',round(rs(45,'/')))
 
         start_time  = get_time()
         paused_time = 0
@@ -116,16 +119,21 @@ class Run :
         end_time    = inf
 
         combo      = 0
-        combo_font = pygame.font.SysFont('segoeuisemibold', round(60/1280*wi))
-        
-        hit_sound = pygame.mixer.Sound(f'assets\\skins\\{skin}\\hit.ogg')
-        hit_sound.set_volume(0.5)
-        
-        miss_sound = pygame.mixer.Sound(f'assets\\skins\\{skin}\\miss.ogg')
-        miss_sound.set_volume(1)
+        combo_font = pygame.font.SysFont('segoeuisemibold',round(rs(90,'/')))
+
+        white = (255,255,255)
+        grey  = (48,48,48)
+
+        offset = 0
+
+        health        = 600
+        max_health    = 600
+        health_minus  = 50
+        health_bonus  = 10
+        health_bar_bg = pygame.Rect(rs(20,'/'),rs(20,'/'),rs(600,'/'),rs(20,'/'))
 
         music_start = get_time() + 3000
-        playing = False
+        playing     = False
 
         pygame.mixer.music.load(songs[ii][1])
         pygame.mixer.music.set_volume(1)
@@ -149,7 +157,7 @@ class Run :
                 if get_time() - paused_time  >=  start_time + circles[e][2] - ar :
 
                     create_time = get_time()
-                    coor        = [circles[e][0]/512*wi*3/4*0.86+240/1280*wi,circles[e][1]/384*he*0.86+50/1280*wi]
+                    coor        = [circles[e][0]/512*wi*3/4*0.86+rs(360,'/'),circles[e][1]/384*he*0.86+rs(75,'/')]
 
                     if circles[e][3] == 1 :
                         numbers = 1
@@ -167,8 +175,11 @@ class Run :
                 end_time = get_time()
                 e += 1
 
-            if get_time() >= end_time + 3000 :
+            if get_time() >= end_time + 3000 or health <= 0:
                 running = False
+
+                if health <= 0 :
+                    play(sounds,'fail',1)
 
                 Score(accuracy)
                 menu()
@@ -195,16 +206,18 @@ class Run :
                     if u[1] < ar :
                         my_settings.screen.blit(u[3],(u[4][0]-a_c_width/2+1,u[4][1]-a_c_width/2+1))
                         my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
-                        my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+2*1920/wi,u[4][1]-u[6].get_height()/2+7*1920/wi))
+                        my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+rs(2,'*'),u[4][1]-u[6].get_height()/2+rs(7,'*')))
 
-                    if u[1] >= 2*ar :
+                    if u[1] >= ar + od :
                         show_circles.pop(0)
                         
                         if acc_check == False :
                             acc.append(0)
 
+                            health -= health_minus
+
                             if combo >= 20 :
-                                miss_sound.play()
+                                play(sounds,'miss',1)
                             combo = 0
 
             if len(acc) != 0 :
@@ -215,7 +228,7 @@ class Run :
                 accuracy /= len(acc)
 
             acc_txt = acc_font.render(f'{round(accuracy,2)}%',False,(255,255,255)).convert()
-            my_settings.screen.blit(acc_txt,(1170/1280*wi,5/1280*wi))
+            my_settings.screen.blit(acc_txt,(rs(1755,'/'),rs(8,'/')))
             
             accuracy = 0
         
@@ -231,7 +244,7 @@ class Run :
             avg_fps /= len(fpss)
 
             fps_txt = fps_font.render(f'{round(avg_fps)}fps',False,(255,255,255)).convert()
-            my_settings.screen.blit(fps_txt,(0,0))
+            my_settings.screen.blit(fps_txt,(rs(1810,'/'),rs(1025,'/')))
             
             avg_fps  = 0
             fps_time = get_time()
@@ -257,7 +270,11 @@ class Run :
             my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
 
             combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
-            my_settings.screen.blit(combo_txt,(20*1920/wi,960*1080/he))
+            my_settings.screen.blit(combo_txt,(rs(20,'/'),rs(960,'/')))
+
+            health_bar = pygame.Rect(rs(20,'/'),rs(20,'/'),600*health/rs(600,'*'),rs(20,'/'))
+            pygame.draw.rect(my_settings.screen,grey,health_bar_bg)
+            pygame.draw.rect(my_settings.screen,white,health_bar)
 
             pygame.mouse.set_visible(False)
             pygame.display.flip()
@@ -282,25 +299,32 @@ class Run :
 
                                     difference = abs(get_time() - (start_time + show_circles[v][5] + paused_time) + offset)
 
-                                    if difference < 200 :
+                                    if difference < od :
 
-                                        if difference < 50 :
+                                        if difference < od/4 :
                                             acc.append(100)
 
-                                        if difference > 50 and difference < 100 :
+                                        if difference > od/4 and difference < od/2 :
                                             acc.append(33.33)
                                         
-                                        if difference > 100 :
+                                        if difference > od/2 :
                                             acc.append(16.67)
 
-                                        hit_sound.play()
+                                        if health + health_bonus < max_health :
+                                            health += health_bonus
+                                        else :
+                                            health = max_health
+
+                                        play(sounds,'hit',0.5)
                                         combo += 1
 
                                     else :
                                         acc.append(0)
 
+                                        health -= health_minus
+
                                         if combo >= 20 :
-                                            miss_sound.play()
+                                            play(sounds,'miss',1)
                                         combo = 0
 
                                     show_circles.pop(v)
@@ -351,12 +375,13 @@ def menu() :
     pygame.mouse.set_visible(True)
 
     noir = load('images\\noir.png',(wi,he))
-    font = pygame.font.Font('assets\\fonts\\shippori.ttf', round(30/1280*wi))
+    font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(rs(45,'/')))
 
     my_settings.screen.blit(noir,(0,0))
     
-    skin  = 'whitecat'
-    songs = SongSelect()
+    skin   = 'whitecat'
+    songs  = SongSelect()
+    sounds = import_sounds(skin)
 
     loop = True
     while loop :
@@ -380,6 +405,8 @@ def menu() :
 
                     if song_rect.collidepoint(pos) :
                         loop = False
+
+                        play(sounds,'click',1)
 
                         diffs = songs[ii][3]
                         for i in range(len(diffs)) :
@@ -411,15 +438,18 @@ def menu() :
                                         if diff_rect.collidepoint(pos) :
                                             loop2 = False
 
-                                            Run(ii,i,songs,skin)
+                                            play(sounds,'click',1)
+
+                                            Run(ii,i,songs,skin,sounds)
 
                                 if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
                                     loop2 = False
 
                                     my_settings.screen.blit(noir,(0,0))
 
-                                    skin  = SkinSelect(font,skin)
-                                    songs = SongSelect()
+                                    skin   = SkinSelect(font,skin,sounds)
+                                    songs  = SongSelect()
+                                    sounds = import_sounds(skin)
 
                                     loop = True
 
@@ -438,8 +468,9 @@ def menu() :
 
                 my_settings.screen.blit(noir,(0,0))
 
-                skin  = SkinSelect(font,skin)
-                songs = SongSelect()
+                skin   = SkinSelect(font,skin,sounds)
+                songs  = SongSelect()
+                sounds = import_sounds(skin)
 
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                 loop = False
