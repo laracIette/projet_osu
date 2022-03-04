@@ -92,7 +92,11 @@ class Run :
 
         numbers  = glob.glob(f'assets\\skins\\{skin}\\numbers\\*.png')
 
-        cursor = load(f'skins\\{skin}\\cursor.png',(c_s,c_s))
+        cursor       = load(f'skins\\{skin}\\cursor.png',(c_s,c_s))
+        t_s          = c_s/4
+        cursor_trail = load(f'skins\\{skin}\\cursortrail.png',(t_s,t_s))
+        trail_pos    = []
+        trail_count  = 0
 
         fpss     = []
         avg_fps  = 0
@@ -106,7 +110,7 @@ class Run :
         accuracy  = 0
         acc_font  = pygame.font.SysFont('segoeuisemibold', round(30/1280*wi))
 
-        debut       = get_time()
+        start_time  = get_time()
         paused_time = 0
         pause_time  = 0
         end_time    = inf
@@ -132,7 +136,7 @@ class Run :
 
             if e < len(circles) :
 
-                if get_time() - paused_time  >=  debut + circles[e][2] - ar :
+                if get_time() - paused_time  >=  start_time + circles[e][2] - ar :
 
                     create_time = get_time()
                     coor        = [circles[e][0]/512*wi*3/4*0.86+240/1280*wi,circles[e][1]/384*he*0.86+50/1280*wi]
@@ -167,16 +171,6 @@ class Run :
                 for u in show_circles :
                     
                     u[1] = get_time() - u[0]
-                    
-                    if u[1] < ar :
-                        my_settings.screen.blit(u[6],(u[4][0]-c_s/4,u[4][1]-c_s/4))
-                        my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
-
-                    if u[1] >= 2*ar :
-                        show_circles.pop(0)
-                        
-                        if acc_check == False :
-                            acc.append(0)
 
                     if u[2] < 6 :
                         a_c_width = u[3].get_width()
@@ -185,11 +179,19 @@ class Run :
 
                         u[3]  = pygame.transform.scale(a_circle,(a_c_rescale,a_c_rescale))
                         u[3].set_alpha(255*u[2]/2-255/2)
-                        u[2] += 6/my_settings.frequence
+                        u[2] += 6/fps
                         u[2]  = round(u[2],2)
 
-                        if u[1] < ar :
-                            my_settings.screen.blit(u[3],(u[4][0]-a_c_width/2+1,u[4][1]-a_c_width/2+1))
+                    if u[1] < ar :
+                        my_settings.screen.blit(u[3],(u[4][0]-a_c_width/2+1,u[4][1]-a_c_width/2+1))
+                        my_settings.screen.blit(u[6],(u[4][0]-c_s/4,u[4][1]-c_s/4))
+                        my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
+
+                    if u[1] >= 2*ar :
+                        show_circles.pop(0)
+                        
+                        if acc_check == False :
+                            acc.append(0)
 
             if len(acc) != 0 :
 
@@ -222,6 +224,22 @@ class Run :
             
             pos = pygame.mouse.get_pos()
 
+            trail_count += 5000 / fps
+            if trail_count > 100:
+
+                trail_pos.append([pos,cursor_trail,255])
+                trail_count = 0
+            
+            if len(trail_pos) > 8 :
+                trail_pos.pop(0)
+            
+            for t in trail_pos :
+
+                t[2] -= 7*160/fps
+                t[1].set_alpha(t[2])
+
+                my_settings.screen.blit(t[1],(t[0][0]-t_s/2,t[0][1]-t_s/2))
+
             my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
 
             pygame.mouse.set_visible(False)
@@ -245,7 +263,7 @@ class Run :
 
                                     acc_check = True
 
-                                    difference = abs(get_time() - (debut + show_circles[v][5] + paused_time) + offset)
+                                    difference = abs(get_time() - (start_time + show_circles[v][5] + paused_time) + offset)
 
                                     if difference < 200 :
 
