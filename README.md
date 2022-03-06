@@ -1,2 +1,3 @@
 # projet_osu
-osu du bled
+
+i try to recreate osu with python and pygame
