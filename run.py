@@ -72,8 +72,10 @@ class Run :
         num     = 0
         circles = []
 
+        start_offset = 5*ar
+
         for i in range(int(len(circles0)/cycle)) :
-            circles0[i*cycle+2] += 3000
+            circles0[i*cycle+2] += start_offset
 
             for j in range(cycle) :
 
@@ -86,10 +88,11 @@ class Run :
         od = 200
         
         pause_screen = load('images\\pause_screen.png',(wi,he))
-        #dim          = load('images\\noir93.png',(wi,he))
+        #dim         = load('images\\noir93.png',(wi,he))
         bg           = pygame.transform.scale(songs[ii][0],(wi,he)).convert()
         noir = load('images\\noir.png',(wi,he))
         game_break = True
+        break_lock = False
         
         c_s     = rs(121/cs*4.9)
         circle  = load(f'skins\\{skin}\\hitcircle.png',(c_s,c_s))
@@ -137,7 +140,7 @@ class Run :
         passive_health = health_minus/500
         health_bar_bg  = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
 
-        music_start = get_time() + 3000
+        music_start = get_time() + start_offset
         playing     = False
 
         pygame.mixer.music.load(songs[ii][1])
@@ -151,8 +154,7 @@ class Run :
             if get_time() >= music_start and playing == False:
             
                 pygame.mixer.music.play()
-                playing    = True
-                game_break = False
+                playing = True
             
             my_settings.clock.tick(my_settings.frequence)
 
@@ -177,9 +179,17 @@ class Run :
             elif e == len(circles) :
 
                 end_time = get_time()
+
                 e += 1
 
-            if get_time() >= end_time + 3000 or health <= 0:
+            if get_time() >= music_start - start_offset/2.5 and break_lock == False :
+                game_break = False
+                break_lock = True
+
+            if get_time() >= end_time + start_offset/2.5 :
+                game_break = True
+
+            if get_time() >= end_time + start_offset or health <= 0:
                 running = False
 
                 pygame.mixer.music.pause()
@@ -188,6 +198,7 @@ class Run :
                     play(sounds,'fail',1)
 
                 Score(accuracy)
+                
                 pygame.mixer.music.unpause()
                 menu()
             
