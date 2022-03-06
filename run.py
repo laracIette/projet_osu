@@ -86,10 +86,12 @@ class Run :
         od = 200
         
         pause_screen = load('images\\pause_screen.png',(wi,he))
-        dim          = load('images\\noir93.png',(wi,he))
-        bg           = pygame.transform.scale(songs[ii][0],(wi,he))
+        #dim          = load('images\\noir93.png',(wi,he))
+        bg           = pygame.transform.scale(songs[ii][0],(wi,he)).convert()
+        noir = load('images\\noir.png',(wi,he))
+        game_break = True
         
-        c_s     = rs(121/cs*4.9,'/')
+        c_s     = rs(121/cs*4.9)
         circle  = load(f'skins\\{skin}\\hitcircle.png',(c_s,c_s))
 
         a_c_s    = c_s*4
@@ -104,14 +106,17 @@ class Run :
         fpss     = []
         avg_fps  = 0
         fps_time = get_time()
-        fps_font = pygame.font.SysFont('arial',round(rs(30,'/')))
+        fps_font = pygame.font.SysFont('arial',round(rs(30)))
 
         number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf',round(c_s/2))
         
         acc       = []
         acc_check = False
         accuracy  = 0
-        acc_font  = pygame.font.SysFont('segoeuisemibold',round(rs(45,'/')))
+        acc_font  = pygame.font.SysFont('segoeuisemibold',round(rs(45)))
+
+        fade  = False
+        faded = False
 
         start_time  = get_time()
         paused_time = 0
@@ -119,18 +124,18 @@ class Run :
         end_time    = inf
 
         combo      = 0
-        combo_font = pygame.font.SysFont('segoeuisemibold',round(rs(90,'/')))
+        combo_font = pygame.font.SysFont('segoeuisemibold',round(rs(90)))
 
         white = (255,255,255)
         grey  = (48,48,48)
 
         offset = 0
 
-        health        = 600
-        max_health    = 600
-        health_minus  = 50
-        health_bonus  = 10
-        health_bar_bg = pygame.Rect(rs(20,'/'),rs(20,'/'),rs(600,'/'),rs(20,'/'))
+        health         = 600
+        max_health     = 600
+        health_minus   = 50
+        passive_health = health_minus/500
+        health_bar_bg  = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
 
         music_start = get_time() + 3000
         playing     = False
@@ -146,9 +151,8 @@ class Run :
             if get_time() >= music_start and playing == False:
             
                 pygame.mixer.music.play()
-                playing = True
-
-            acc_check  = False
+                playing    = True
+                game_break = False
             
             my_settings.clock.tick(my_settings.frequence)
 
@@ -157,7 +161,7 @@ class Run :
                 if get_time() - paused_time  >=  start_time + circles[e][2] - ar :
 
                     create_time = get_time()
-                    coor        = [circles[e][0]/512*wi*3/4*0.86+rs(360,'/'),circles[e][1]/384*he*0.86+rs(75,'/')]
+                    coor        = [circles[e][0]/512*wi*3/4*0.86+rs(360),circles[e][1]/384*he*0.86+rs(75)]
 
                     if circles[e][3] == 1 :
                         numbers = 1
@@ -166,7 +170,7 @@ class Run :
 
                     number = number_font.render(f'{numbers}',False,(255,255,255)).convert()
 
-                    show_circles.append([create_time,0,1,a_circle,coor,circles[e][2],number,circle])
+                    show_circles.append([create_time,0,1,a_circle,coor,circles[e][2],number,circle,fade,1,acc_check,faded])
 
                     e += 1
 
@@ -178,14 +182,20 @@ class Run :
             if get_time() >= end_time + 3000 or health <= 0:
                 running = False
 
+                pygame.mixer.music.pause()
+
                 if health <= 0 :
                     play(sounds,'fail',1)
 
                 Score(accuracy)
+                pygame.mixer.music.unpause()
                 menu()
             
-            my_settings.screen.blit(bg,(0,0))
-            my_settings.screen.blit(dim,(0,0))
+            if game_break == False :
+                my_settings.screen.blit(noir,(0,0))
+            else :
+                my_settings.screen.blit(bg,(0,0))
+                #my_settings.screen.blit(dim,(0,0))
             
             if len(show_circles) > 0 :
 
@@ -193,25 +203,41 @@ class Run :
                     
                     u[1] = get_time() - u[0]
 
-                    if u[2] < 6 :
-                        a_c_width = u[3].get_width()
+                    if u[1] >= ar and u[8] == False :
+                        u[8] = True
 
+                    if u[2] < 4 :
+
+                        a_c_width   = u[3].get_width()
                         a_c_rescale = a_c_s*1/u[2]
+                        u[3]        = pygame.transform.scale(a_circle,(a_c_rescale,a_c_rescale))
+                    
+                    if u[8] == False :
 
-                        u[3]  = pygame.transform.scale(a_circle,(a_c_rescale,a_c_rescale))
                         u[3].set_alpha(255*u[2]/2-255/2)
+                        u[7].set_alpha(255*u[2]-255)
+                        u[6].set_alpha(255*u[2]-255)
+
                         u[2] += 6/fps
                         u[2]  = round(u[2],2)
+                    
+                    else :
 
-                    if u[1] < ar :
-                        my_settings.screen.blit(u[3],(u[4][0]-a_c_width/2+1,u[4][1]-a_c_width/2+1))
-                        my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
-                        my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+rs(2,'*'),u[4][1]-u[6].get_height()/2+rs(7,'*')))
+                        u[3].set_alpha(255*u[9])
+                        u[7].set_alpha(255*u[9])
+                        u[6].set_alpha(255*u[9])
 
+                        u[9] -= 6/fps
+                        u[9]  = round(u[9],2)
+
+                    my_settings.screen.blit(u[3],(u[4][0]-a_c_width/2,u[4][1]-a_c_width/2))
+                    my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
+                    my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+rs(2),u[4][1]-u[6].get_height()/2+rs(7)))
+                
                     if u[1] >= ar + od :
                         show_circles.pop(0)
                         
-                        if acc_check == False :
+                        if u[11] == False :
                             acc.append(0)
 
                             health -= health_minus
@@ -219,6 +245,8 @@ class Run :
                             if combo >= 20 :
                                 play(sounds,'miss',1)
                             combo = 0
+            
+            acc_check = False
 
             if len(acc) != 0 :
 
@@ -228,7 +256,7 @@ class Run :
                 accuracy /= len(acc)
 
             acc_txt = acc_font.render(f'{round(accuracy,2)}%',False,(255,255,255)).convert()
-            my_settings.screen.blit(acc_txt,(rs(1755,'/'),rs(8,'/')))
+            my_settings.screen.blit(acc_txt,(rs(1755),rs(8)))
             
             accuracy = 0
         
@@ -244,7 +272,7 @@ class Run :
             avg_fps /= len(fpss)
 
             fps_txt = fps_font.render(f'{round(avg_fps)}fps',False,(255,255,255)).convert()
-            my_settings.screen.blit(fps_txt,(rs(1810,'/'),rs(1025,'/')))
+            my_settings.screen.blit(fps_txt,(rs(1810),rs(1025)))
             
             avg_fps  = 0
             fps_time = get_time()
@@ -270,9 +298,11 @@ class Run :
             my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
 
             combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
-            my_settings.screen.blit(combo_txt,(rs(20,'/'),rs(960,'/')))
+            my_settings.screen.blit(combo_txt,(rs(20),rs(960)))\
 
-            health_bar = pygame.Rect(rs(20,'/'),rs(20,'/'),600*health/rs(600,'*'),rs(20,'/'))
+            health -= passive_health*160/fps
+
+            health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
             pygame.draw.rect(my_settings.screen,grey,health_bar_bg)
             pygame.draw.rect(my_settings.screen,white,health_bar)
 
@@ -288,7 +318,7 @@ class Run :
 
                         for v in range(len(show_circles)) :
 
-                            if acc_check == False :
+                            if acc_check == False and show_circles[v][11] == False :
 
                                 circle_rect = circle.get_rect()
                                 circle_rect.center = show_circles[v][4]
@@ -303,12 +333,15 @@ class Run :
 
                                         if difference < od/4 :
                                             acc.append(100)
+                                            health_bonus = 10
 
                                         if difference > od/4 and difference < od/2 :
                                             acc.append(33.33)
+                                            health_bonus = 3.33
                                         
                                         if difference > od/2 :
                                             acc.append(16.67)
+                                            health_bonus = 1.67
 
                                         if health + health_bonus < max_health :
                                             health += health_bonus
@@ -327,7 +360,8 @@ class Run :
                                             play(sounds,'miss',1)
                                         combo = 0
 
-                                    show_circles.pop(v)
+                                    show_circles[v][8] = True
+                                    show_circles[v][11] = True
 
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                     running = False
@@ -375,7 +409,7 @@ def menu() :
     pygame.mouse.set_visible(True)
 
     noir = load('images\\noir.png',(wi,he))
-    font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(rs(45,'/')))
+    font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(rs(45)))
 
     my_settings.screen.blit(noir,(0,0))
     
@@ -398,7 +432,7 @@ def menu() :
                 for ii in range(len(songs)) :
 
                     song = songs[ii][0]
-                    song = pygame.transform.scale(song,(wi/5,he/5))
+                    song = pygame.transform.scale(song,(wi/5,he/5)).convert()
 
                     song_rect   = song.get_rect()
                     song_rect.y = my_settings.height/5*ii

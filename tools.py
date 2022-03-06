@@ -9,7 +9,7 @@ my_settings = Settings()
 def load(name,size) :
 
     image = pygame.image.load(f'assets\\{name}').convert_alpha()
-    image = pygame.transform.scale(image,size)
+    image = pygame.transform.scale(image,size).convert_alpha()
 
     return image
 
@@ -85,13 +85,14 @@ def SongSelect() :
 
             diff_names.append(os.path.basename(os.path.splitext(u)[0]))
 
-        bg = glob.glob(f'{maps[i]}\\*.jpg')
-        bg = pygame.image.load(bg[0]).convert()
-        bg = pygame.transform.scale(bg,(my_settings.width,my_settings.height))
+        bgs = glob.glob(f'{maps[i]}\\*.jpg')
+        bg = pygame.image.load(bgs[0]).convert()
+        bg = pygame.transform.scale(bg,(my_settings.width,my_settings.height)).convert()
         
         songs.append([bg,audio,diffs,diff_names])
 
-        bg = pygame.transform.scale(bg,(my_settings.width/5,my_settings.height/5))
+        bg = pygame.image.load(bgs[1]).convert()
+        bg = pygame.transform.scale(bg,(my_settings.width/5,my_settings.height/5)).convert()
         my_settings.screen.blit(bg,(0,my_settings.height/5*i))
 
     return songs
@@ -138,9 +139,6 @@ def play(sounds,name,volume) :
     sounds[name].set_volume(volume)
     sounds[name].play()
 
-def rs(number,way):
-    if way == '/' :
-        number = number/1920*my_settings.width
-    elif way == '*' :
-        number = number*1920/my_settings.width
+def rs(number):
+    number = number/1920*my_settings.width
     return number
