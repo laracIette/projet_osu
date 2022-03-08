@@ -14,7 +14,7 @@ class Run :
         circles0,circles = [],[]
         show_circles     = []
 
-        cs_t,ar_t = [],[]
+        cs_t,ar_t,od_t,hp_t = [],[],[],[]
 
         a   = 0
         map = songs[ii][2][diff]
@@ -28,9 +28,9 @@ class Run :
                     continue
 
                 elif a == 1 :
-                    for q in i :
-                        if q != '\n' :
-                            cs_t.append(q)
+                    for o in i :
+                        if o != '\n' :
+                            cs_t.append(o)
 
                     cs = ''.join(cs_t)
                     cs = float(cs)
@@ -42,10 +42,27 @@ class Run :
 
                     ar = ''.join(ar_t)
                     ar = float(ar)
-                    ar = 450*10/ar
+                    ar_time = 450*10/ar
+
+                elif a == 3 :
+                    for o in i :
+                        if o != '\n' :
+                            od_t.append(o)
+
+                    od = ''.join(od_t)
+                    od = float(od)
+                    od_time = 100*10/od
+                
+                elif a == 4 :
+                    for o in i :
+                        if o != '\n' :
+                            hp_t.append(o)
+
+                    hp = ''.join(hp_t)
+                    hp = float(hp)
 
                 else :
-                    circles0.append(i)
+                    circles0.append(i)            
 
             cycle = 1
             for c in circles0[0] :
@@ -72,7 +89,7 @@ class Run :
         num     = 0
         circles = []
 
-        start_offset = 5*ar
+        start_offset = 2500-circles0[2]
 
         for i in range(int(len(circles0)/cycle)) :
             circles0[i*cycle+2] += start_offset
@@ -84,13 +101,12 @@ class Run :
 
             circles.append(tab)
             tab = []
-
-        od = 200
         
         pause_screen = load('images\\pause_screen.png',(wi,he))
         #dim         = load('images\\noir93.png',(wi,he))
         bg           = pygame.transform.scale(songs[ii][0],(wi,he)).convert()
-        noir = load('images\\noir.png',(wi,he))
+        noir         = load('images\\noir.png',(wi,he))
+        
         game_break = True
         break_lock = False
         
@@ -126,19 +142,42 @@ class Run :
         pause_time  = 0
         end_time    = inf
 
-        combo      = 0
-        combo_font = pygame.font.SysFont('segoeuisemibold',round(rs(90)))
+        cs_od_hp = cs + od + hp
+
+        if cs_od_hp < 6 :
+            difficulty_multiplier = 2
+        
+        elif cs_od_hp >= 6 and cs_od_hp < 13:
+            difficulty_multiplier = 3
+
+        elif cs_od_hp >= 13 and cs_od_hp < 18:
+            difficulty_multiplier = 4
+        
+        elif cs_od_hp >= 18 and cs_od_hp < 25:
+            difficulty_multiplier = 5
+
+        elif cs_od_hp >= 25 :
+            difficulty_multiplier = 6
+
+        mod_multiplier = 1
+        hit_value      = 0
+        score          = 0
+        combo          = 0
+        combo_font     = pygame.font.SysFont('segoeuisemibold',round(rs(90)))
 
         white = (255,255,255)
         grey  = (48,48,48)
 
         offset = 0
 
-        health         = 600
         max_health     = 600
-        health_minus   = 50
+        health         = max_health
+        health_minus   = 50*hp/6
         passive_health = health_minus/500
         health_bar_bg  = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
+
+        score_txt = combo_font.render('0',False,(255,255,255)).convert()
+        combo_txt = combo_font.render('0',False,(255,255,255)).convert()
 
         music_start = get_time() + start_offset
         playing     = False
@@ -160,7 +199,7 @@ class Run :
 
             if e < len(circles) :
 
-                if get_time() - paused_time  >=  start_time + circles[e][2] - ar :
+                if get_time() - paused_time  >=  start_time + circles[e][2] - ar_time :
 
                     create_time = get_time()
                     coor        = [circles[e][0]/512*wi*3/4*0.86+rs(360),circles[e][1]/384*he*0.86+rs(75)]
@@ -196,6 +235,7 @@ class Run :
 
                 if health <= 0 :
                     play(sounds,'fail',1)
+                    menu()
 
                 Score(accuracy)
                 
@@ -214,7 +254,7 @@ class Run :
                     
                     u[1] = get_time() - u[0]
 
-                    if u[1] >= ar and u[8] == False :
+                    if u[1] >= ar_time and u[8] == False :
                         u[8] = True
 
                     if u[2] < 4 :
@@ -245,7 +285,7 @@ class Run :
                     my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
                     my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+rs(2),u[4][1]-u[6].get_height()/2+rs(7)))
                 
-                    if u[1] >= ar + od :
+                    if u[1] >= ar_time + od_time :
                         show_circles.pop(0)
                         
                         if u[11] == False :
@@ -256,6 +296,8 @@ class Run :
                             if combo >= 20 :
                                 play(sounds,'miss',1)
                             combo = 0
+
+                            combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
             
             acc_check = False
 
@@ -266,9 +308,7 @@ class Run :
 
                 accuracy /= len(acc)
 
-            acc_txt = acc_font.render(f'{round(accuracy,2)}%',False,(255,255,255)).convert()
-            my_settings.screen.blit(acc_txt,(rs(1755),rs(8)))
-            
+            acc_txt  = acc_font.render(f'{round(accuracy,2)}%',False,(255,255,255)).convert()
             accuracy = 0
         
             fps = round(1000 / (get_time() - fps_time),2)
@@ -281,10 +321,7 @@ class Run :
                 avg_fps += i
 
             avg_fps /= len(fpss)
-
-            fps_txt = fps_font.render(f'{round(avg_fps)}fps',False,(255,255,255)).convert()
-            my_settings.screen.blit(fps_txt,(rs(1810),rs(1025)))
-            
+            fps_txt  = fps_font.render(f'{round(avg_fps)}fps',False,(255,255,255)).convert()
             avg_fps  = 0
             fps_time = get_time()
             
@@ -299,6 +336,17 @@ class Run :
             if len(trail_pos) > 8 :
                 trail_pos.pop(0)
             
+            health    -= passive_health*160/fps
+            health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
+
+            pygame.draw.rect(my_settings.screen,grey,health_bar_bg)
+            pygame.draw.rect(my_settings.screen,white,health_bar)
+
+            my_settings.screen.blit(combo_txt,(rs(20),rs(960)))            
+            my_settings.screen.blit(score_txt,(rs(1910)-score_txt.get_width(),rs(-20)))
+            my_settings.screen.blit(acc_txt,(rs(1910)-acc_txt.get_width(),rs(80)))
+            my_settings.screen.blit(fps_txt,(rs(1910)-fps_txt.get_width(),rs(1075)-fps_txt.get_height()))
+
             for t in trail_pos :
 
                 t[2] -= 7*160/fps
@@ -308,16 +356,6 @@ class Run :
 
             my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
 
-            combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
-            my_settings.screen.blit(combo_txt,(rs(20),rs(960)))\
-
-            health -= passive_health*160/fps
-
-            health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
-            pygame.draw.rect(my_settings.screen,grey,health_bar_bg)
-            pygame.draw.rect(my_settings.screen,white,health_bar)
-
-            pygame.mouse.set_visible(False)
             pygame.display.flip()
 
             key = pygame.key.get_pressed()
@@ -340,19 +378,19 @@ class Run :
 
                                     difference = abs(get_time() - (start_time + show_circles[v][5] + paused_time) + offset)
 
-                                    if difference < od :
+                                    if difference < od_time :
 
-                                        if difference < od/4 :
-                                            acc.append(100)
-                                            health_bonus = 10
+                                        if difference < od_time/4 :
+                                            hit_value = 300
 
-                                        if difference > od/4 and difference < od/2 :
-                                            acc.append(33.33)
-                                            health_bonus = 3.33
+                                        if difference > od_time/4 and difference < od_time/2 :
+                                            hit_value = 100
                                         
-                                        if difference > od/2 :
-                                            acc.append(16.67)
-                                            health_bonus = 1.67
+                                        if difference > od_time/2 :
+                                            hit_value = 50
+
+                                        acc.append(round(hit_value/3,2))
+                                        health_bonus = round(hit_value/30,2)
 
                                         if health + health_bonus < max_health :
                                             health += health_bonus
@@ -373,6 +411,16 @@ class Run :
 
                                     show_circles[v][8] = True
                                     show_circles[v][11] = True
+
+                                    if combo > 2 :
+                                        combo_multiplier = combo - 2
+                                    else :
+                                        combo_multiplier = 0
+
+                                    combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
+
+                                    score     += round(hit_value + (hit_value * ((combo_multiplier * difficulty_multiplier * mod_multiplier) / 25)))
+                                    score_txt  = combo_font.render(str(score),False,(255,255,255)).convert()
 
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                     running = False
@@ -402,6 +450,7 @@ class Run :
 
                                 paused_time += get_time() - pause_time
 
+                                pygame.mouse.set_visible(False)
                                 pygame.mixer.music.unpause()
 
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_q :
@@ -485,6 +534,7 @@ def menu() :
 
                                             play(sounds,'click',1)
 
+                                            pygame.mouse.set_visible(False)
                                             Run(ii,i,songs,skin,sounds)
 
                                 if event.type == pygame.KEYDOWN and event.key == pygame.K_s :

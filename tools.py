@@ -140,5 +140,4 @@ def play(sounds,name,volume) :
     sounds[name].play()
 
 def rs(number):
-    number = number/1920*my_settings.width
-    return number
+    return number/1920*my_settings.width
