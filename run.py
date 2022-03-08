@@ -6,6 +6,9 @@ from tools import load,SkinSelect,SongSelect,Score,get_time,import_sounds,play,r
 my_settings = Settings()
 wi = my_settings.width
 he = my_settings.height
+white = (255,255,255)
+grey  = (48,48,48)
+black = (0,0,0)
 
 class Run :
 
@@ -105,7 +108,7 @@ class Run :
         pause_screen = load('images\\pause_screen.png',(wi,he))
         #dim         = load('images\\noir93.png',(wi,he))
         bg           = pygame.transform.scale(songs[ii][0],(wi,he)).convert()
-        noir         = load('images\\noir.png',(wi,he))
+        noir         = pygame.Rect(0,0,wi,he)
         
         game_break = True
         break_lock = False
@@ -131,7 +134,6 @@ class Run :
         
         acc       = []
         acc_check = False
-        accuracy  = 0
         acc_font  = pygame.font.SysFont('segoeuisemibold',round(rs(45)))
 
         fade  = False
@@ -165,9 +167,6 @@ class Run :
         combo          = 0
         combo_font     = pygame.font.SysFont('segoeuisemibold',round(rs(90)))
 
-        white = (255,255,255)
-        grey  = (48,48,48)
-
         offset = 0
 
         max_health     = 600
@@ -176,11 +175,15 @@ class Run :
         passive_health = health_minus/500
         health_bar_bg  = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
 
-        score_txt = combo_font.render('0',False,(255,255,255)).convert()
-        combo_txt = combo_font.render('0',False,(255,255,255)).convert()
+        score_txt = combo_font.render('0',False,white).convert()
+        combo_txt = combo_font.render('0',False,white).convert()
+        acc_txt   = acc_font.render('100.00%',False,white).convert()
 
         music_start = get_time() + start_offset
         playing     = False
+
+        UI    = True
+        shift = False
 
         pygame.mixer.music.load(songs[ii][1])
         pygame.mixer.music.set_volume(1)
@@ -209,7 +212,7 @@ class Run :
                     else :
                         numbers += 1
 
-                    number = number_font.render(f'{numbers}',False,(255,255,255)).convert()
+                    number = number_font.render(f'{numbers}',False,white).convert()
 
                     show_circles.append([create_time,0,1,a_circle,coor,circles[e][2],number,circle,fade,1,acc_check,faded])
 
@@ -243,7 +246,7 @@ class Run :
                 menu()
             
             if game_break == False :
-                my_settings.screen.blit(noir,(0,0))
+                pygame.draw.rect(my_settings.screen,black,noir)
             else :
                 my_settings.screen.blit(bg,(0,0))
                 #my_settings.screen.blit(dim,(0,0))
@@ -290,27 +293,38 @@ class Run :
                         
                         if u[11] == False :
                             acc.append(0)
+                            acc_check = True
 
                             health -= health_minus
 
                             if combo >= 20 :
                                 play(sounds,'miss',1)
                             combo = 0
-
-                            combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
             
-            acc_check = False
+            if acc_check == True :
 
-            if len(acc) != 0 :
+                accuracy = 0
 
-                for w in acc :
-                    accuracy += w
+                if len(acc) != 0 :
 
-                accuracy /= len(acc)
+                    for w in acc :
+                        accuracy += w
 
-            acc_txt  = acc_font.render(f'{round(accuracy,2)}%',False,(255,255,255)).convert()
-            accuracy = 0
-        
+                    accuracy /= len(acc)
+
+                if combo > 2 :
+                    combo_multiplier = combo - 2
+                else :
+                    combo_multiplier = 0
+
+                score += round(hit_value + (hit_value * ((combo_multiplier * difficulty_multiplier * mod_multiplier) / 25)))
+                
+                acc_txt    = acc_font.render(f'{round(accuracy,2)}%',False,white).convert()
+                combo_txt  = combo_font.render(f'{combo}x',False,white).convert()
+                score_txt  = combo_font.render(str(score),False,white).convert()
+
+                acc_check = False
+            
             fps = round(1000 / (get_time() - fps_time),2)
 
             fpss.append(fps)
@@ -320,14 +334,14 @@ class Run :
             for i in fpss :
                 avg_fps += i
 
-            avg_fps /= len(fpss)
-            fps_txt  = fps_font.render(f'{round(avg_fps)}fps',False,(255,255,255)).convert()
-            avg_fps  = 0
             fps_time = get_time()
+            avg_fps /= len(fpss)
+            fps_txt  = fps_font.render(f'{round(avg_fps)}fps',False,white).convert()
+            avg_fps  = 0
             
             pos = pygame.mouse.get_pos()
 
-            trail_count += round(5000 / fps)
+            trail_count += round(5000/fps)
             if trail_count > 100 :
 
                 trail_pos.append([pos,cursor_trail,255])
@@ -338,14 +352,16 @@ class Run :
             
             health    -= passive_health*160/fps
             health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
+            
+            if UI == True :
 
-            pygame.draw.rect(my_settings.screen,grey,health_bar_bg)
-            pygame.draw.rect(my_settings.screen,white,health_bar)
+                pygame.draw.rect(my_settings.screen,grey,health_bar_bg)
+                pygame.draw.rect(my_settings.screen,white,health_bar)
 
-            my_settings.screen.blit(combo_txt,(rs(20),rs(960)))            
-            my_settings.screen.blit(score_txt,(rs(1910)-score_txt.get_width(),rs(-20)))
-            my_settings.screen.blit(acc_txt,(rs(1910)-acc_txt.get_width(),rs(80)))
-            my_settings.screen.blit(fps_txt,(rs(1910)-fps_txt.get_width(),rs(1075)-fps_txt.get_height()))
+                my_settings.screen.blit(combo_txt,(rs(20),rs(960)))
+                my_settings.screen.blit(score_txt,(rs(1910)-score_txt.get_width(),rs(-20)))
+                my_settings.screen.blit(acc_txt,(rs(1910)-acc_txt.get_width(),rs(80)))
+                my_settings.screen.blit(fps_txt,(rs(1910)-fps_txt.get_width(),rs(1075)-fps_txt.get_height()))
 
             for t in trail_pos :
 
@@ -412,15 +428,17 @@ class Run :
                                     show_circles[v][8] = True
                                     show_circles[v][11] = True
 
-                                    if combo > 2 :
-                                        combo_multiplier = combo - 2
-                                    else :
-                                        combo_multiplier = 0
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_LSHIFT :
+                    shift = True
+                if event.type == pygame.KEYUP and event.key == pygame.K_LSHIFT :
+                    shift = False
 
-                                    combo_txt = combo_font.render(f'{combo}x',False,(255,255,255)).convert()
-
-                                    score     += round(hit_value + (hit_value * ((combo_multiplier * difficulty_multiplier * mod_multiplier) / 25)))
-                                    score_txt  = combo_font.render(str(score),False,(255,255,255)).convert()
+                if shift == True :
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_TAB :
+                        if UI == True :
+                            UI = False
+                        else :
+                            UI = True
 
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                     running = False
@@ -468,10 +486,10 @@ def menu() :
 
     pygame.mouse.set_visible(True)
 
-    noir = load('images\\noir.png',(wi,he))
+    noir = pygame.Rect(0,0,wi,he)
     font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(rs(45)))
 
-    my_settings.screen.blit(noir,(0,0))
+    pygame.draw.rect(my_settings.screen,black,noir)
     
     skin   = 'whitecat'
     songs  = SongSelect()
@@ -505,7 +523,7 @@ def menu() :
                         diffs = songs[ii][3]
                         for i in range(len(diffs)) :
                     
-                            diff = font.render(diffs[i],False,(255,255,255)).convert()
+                            diff = font.render(diffs[i],False,white).convert()
                             my_settings.screen.blit(diff,(wi/5,he/20*i+he/5*ii))
                         
                         loop2 = True
@@ -523,7 +541,7 @@ def menu() :
                                     diffs = songs[ii][3]
                                     for i in range(len(diffs)) :
                                 
-                                        diff = font.render(diffs[i],False,(255,255,255)).convert()
+                                        diff = font.render(diffs[i],False,white).convert()
 
                                         diff_rect   = diff.get_rect()
                                         diff_rect.x = wi/5
@@ -540,7 +558,7 @@ def menu() :
                                 if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
                                     loop2 = False
 
-                                    my_settings.screen.blit(noir,(0,0))
+                                    pygame.draw.rect(my_settings.screen,black,noir)
 
                                     skin   = SkinSelect(font,skin,sounds)
                                     songs  = SongSelect()
@@ -561,7 +579,7 @@ def menu() :
             
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
 
-                my_settings.screen.blit(noir,(0,0))
+                pygame.draw.rect(my_settings.screen,black,noir)
 
                 skin   = SkinSelect(font,skin,sounds)
                 songs  = SongSelect()
