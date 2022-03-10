@@ -50,6 +50,7 @@ class Run :
 
                     ar = ''.join(ar_t)
                     ar = float(ar)
+
                     ar_time = 450*10/ar
 
                 elif a == 3 :
@@ -59,6 +60,7 @@ class Run :
 
                     od = ''.join(od_t)
                     od = float(od)
+
                     od_time = 100*10/od
                 
                 elif a == 4 :
@@ -110,6 +112,8 @@ class Run :
             circles.append(tab)
             tab = []
         
+        del circles0,tab,cs_t,ar_t,od_t,hp_t,num,cycle,a
+
         pause_screen = load('images\\pause_screen.png',(wi,he))
         #dim         = load('images\\noir93.png',(wi,he))
         bg           = pygame.transform.scale(songs[ii][0],(wi,he)).convert()
@@ -201,6 +205,7 @@ class Run :
 
         music_start = get_time() + start_offset
         playing     = False
+        waiting     = False
 
         pygame.mixer.music.load(songs[ii][1])
         pygame.mixer.music.set_volume(1)
@@ -211,58 +216,60 @@ class Run :
         running = True
         while running :
 
-            if get_time() - paused_time >= music_start and playing == False :
-            
-                pygame.mixer.music.play()
-                playing = True
-            
-            my_settings.clock.tick(my_settings.frequence)
+            if waiting == False :
 
-            if e < len(circles) :
+                if get_time() - paused_time >= music_start and playing == False :
+                
+                    pygame.mixer.music.play()
+                    playing = True
+                
+                my_settings.clock.tick(my_settings.frequence)
 
-                if get_time() - paused_time  >=  start_time + circles[e][2] - ar_time :
+                if e < len(circles) :
 
-                    create_time = get_time() - paused_time
-                    coor        = [round(circles[e][0]/512*wi*3/4*0.86+rs(360),2),round(circles[e][1]/384*he*0.86+rs(75),2)]
+                    if get_time() - paused_time  >=  start_time + circles[e][2] - ar_time :
 
-                    if circles[e][3] == 1 :
-                        numbers = 1
-                    else :
-                        numbers += 1
+                        create_time = get_time() - paused_time
+                        coor        = [round(circles[e][0]/512*wi*3/4*0.86+rs(360),2),round(circles[e][1]/384*he*0.86+rs(75),2)]
 
-                    number = number_font.render(f'{numbers}',False,white).convert()
+                        if circles[e][3] == 1 :
+                            numbers = 1
+                        else :
+                            numbers += 1
 
-                    show_circles.append([create_time,0,1,a_circle,coor,circles[e][2],number,circle,fade,1,acc_check,faded])
+                        number = number_font.render(f'{numbers}',False,white).convert()
+
+                        show_circles.append([create_time,0,1,a_circle,coor,circles[e][2],number,circle,fade,1,acc_check,faded])
+
+                        e += 1
+
+                elif e == len(circles) :
+
+                    end_time = get_time()
 
                     e += 1
 
-            elif e == len(circles) :
+                if get_time() >= music_start - start_offset/2.5 and break_lock == False :
+                    game_break = False
+                    break_lock = True
 
-                end_time = get_time()
+                if get_time() >= end_time + start_offset/2.5 :
+                    game_break = True
 
-                e += 1
+                if get_time() >= end_time + start_offset or health <= 0 :
+                    running = False
 
-            if get_time() >= music_start - start_offset/2.5 and break_lock == False :
-                game_break = False
-                break_lock = True
+                    pygame.mixer.music.pause()
 
-            if get_time() >= end_time + start_offset/2.5 :
-                game_break = True
+                    if health <= 0 :
+                        play(sounds,'fail',1)
+                        menu()
 
-            if get_time() >= end_time + start_offset or health <= 0 :
-                running = False
-
-                pygame.mixer.music.pause()
-
-                if health <= 0 :
-                    play(sounds,'fail',1)
+                    Score(accuracy)
+                    
+                    pygame.mixer.music.unpause()
                     menu()
-
-                Score(accuracy)
                 
-                pygame.mixer.music.unpause()
-                menu()
-            
             if game_break == False :
                 pygame.draw.rect(my_settings.screen,black,noir)
             else :
@@ -270,37 +277,38 @@ class Run :
                 #my_settings.screen.blit(dim,(0,0))
 
             for u in show_circles :
+
+                if waiting == False :
                 
-                u[1] = get_time() - u[0] - paused_time
+                    u[1] = get_time() - u[0] - paused_time
 
-                if u[1] >= ar_time and u[8] == False :
-                    u[8] = True
+                    if u[1] >= ar_time and u[8] == False :
+                        u[8] = True
 
-                if u[2] < 4 :
+                    if u[2] < 4 :
 
-                    a_c_width   = u[3].get_width()
-                    a_c_rescale = a_c_s*1/u[2]
-                    u[3]        = pygame.transform.scale(a_circle,(a_c_rescale,a_c_rescale))
-                
-                if u[8] == False :
+                        a_c_rescale = a_c_s*1/u[2]
+                        u[3]        = pygame.transform.scale(a_circle,(a_c_rescale,a_c_rescale))
+                    
+                    if u[8] == False :
 
-                    u[3].set_alpha(255*u[2]/2-255/2)
-                    u[7].set_alpha(255*u[2]-255)
-                    u[6].set_alpha(255*u[2]-255)
+                        u[3].set_alpha(255*u[2]/2-255/2)
+                        u[7].set_alpha(255*u[2]-255)
+                        u[6].set_alpha(255*u[2]-255)
 
-                    u[2] += 6/fps
-                    u[2]  = round(u[2],2)
-                
-                else :
+                        u[2] += 6/fps
+                        u[2]  = round(u[2],2)
+                    
+                    else :
 
-                    u[3].set_alpha(255*u[9])
-                    u[7].set_alpha(255*u[9])
-                    u[6].set_alpha(255*u[9])
+                        u[3].set_alpha(255*u[9])
+                        u[7].set_alpha(255*u[9])
+                        u[6].set_alpha(255*u[9])
 
-                    u[9] -= 6/fps
-                    u[9]  = round(u[9],2)
+                        u[9] -= 6/fps
+                        u[9]  = round(u[9],2)
 
-                my_settings.screen.blit(u[3],(u[4][0]-a_c_width/2,u[4][1]-a_c_width/2))
+                my_settings.screen.blit(u[3],(u[4][0]-u[3].get_width()/2,u[4][1]-u[3].get_width()/2))
                 my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
                 my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+rs(2),u[4][1]-u[6].get_height()/2+rs(7)))
             
@@ -358,26 +366,29 @@ class Run :
             fps_txt  = fps_font.render(f'{round(avg_fps)}fps',False,white).convert()
             avg_fps  = 0
             
-            pos = pygame.mouse.get_pos()
+            if waiting == False :
 
-            trail_count += round(5000/fps)
-            if trail_count > 100 :
+                pos = pygame.mouse.get_pos()
 
-                trail_pos.append([pos,cursor_trail,255])
-                trail_count = 0
-            
-            if len(trail_pos) > 8 :
-                trail_pos.pop(0)
-            
-            health    -= passive_health*160/fps
-            health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
+                trail_count += round(5000/fps)
+                if trail_count > 100 :
+
+                    trail_pos.append([pos,cursor_trail,255])
+                    trail_count = 0
+                
+                if len(trail_pos) > 8 :
+                    trail_pos.pop(0)
+                
+                health    -= passive_health*160/fps
+                health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
 
             if len(show_ur) > 20 :
                 show_ur.pop(0)
 
             for s in range(len(show_acc)) :
 
-                showed_time = get_time() - show_acc[s][2] - paused_time
+                showed_time = get_time() - show_acc[s][2]
+                print(showed_time)
 
                 if showed_time < 300 :
 
@@ -429,7 +440,6 @@ class Run :
                 ur_hit = pygame.Rect(961-rs(u[1]),rs(1039),rs(2),rs(30))
                 pygame.draw.rect(my_settings.screen,u[0],ur_hit)
 
-
             for s in show_acc :
                 my_settings.screen.blit(s[0],(s[1][0]-c_s/4,s[1][1]-c_s/2))
             
@@ -443,67 +453,90 @@ class Run :
 
                 my_settings.screen.blit(t[1],(t[0][0]-t_s/2,t[0][1]-t_s/2))
 
+            if waiting :
+
+                my_settings.screen.blit(cursor,(pos1[0]-c_s/2,pos1[1]-c_s/2))
+
             my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
 
             pygame.display.flip()
 
+            
             key = pygame.key.get_pressed()
             for event in pygame.event.get() :
 
-                if (event.type == pygame.KEYDOWN and event.key == pygame.K_x) or (event.type == pygame.KEYDOWN and event.key == pygame.K_v) :
+                if waiting == False :
 
-                    for v in range(len(show_circles)) :
+                    if (event.type == pygame.KEYDOWN and event.key == pygame.K_x) or (event.type == pygame.KEYDOWN and event.key == pygame.K_v) :
 
-                        if acc_check == False and show_circles[v][11] == False :
+                        for v in range(len(show_circles)) :
 
-                            distance    = math.hypot(show_circles[v][4][0]-pos[0],show_circles[v][4][1]-pos[1])
+                            if acc_check == False and show_circles[v][11] == False :
 
-                            if distance < c_s/2*115/121 :
+                                distance = math.hypot(show_circles[v][4][0]-pos[0],show_circles[v][4][1]-pos[1])
 
-                                acc_check = True
+                                if distance < c_s/2*115/121 :
 
-                                difference = abs(get_time() - (start_time + show_circles[v][5] + paused_time) + offset)
+                                    acc_check = True
 
-                                if difference < od_time :
+                                    difference = abs(get_time() - (start_time + show_circles[v][5] + paused_time) + offset)
 
-                                    if difference < od_time/4 :
-                                        hit_value = 300
-                                        show_ur.append([blue,278*difference/od_time/2])
+                                    if difference < od_time :
 
-                                    if difference > od_time/4 and difference < od_time/2 :
-                                        hit_value = 100
-                                        show_ur.append([green,278*difference/od_time/2])
-                                        show_acc.append([acc_100,show_circles[v][4],get_time(),0])
-                                    
-                                    if difference > od_time/2 :
-                                        hit_value = 50
-                                        show_ur.append([orange,278*difference/od_time/2])
-                                        show_acc.append([acc_50,show_circles[v][4],get_time(),0])
+                                        if difference < od_time/4 :
+                                            hit_value = 300
+                                            show_ur.append([blue,278*difference/od_time/2])
 
-                                    acc.append(round(hit_value/3,2))
-                                    health_bonus = round(hit_value/30,2)
+                                        if difference > od_time/4 and difference < od_time/2 :
+                                            hit_value = 100
+                                            show_ur.append([green,278*difference/od_time/2])
+                                            show_acc.append([acc_100,show_circles[v][4],get_time(),0])
+                                        
+                                        if difference > od_time/2 :
+                                            hit_value = 50
+                                            show_ur.append([orange,278*difference/od_time/2])
+                                            show_acc.append([acc_50,show_circles[v][4],get_time(),0])
 
-                                    if health + health_bonus < max_health :
-                                        health += health_bonus
+                                        acc.append(round(hit_value/3,2))
+                                        health_bonus = round(hit_value/30,2)
+
+                                        if health + health_bonus < max_health :
+                                            health += health_bonus
+                                        else :
+                                            health = max_health
+
+                                        play(sounds,'hit',0.5)
+                                        combo += 1
+
                                     else :
-                                        health = max_health
 
-                                    play(sounds,'hit',0.5)
-                                    combo += 1
+                                        acc.append(0)
+                                        show_acc.append([acc_miss,show_circles[v][4],get_time(),0])
 
-                                else :
+                                        health -= health_minus
 
-                                    acc.append(0)
-                                    show_acc.append([acc_miss,show_circles[v][4],get_time(),0])
+                                        if combo >= 20 :
+                                            play(sounds,'miss',1)
+                                        combo = 0
 
-                                    health -= health_minus
+                                    show_circles[v][8]  = True
+                                    show_circles[v][11] = True
 
-                                    if combo >= 20 :
-                                        play(sounds,'miss',1)
-                                    combo = 0
+                else :
 
-                                show_circles[v][8]  = True
-                                show_circles[v][11] = True
+                    pos1 = pygame.mouse.get_pos()
+
+                    if (event.type == pygame.KEYDOWN and event.key == pygame.K_x) or (event.type == pygame.KEYDOWN and event.key == pygame.K_v) :
+                        
+                        distance1 = math.hypot(pos1[0]-pos[0],pos1[1]-pos[1])
+
+                        if distance1 < 5 :
+
+                            waiting = False
+
+                            pygame.mixer.music.unpause()
+
+                            paused_time += get_time() - pause_time
 
                 if  (event.type == pygame.KEYDOWN and event.key == pygame.K_TAB and key[pygame.K_LSHIFT]) or\
                     (event.type == pygame.KEYDOWN and event.key == pygame.K_LSHIFT and key[pygame.K_TAB]) :
@@ -547,14 +580,17 @@ class Run :
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
                                 loop    = False
                                 running = True
-                                                                    
-                                paused_time += get_time() - pause_time
+                                waiting = True
+
+                                pos1 = pygame.mouse.get_pos()
 
                                 pygame.mouse.set_visible(False)
-                                pygame.mixer.music.unpause()
+                                fps_time    += get_time() - pause_time
+                                print(fps_time)
+
 
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_q :
-                                loop = False
+                                loop  = False
 
                                 menu()
 
