@@ -135,8 +135,8 @@ def import_sounds(skin) :
     }
     return sounds
 
-def play(sounds,name,volume) :
-    sounds[name].set_volume(volume)
+def play(sounds,name,volume,percentage) :
+    sounds[name].set_volume(volume*percentage/100)
     sounds[name].play()
 
 def rs(number):

@@ -17,7 +17,7 @@ blue   = (50,188,231)
 
 class Run :
 
-    def __init__(self,ii,diff,songs,skin,sounds) :
+    def __init__(self,ii,diff,songs,skin,sounds,volume) :
 
         circles0,circles = [],[]
         show_circles     = []
@@ -26,9 +26,9 @@ class Run :
 
         a   = 0
         map = songs[ii][2][diff]
-        with open(map,'r') as file :
+        with open(map,'r') as map_file :
 
-            for i in file :
+            for i in map_file :
 
                 a += 1
 
@@ -112,6 +112,26 @@ class Run :
             circles.append(tab)
             tab = []
         
+        with open('assets\\settings.txt','r') as settings_file :
+
+            a = 0
+
+            lines = settings_file.readlines()
+            for i in lines :
+                
+                if a == 0 :
+
+                    offset = int(i)
+
+                a += 1
+
+        if offset != 0 :
+            show_offset = True
+        else :
+            show_offset = False
+
+        offset_time = get_time()
+
         del circles0,tab,cs_t,ar_t,od_t,hp_t,num,cycle,a
 
         pause_screen = load('images\\pause_screen.png',(wi,he))
@@ -181,12 +201,6 @@ class Run :
         combo          = 0
         combo_font     = pygame.font.SysFont('segoeuisemibold',round(rs(90)))
 
-        offset = 0
-        if offset != 0 :
-            show_offset = True
-        else :
-            show_offset = False
-
         max_health     = 600
         health         = max_health
         health_minus   = 50*hp/6
@@ -208,13 +222,15 @@ class Run :
         waiting     = False
 
         pygame.mixer.music.load(songs[ii][1])
-        pygame.mixer.music.set_volume(1)
+        pygame.mixer.music.set_volume(volume)
 
         e  = 0
         UI = True
 
         running = True
         while running :
+
+            my_settings.clock.tick(my_settings.frequence)
 
             if waiting == False :
 
@@ -223,8 +239,6 @@ class Run :
                     pygame.mixer.music.play()
                     playing = True
                 
-                my_settings.clock.tick(my_settings.frequence)
-
                 if e < len(circles) :
 
                     if get_time() - paused_time  >=  start_time + circles[e][2] - ar_time :
@@ -261,8 +275,16 @@ class Run :
 
                     pygame.mixer.music.pause()
 
+                    with open('assets\\settings.txt','w') as settings_file :
+                        
+                        modifs = [offset,volume]
+
+                        for a in range(len(lines)) :
+
+                            settings_file.write(lines[a].replace(lines[a],str(modifs[a])))
+
                     if health <= 0 :
-                        play(sounds,'fail',1)
+                        play(sounds,'fail',1,volume)
                         menu()
 
                     Score(accuracy)
@@ -325,7 +347,7 @@ class Run :
                         health -= health_minus
 
                         if combo >= 20 :
-                            play(sounds,'miss',1)
+                            play(sounds,'miss',1,volume)
                         combo = 0
             
             if acc_check :
@@ -388,7 +410,6 @@ class Run :
             for s in range(len(show_acc)) :
 
                 showed_time = get_time() - show_acc[s][2]
-                print(showed_time)
 
                 if showed_time < 300 :
 
@@ -448,19 +469,20 @@ class Run :
 
             for t in trail_pos :
 
-                t[2] -= 7*160/fps
+                if waiting == False :
+
+                    t[2] -= 7*160/fps
                 t[1].set_alpha(t[2])
 
                 my_settings.screen.blit(t[1],(t[0][0]-t_s/2,t[0][1]-t_s/2))
+
+            my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
 
             if waiting :
 
                 my_settings.screen.blit(cursor,(pos1[0]-c_s/2,pos1[1]-c_s/2))
 
-            my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
-
             pygame.display.flip()
-
             
             key = pygame.key.get_pressed()
             for event in pygame.event.get() :
@@ -505,7 +527,7 @@ class Run :
                                         else :
                                             health = max_health
 
-                                        play(sounds,'hit',0.5)
+                                        play(sounds,'hit',0.5,volume)
                                         combo += 1
 
                                     else :
@@ -516,7 +538,7 @@ class Run :
                                         health -= health_minus
 
                                         if combo >= 20 :
-                                            play(sounds,'miss',1)
+                                            play(sounds,'miss',1,volume)
                                         combo = 0
 
                                     show_circles[v][8]  = True
@@ -535,9 +557,9 @@ class Run :
                             waiting = False
 
                             pygame.mixer.music.unpause()
-
+                                                        
                             paused_time += get_time() - pause_time
-
+                        
                 if  (event.type == pygame.KEYDOWN and event.key == pygame.K_TAB and key[pygame.K_LSHIFT]) or\
                     (event.type == pygame.KEYDOWN and event.key == pygame.K_LSHIFT and key[pygame.K_TAB]) :
                     if UI :
@@ -558,11 +580,22 @@ class Run :
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                     running = False
 
+                    with open('assets\\settings.txt','w') as settings_file :
+
+                        modifs = [offset,volume]
+
+                        for a in range(len(lines)) :
+
+                            settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
+
                     pygame.quit()
                     exit()
 
                 if (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) :
                     running = False
+                    
+                    if waiting :
+                        paused_time += get_time() - pause_time
 
                     pause_time = get_time()
 
@@ -571,6 +604,14 @@ class Run :
 
                     my_settings.screen.blit(pause_screen,(0,0))
                     pygame.display.flip()
+                    
+                    with open('assets\\settings.txt','w') as settings_file :
+
+                        modifs = [offset,volume]
+
+                        for a in range(len(lines)) :
+
+                            settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
 
                     loop = True
                     while loop :
@@ -582,12 +623,9 @@ class Run :
                                 running = True
                                 waiting = True
 
-                                pos1 = pygame.mouse.get_pos()
-
                                 pygame.mouse.set_visible(False)
-                                fps_time    += get_time() - pause_time
-                                print(fps_time)
 
+                                fps_time += get_time() - pause_time
 
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_q :
                                 loop  = False
@@ -613,88 +651,138 @@ def menu() :
     songs  = SongSelect()
     sounds = import_sounds(skin)
 
+    with open('assets\\settings.txt','r') as settings_file :
+
+            a = 0
+
+            lines = settings_file.readlines()
+            for i in lines :
+                
+                if a == 1 :
+
+                    volume = int(i)
+
+                a += 1
+
+    show_volume = False
+    volume_font = pygame.font.SysFont('arial',round(rs(30)))
+    volume_txt  = volume_font.render(f'{volume}%',False,white).convert()
+    volume_noir = pygame.Rect(wi-volume_txt.get_width(),he-volume_txt.get_height(),volume_txt.get_width(),volume_txt.get_height())
+    volume_time = get_time()
+
     loop = True
     while loop :
 
         my_settings.clock.tick(my_settings.frequence)
+
+        if show_volume :
+            
+            pygame.draw.rect(my_settings.screen,black,volume_noir)
+
+            if get_time() >= volume_time + 1000 :
+                show_volume = False
+                continue
+
+            my_settings.screen.blit(volume_txt,(wi-volume_txt.get_width(),he-volume_txt.get_height()))
+
         pygame.display.flip()
 
         key = pygame.key.get_pressed()
         for event in pygame.event.get() :
 
             if event.type == pygame.MOUSEBUTTONDOWN :
-                pos = pygame.mouse.get_pos()
 
-                for ii in range(len(songs)) :
+                if event.button == pygame.BUTTON_LEFT :
 
-                    song = songs[ii][0]
-                    song = pygame.transform.scale(song,(wi/5,he/5)).convert()
+                    pos = pygame.mouse.get_pos()
 
-                    song_rect   = song.get_rect()
-                    song_rect.y = my_settings.height/5*ii
+                    for ii in range(len(songs)) :
 
-                    if song_rect.collidepoint(pos) :
-                        loop = False
+                        song = songs[ii][0]
+                        song = pygame.transform.scale(song,(wi/5,he/5)).convert()
 
-                        play(sounds,'click',1)
+                        song_rect   = song.get_rect()
+                        song_rect.y = my_settings.height/5*ii
 
-                        diffs = songs[ii][3]
-                        for i in range(len(diffs)) :
-                    
-                            diff = font.render(diffs[i],False,white).convert()
-                            my_settings.screen.blit(diff,(wi/5,he/20*i+he/5*ii))
+                        if song_rect.collidepoint(pos) :
+                            loop = False
+
+                            play(sounds,'click',1,volume)
+
+                            diffs = songs[ii][3]
+                            for i in range(len(diffs)) :
                         
-                        loop2 = True
-                        while loop2 :
+                                diff = font.render(diffs[i],False,white).convert()
+                                my_settings.screen.blit(diff,(wi/5,he/20*i+he/5*ii))
                             
-                            my_settings.clock.tick(my_settings.frequence)
-                            pygame.display.flip()
-                            
-                            key = pygame.key.get_pressed()
-                            for event in pygame.event.get() :
-
-                                if event.type == pygame.MOUSEBUTTONDOWN :
-                                    pos = pygame.mouse.get_pos()
+                            loop2 = True
+                            while loop2 :
                                 
-                                    diffs = songs[ii][3]
-                                    for i in range(len(diffs)) :
+                                my_settings.clock.tick(my_settings.frequence)
+                                pygame.display.flip()
                                 
-                                        diff = font.render(diffs[i],False,white).convert()
+                                key = pygame.key.get_pressed()
+                                for event in pygame.event.get() :
 
-                                        diff_rect   = diff.get_rect()
-                                        diff_rect.x = wi/5
-                                        diff_rect.y = he/20*i+he/5*ii
-
-                                        if diff_rect.collidepoint(pos) :
-                                            loop2 = False
-
-                                            play(sounds,'click',1)
-
-                                            pygame.mouse.set_visible(False)
-                                            Run(ii,i,songs,skin,sounds)
-
-                                if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
-                                    loop2 = False
-
-                                    pygame.draw.rect(my_settings.screen,black,noir)
-
-                                    skin   = SkinSelect(font,skin,sounds)
-                                    songs  = SongSelect()
-                                    sounds = import_sounds(skin)
-
-                                    loop = True
-
-                                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
-                                    loop2 = False
+                                    if event.type == pygame.MOUSEBUTTONDOWN :
+                                        pos = pygame.mouse.get_pos()
                                     
-                                    menu()
+                                        for i in range(len(diffs)) :
+                                    
+                                            diff = font.render(diffs[i],False,white).convert()
 
-                                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
-                                    loop2 = False
+                                            diff_rect   = diff.get_rect()
+                                            diff_rect.x = wi/5
+                                            diff_rect.y = he/20*i+he/5*ii
 
-                                    pygame.quit()
-                                    exit()
-            
+                                            if diff_rect.collidepoint(pos) :
+                                                loop2 = False
+
+                                                play(sounds,'click',1,volume)
+
+                                                pygame.mouse.set_visible(False)
+                                                Run(ii,i,songs,skin,sounds,volume)
+
+                                    if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
+                                        loop2 = False
+
+                                        pygame.draw.rect(my_settings.screen,black,noir)
+
+                                        skin   = SkinSelect(font,skin,sounds)
+                                        songs  = SongSelect()
+                                        sounds = import_sounds(skin)
+
+                                        loop = True
+
+                                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
+                                        loop2 = False
+                                        
+                                        menu()
+
+                                    if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
+                                        loop2 = False
+
+                                        pygame.quit()
+                                        exit()
+
+                if event.button == 4 or event.button == 5 :
+                    
+                    if event.button == 4 :
+
+                        if volume < 100:
+
+                            volume     += 1
+                
+                    if event.button == 5 :
+
+                        if volume > 0 :
+
+                            volume     -= 1
+
+                    show_volume = True
+                    volume_txt  = volume_font.render(f'{volume}%',False,white).convert()
+                    volume_time = get_time()
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
 
                 pygame.draw.rect(my_settings.screen,black,noir)
@@ -702,7 +790,7 @@ def menu() :
                 skin   = SkinSelect(font,skin,sounds)
                 songs  = SongSelect()
                 sounds = import_sounds(skin)
-
+                
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                 loop = False
 
