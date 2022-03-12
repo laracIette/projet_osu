@@ -17,7 +17,7 @@ blue   = (50,188,231)
 
 class Run :
 
-    def __init__(self,ii,diff,songs,skin,sounds,volume) :
+    def __init__(self,ii,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines) :
 
         circles0,circles = [],[]
         show_circles     = []
@@ -111,19 +111,6 @@ class Run :
 
             circles.append(tab)
             tab = []
-        
-        with open('assets\\settings.txt','r') as settings_file :
-
-            a = 0
-
-            lines = settings_file.readlines()
-            for i in lines :
-                
-                if a == 0 :
-
-                    offset = int(i)
-
-                a += 1
 
         if offset != 0 :
             show_offset = True
@@ -222,7 +209,7 @@ class Run :
         waiting     = False
 
         pygame.mixer.music.load(songs[ii][1])
-        pygame.mixer.music.set_volume(volume)
+        pygame.mixer.music.set_volume(volume*volume_music/100)
 
         e  = 0
         UI = True
@@ -277,14 +264,14 @@ class Run :
 
                     with open('assets\\settings.txt','w') as settings_file :
                         
-                        modifs = [offset,volume]
+                        modifs = [offset,volume,volume_music,volume_effects]
 
                         for a in range(len(lines)) :
 
                             settings_file.write(lines[a].replace(lines[a],str(modifs[a])))
 
                     if health <= 0 :
-                        play(sounds,'fail',1,volume)
+                        play(sounds,'fail',1,volume,volume_effects)
                         menu()
 
                     Score(accuracy)
@@ -347,7 +334,7 @@ class Run :
                         health -= health_minus
 
                         if combo >= 20 :
-                            play(sounds,'miss',1,volume)
+                            play(sounds,'miss',1,volume,volume_effects)
                         combo = 0
             
             if acc_check :
@@ -527,7 +514,7 @@ class Run :
                                         else :
                                             health = max_health
 
-                                        play(sounds,'hit',0.5,volume)
+                                        play(sounds,'hit',0.5,volume,volume_effects)
                                         combo += 1
 
                                     else :
@@ -538,7 +525,7 @@ class Run :
                                         health -= health_minus
 
                                         if combo >= 20 :
-                                            play(sounds,'miss',1,volume)
+                                            play(sounds,'miss',1,volume,volume_effects)
                                         combo = 0
 
                                     show_circles[v][8]  = True
@@ -582,7 +569,7 @@ class Run :
 
                     with open('assets\\settings.txt','w') as settings_file :
 
-                        modifs = [offset,volume]
+                        modifs = [offset,volume,volume_music,volume_effects]
 
                         for a in range(len(lines)) :
 
@@ -607,7 +594,7 @@ class Run :
                     
                     with open('assets\\settings.txt','w') as settings_file :
 
-                        modifs = [offset,volume]
+                        modifs = [offset,volume,volume_music,volume_effects]
 
                         for a in range(len(lines)) :
 
@@ -657,17 +644,44 @@ def menu() :
 
             lines = settings_file.readlines()
             for i in lines :
+
+                if a == 0 :
+
+                    offset = int(i)
                 
                 if a == 1 :
 
                     volume = int(i)
+                
+                if a == 2 :
+
+                    volume_music = int(i)
+
+                if a == 3 :
+
+                    volume_effects = int(i)
 
                 a += 1
 
-    show_volume = False
-    volume_font = pygame.font.SysFont('arial',round(rs(30)))
-    volume_txt  = volume_font.render(f'{volume}%',False,white).convert()
-    volume_noir = pygame.Rect(wi-volume_txt.get_width(),he-volume_txt.get_height(),volume_txt.get_width(),volume_txt.get_height())
+    show_volume = True
+
+    volume_font = pygame.font.SysFont('arial',round(rs(60)))
+    music_font  = pygame.font.SysFont('arial',round(rs(40)))
+
+    volume_txt    = volume_font.render(f'main : {volume}%',False,white).convert()
+    volume_rect   = volume_txt.get_rect()
+    volume_rect.y = he-2*volume_txt.get_height()-rs(15)
+
+    music_txt    = music_font.render(f'music : {volume_music}%',False,white).convert()
+    music_rect   = music_txt.get_rect()
+    music_rect.y = he-2*music_txt.get_height()
+
+    effects_txt    = music_font.render(f'effects : {volume_effects}%',False,white).convert()
+    effects_rect   = effects_txt.get_rect()
+    effects_rect.y = he-effects_txt.get_height()
+
+    volume_noir = pygame.Rect(wi/3*2,he/3*2,wi/3,he/3)
+    
     volume_time = get_time()
 
     loop = True
@@ -683,18 +697,24 @@ def menu() :
                 show_volume = False
                 continue
 
-            my_settings.screen.blit(volume_txt,(wi-volume_txt.get_width(),he-volume_txt.get_height()))
+            volume_rect.x = wi-volume_txt.get_width()
+            music_rect.x = wi-music_txt.get_width()
+            effects_rect.x = wi-effects_txt.get_width()
+
+            my_settings.screen.blit(volume_txt,(volume_rect.x,volume_rect.y))
+            my_settings.screen.blit(music_txt,(music_rect.x,music_rect.y))
+            my_settings.screen.blit(effects_txt,(effects_rect.x,effects_rect.y))
 
         pygame.display.flip()
 
         key = pygame.key.get_pressed()
         for event in pygame.event.get() :
 
+            pos = pygame.mouse.get_pos()
+
             if event.type == pygame.MOUSEBUTTONDOWN :
 
                 if event.button == pygame.BUTTON_LEFT :
-
-                    pos = pygame.mouse.get_pos()
 
                     for ii in range(len(songs)) :
 
@@ -707,7 +727,7 @@ def menu() :
                         if song_rect.collidepoint(pos) :
                             loop = False
 
-                            play(sounds,'click',1,volume)
+                            play(sounds,'click',1,volume,volume_effects)
 
                             diffs = songs[ii][3]
                             for i in range(len(diffs)) :
@@ -738,17 +758,17 @@ def menu() :
                                             if diff_rect.collidepoint(pos) :
                                                 loop2 = False
 
-                                                play(sounds,'click',1,volume)
+                                                play(sounds,'click',1,volume,volume_effects)
 
                                                 pygame.mouse.set_visible(False)
-                                                Run(ii,i,songs,skin,sounds,volume)
+                                                Run(ii,i,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines)
 
                                     if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
                                         loop2 = False
 
                                         pygame.draw.rect(my_settings.screen,black,noir)
 
-                                        skin   = SkinSelect(font,skin,sounds)
+                                        skin   = SkinSelect(font,skin,sounds,volume,volume_effects)
                                         songs  = SongSelect()
                                         sounds = import_sounds(skin)
 
@@ -756,6 +776,14 @@ def menu() :
 
                                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
                                         loop2 = False
+
+                                        with open('assets\\settings.txt','w') as settings_file :
+                                            
+                                            modifs = [offset,volume,volume_music,volume_effects]
+
+                                            for a in range(len(lines)) :
+
+                                                settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
                                         
                                         menu()
 
@@ -766,28 +794,43 @@ def menu() :
                                         exit()
 
                 if event.button == 4 or event.button == 5 :
-                    
-                    if event.button == 4 :
 
-                        if volume < 100:
+                    rects   = [volume_rect,music_rect,effects_rect]
+                    volumes = [volume,volume_music,volume_effects]
 
-                            volume     += 1
+                    for i in range(len(rects)) :
+
+                        if rects[i].collidepoint(pos) :
+                        
+                            if event.button == 4 :
+
+                                if volumes[i] < 100 :
+
+                                    volumes[i] += 1
                 
-                    if event.button == 5 :
+                            if event.button == 5 :
 
-                        if volume > 0 :
+                                if volumes[i] > 0 :
 
-                            volume     -= 1
+                                    volumes[i] -= 1
 
                     show_volume = True
-                    volume_txt  = volume_font.render(f'{volume}%',False,white).convert()
+
+                    volume         = volumes[0]
+                    volume_music   = volumes[1]
+                    volume_effects = volumes[2]
+
+                    volume_txt  = volume_font.render(f'main : {volume}%',False,white).convert()
+                    music_txt   = music_font.render(f'music : {volume_music}%',False,white).convert()
+                    effects_txt = music_font.render(f'effects : {volume_effects}%',False,white).convert()
+                    
                     volume_time = get_time()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
 
                 pygame.draw.rect(my_settings.screen,black,noir)
 
-                skin   = SkinSelect(font,skin,sounds)
+                skin   = SkinSelect(font,skin,sounds,volume,volume_effects)
                 songs  = SongSelect()
                 sounds = import_sounds(skin)
                 

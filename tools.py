@@ -13,7 +13,7 @@ def load(name,size) :
 
     return image
 
-def SkinSelect(font,skin,sounds) :
+def SkinSelect(font,skin,sounds,volume,volume_effects) :
 
     skins0 = []
     skins  = glob.glob('assets\\skins\\*')
@@ -49,7 +49,7 @@ def SkinSelect(font,skin,sounds) :
                     if skin1_rect.collidepoint(pos) :
                         loop = False
 
-                        play(sounds,'click',1)
+                        play(sounds,'click',1,volume,volume_effects)
                         
                         skin = skins0[w]
 
@@ -135,8 +135,8 @@ def import_sounds(skin) :
     }
     return sounds
 
-def play(sounds,name,volume,percentage) :
-    sounds[name].set_volume(volume*percentage/100)
+def play(sounds,name,volume,percentage,type) :
+    sounds[name].set_volume(volume*percentage/100*type/100)
     sounds[name].play()
 
 def rs(number):
