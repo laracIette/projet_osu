@@ -263,12 +263,12 @@ class Run :
                     pygame.mixer.music.pause()
 
                     with open('assets\\settings.txt','w') as settings_file :
-                        
+
                         modifs = [offset,volume,volume_music,volume_effects]
 
                         for a in range(len(lines)) :
 
-                            settings_file.write(lines[a].replace(lines[a],str(modifs[a])))
+                            settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
 
                     if health <= 0 :
                         play(sounds,'fail',1,volume,volume_effects)
@@ -662,7 +662,6 @@ def menu() :
                     volume_effects = int(i)
 
                 a += 1
-
                 
     volumes = [volume,volume_music,volume_effects]
 
