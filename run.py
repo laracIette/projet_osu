@@ -663,6 +663,9 @@ def menu() :
 
                 a += 1
 
+                
+    volumes = [volume,volume_music,volume_effects]
+
     show_volume = True
 
     volume_font = pygame.font.SysFont('arial',round(rs(60)))
@@ -790,13 +793,20 @@ def menu() :
                                     if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                                         loop2 = False
 
+                                        with open('assets\\settings.txt','w') as settings_file :
+                                            
+                                            modifs = [offset,volume,volume_music,volume_effects]
+
+                                            for a in range(len(lines)) :
+
+                                                settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
+
                                         pygame.quit()
                                         exit()
 
                 if event.button == 4 or event.button == 5 :
 
                     rects   = [volume_rect,music_rect,effects_rect]
-                    volumes = [volume,volume_music,volume_effects]
 
                     for i in range(len(rects)) :
 
@@ -836,6 +846,14 @@ def menu() :
                 
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                 loop = False
+
+                with open('assets\\settings.txt','w') as settings_file :
+                                            
+                    modifs = [offset,volume,volume_music,volume_effects]
+
+                    for a in range(len(lines)) :
+
+                        settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
 
                 pygame.quit()
                 exit()
