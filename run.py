@@ -89,7 +89,7 @@ class Run :
                         circles0.append(i)
 
                 else :
-                    spinners0.append(i)
+                    spinners.append(i)
 
         cycle = 1
         for c in circles0[0] :
@@ -107,19 +107,6 @@ class Run :
                 else :
                     tab = ''.join(tab)
                     circles.append(tab)
-                    tab = []
-
-        for j in spinners0 :
-
-            for k in j :
-
-                if k != ',' and k != '\n' and k != '-' and k != '1' :
-                    tab.append(k)
-
-                else :
-                    if tab != [] :
-                        tab = ''.join(tab)
-                        spinners.append(tab)
                     tab = []
 
         circles0 = []
@@ -141,6 +128,31 @@ class Run :
 
             circles.append(tab)
             tab = []
+        
+        for j in spinners :
+
+            for k in j :
+
+                if k != ',' and k != '\n' and k != '-' and k != '1' :
+                    tab.append(k)
+
+                else :
+                    if tab != [] :
+                        tab = ''.join(tab)
+                        spinners0.append(tab)
+                    tab = []
+        
+        for r in range(len(spinners0)) :
+            spinners0[r]  = int(spinners0[r])
+            spinners0[r] += start_offset
+
+        spinners = []
+        h        = 0
+        for r in range(int(len(spinners0)/2)) :
+
+            spinners.append([spinners0[h],spinners0[h+1]])
+            
+            h += 2
 
         if offset != 0 :
             show_offset = True
@@ -149,7 +161,7 @@ class Run :
 
         offset_time = get_time()
 
-        del circles0,spinners0,tab,cs_t,ar_t,od_t,hp_t,num,cycle,a
+        del circles0,spinners0,tab,cs_t,ar_t,od_t,hp_t,num,cycle,a,h
 
         pause_screen = load('images\\pause_screen.png',(wi,he))
         #dim         = load('images\\noir93.png',(wi,he))
@@ -171,7 +183,7 @@ class Run :
         trail_pos    = []
         trail_count  = 0
 
-        spinner      = load(f'skins\\{skin}\\spinner.png',(rs(300),rs(300)))
+        spinner      = load(f'skins\\{skin}\\spinner.png',(rs(400),rs(400)))
         spin         = 0
         show_spinner = False
         spin_tot     = 0
@@ -235,6 +247,7 @@ class Run :
         health         = max_health
         health_minus   = 50*hp/6
         passive_health = health_minus/500
+        spin_health    = max_health/200
         health_bar_bg  = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
 
         ur_50     = pygame.Rect(rs(821),rs(1050),rs(278),rs(8))
@@ -272,11 +285,11 @@ class Run :
 
                 if q < len(spinners) :
 
-                    if get_time() - paused_time  >=  start_time + int(spinners[q]) - ar_time :
+                    if get_time() - paused_time  >=  start_time + spinners[q][0] - ar_time :
                         
-                        show_spinners.append([get_time()-paused_time,0])
+                        show_spinners.append([get_time()-paused_time,0,spinners[q][1]-spinners[q][0]])
                         show_spinner = True
-
+                        
                         q += 1
                 
                 if e < len(circles) :
@@ -369,9 +382,14 @@ class Run :
                         u[9] -= 6/fps
                         u[9]  = round(u[9],2)
 
-                my_settings.screen.blit(u[3],(u[4][0]-u[3].get_width()/2,u[4][1]-u[3].get_width()/2))
-                my_settings.screen.blit(u[7],(u[4][0]-c_s/2,u[4][1]-c_s/2))
-                my_settings.screen.blit(u[6],(u[4][0]-u[6].get_width()/2+rs(2),u[4][1]-u[6].get_height()/2+rs(7)))
+                center_rect = (u[4][0],u[4][1])
+                a_c_rect    = u[3].get_rect(center = center_rect)
+                circle_rect = u[7].get_rect(center = center_rect)
+                number_rect = u[6].get_rect(center = center_rect)
+
+                my_settings.screen.blit(u[3],a_c_rect)
+                my_settings.screen.blit(u[7],circle_rect)
+                my_settings.screen.blit(u[6],(number_rect[0]+rs(1),number_rect[1]+rs(8)))
             
                 if u[1] >= ar_time + od_time :
                     show_circles.pop(0)
@@ -483,7 +501,7 @@ class Run :
                 for p in show_spinners :
 
                     p[1] = get_time() - p[0] - paused_time
-                    if p[1] >= 10000 :
+                    if p[1] >= p[2] :
                         show_spinners.pop(0)
                         show_spinner = False
 
@@ -500,6 +518,13 @@ class Run :
                     if abs(spin - spin_tot2) > 66 :
                         spin_tot2 = spin
                         score    += 10
+
+                        if health < max_health - spin_health :
+                            health += spin_health
+                        else :
+                            health = max_health
+                        
+                        play(sounds,'spinnerspin',0.5,volume,volume_effects)
                         
                     if abs(spin - spin_tot) > 330 :
                         spin_tot = spin
@@ -547,15 +572,20 @@ class Run :
                     t[2] -= 7*160/fps
                 t[1].set_alpha(t[2])
 
-                my_settings.screen.blit(t[1],(t[0][0]-t_s/2,t[0][1]-t_s/2))
+                trail_rect = t[1].get_rect(center = t[0])
+
+                my_settings.screen.blit(t[1],trail_rect)
 
             if waiting == False :
                 pos3 = pygame.mouse.get_pos()
-            my_settings.screen.blit(cursor,(pos3[0]-c_s/2,pos3[1]-c_s/2))
+            
+            cursor_rect = cursor.get_rect(center = pos3)
+            my_settings.screen.blit(cursor,cursor_rect)
 
             if waiting :
 
-                my_settings.screen.blit(cursor,(pos[0]-c_s/2,pos[1]-c_s/2))
+                waiting_cursor_rect = cursor.get_rect(center = pos)
+                my_settings.screen.blit(cursor,waiting_cursor_rect)
 
             pos = pygame.mouse.get_pos()
 
