@@ -2,9 +2,12 @@ import pygame
 import time
 import glob
 import os
+import math
 from settings import Settings
 
 my_settings = Settings()
+wi = my_settings.width
+he = my_settings.height
 
 def load(name,size) :
 
@@ -24,7 +27,7 @@ def SkinSelect(font,skin,sounds,volume,volume_effects) :
     for z in range(len(skins0)) :
 
         text = font.render(skins0[z],False,(255,255,255))
-        my_settings.screen.blit(text,(0,my_settings.height/15*z))
+        my_settings.screen.blit(text,(0,he/15*z))
 
         skins.append(text)
 
@@ -44,7 +47,7 @@ def SkinSelect(font,skin,sounds,volume,volume_effects) :
                     skin1 = skins[w]
 
                     skin1_rect   = skin1.get_rect()
-                    skin1_rect.y = my_settings.height/15*w
+                    skin1_rect.y = he/15*w
 
                     if skin1_rect.collidepoint(pos) :
                         loop = False
@@ -87,19 +90,19 @@ def SongSelect() :
 
         bgs = glob.glob(f'{maps[i]}\\*.jpg')
         bg = pygame.image.load(bgs[0]).convert()
-        bg = pygame.transform.scale(bg,(my_settings.width,my_settings.height)).convert()
+        bg = pygame.transform.scale(bg,(wi,he)).convert()
         
         songs.append([bg,audio,diffs,diff_names])
 
         bg = pygame.image.load(bgs[1]).convert()
-        bg = pygame.transform.scale(bg,(my_settings.width/5,my_settings.height/5)).convert()
-        my_settings.screen.blit(bg,(0,my_settings.height/5*i))
+        bg = pygame.transform.scale(bg,(wi/5,he/5)).convert()
+        my_settings.screen.blit(bg,(0,he/5*i))
 
     return songs
 
 def Score(accuracy) :
 
-    end_screen = load('images\\end_screen.png',(my_settings.width,my_settings.height))
+    end_screen = load('images\\end_screen.png',(wi,he))
 
     my_settings.screen.blit(end_screen,(0,0))
     pygame.display.flip()
@@ -121,17 +124,17 @@ def Score(accuracy) :
                 pygame.quit()
                 exit()
 
-def get_time():
+def get_time() :
     return int(round(time.time() * 1000))
 
 def import_sounds(skin) :
     sounds = {
-        'click': pygame.mixer.Sound(f'assets\\skins\\{skin}\\click.ogg'),
-        'fail': pygame.mixer.Sound(f'assets\\skins\\{skin}\\fail.ogg'),
-        'hit': pygame.mixer.Sound(f'assets\\skins\\{skin}\\hit.ogg'),
-        'miss': pygame.mixer.Sound(f'assets\\skins\\{skin}\\miss.ogg'),
-        'spinnerspin': pygame.mixer.Sound(f'assets\\skins\\{skin}\\spinnerspin.ogg'),
-        'spinnerbonus': pygame.mixer.Sound(f'assets\\skins\\{skin}\\spinnerbonus.ogg')
+               'click' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\click.ogg'),
+                'fail' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\fail.ogg'),
+                 'hit' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\hit.ogg'),
+                'miss' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\miss.ogg'),
+         'spinnerspin' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\spinnerspin.ogg'),
+        'spinnerbonus' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\spinnerbonus.ogg')
     }
     return sounds
 
@@ -140,4 +143,36 @@ def play(sounds,name,volume,percentage,type) :
     sounds[name].play()
 
 def rs(number):
-    return number/1920*my_settings.width
+    return number/1920*wi
+
+def spinning(spin,pos2,spin_x,spin_y) :
+    
+    if spin_x >= 0 and spin_y >= 0 :
+
+        if pos2[0] < wi/2 and pos2[1] >= he/2 :
+            spin -= math.hypot(spin_x,spin_y)
+        if pos2[0] >= wi/2 and pos2[1] < he/2 :
+            spin += math.hypot(spin_x,spin_y)
+
+    if spin_x >= 0 and spin_y < 0 :
+
+        if pos2[0] < wi/2 and pos2[1] < he/2 :
+            spin += math.hypot(spin_x,spin_y)
+        if pos2[0] >= wi/2 and pos2[1] >= he/2 :
+            spin -= math.hypot(spin_x,spin_y)
+
+    if spin_x < 0 and spin_y >= 0 :
+
+        if pos2[0] < wi/2 and pos2[1] < he/2 :
+            spin -= math.hypot(spin_x,spin_y)
+        if pos2[0] >= wi/2 and pos2[1] >= he/2 :
+            spin += math.hypot(spin_x,spin_y)
+
+    if spin_x < 0 and spin_y < 0 :
+
+        if pos2[0] < wi/2 and pos2[1] >= he/2 :
+            spin += math.hypot(spin_x,spin_y)
+        if pos2[0] >= wi/2 and pos2[1] < he/2 :
+            spin -= math.hypot(spin_x,spin_y)
+
+    return spin
