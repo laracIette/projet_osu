@@ -9,10 +9,13 @@ my_settings = Settings()
 wi = my_settings.width
 he = my_settings.height
 
-def load(name,size) :
+def load(name,size,smooth) :
 
     image = pygame.image.load(f'assets\\{name}').convert_alpha()
-    image = pygame.transform.scale(image,size).convert_alpha()
+    if smooth :
+        image = pygame.transform.smoothscale(image,size).convert_alpha()
+    else :
+        image = pygame.transform.scale(image,size).convert_alpha()
 
     return image
 
@@ -102,7 +105,7 @@ def SongSelect() :
 
 def Score(accuracy) :
 
-    end_screen = load('images\\end_screen.png',(wi,he))
+    end_screen = load('images\\end_screen.png',(wi,he),False)
 
     my_settings.screen.blit(end_screen,(0,0))
     pygame.display.flip()
