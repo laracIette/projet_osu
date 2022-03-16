@@ -9,11 +9,11 @@ wi = my_settings.width
 he = my_settings.height
 
 white  = (255,255,255)
-grey   = (48,48,48)
-black  = (0,0,0)
-orange = (218,174,70)
-green  = (87,227,19)
-blue   = (50,188,231)
+grey   = ( 48, 48, 48)
+black  = (  0,  0,  0)
+orange = (218,174, 70)
+green  = ( 87,227, 19)
+blue   = ( 50,188,231)
 
 class Run :
 
@@ -247,7 +247,7 @@ class Run :
         health           = max_health
         health_minus     = 50*hp/6
         passive_health   = health_minus/500
-        spin_health      = max_health/200
+        spin_health      = max_health/300
         spinner_fade     = False
         health_bar_bg    = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
         click_time       = 0
@@ -470,7 +470,10 @@ class Run :
                 health    -= passive_health*160/fps
                 health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
 
-            if len(show_ur) > 20 :
+            for s in show_ur :
+                s[3] = get_time() - s[2] - paused_time
+
+            if show_ur != [] and (len(show_ur) > 20 or show_ur[0][3] >= 8000) :
                 show_ur.pop(0)
 
             for s in range(len(show_acc)) :
@@ -568,19 +571,24 @@ class Run :
                                     score   += 950
                                     play(sounds,'spinnerbonus',1,volume,volume_effects)
 
-                                    spin_score_bonus     += 1
                                     spin_score_bonus_time = get_time()
+                                    spin_score_bonus     += 1
 
                                     spin_score = combo_font.render(str(spin_score_bonus*1000),False,white).convert()
 
-                                if get_time() < spin_score_bonus_time + 1000 :
+                if get_time() < spin_score_bonus_time + 1000 :
 
-                                    spin_score_bonus_alpha += 3/fps
-                                    spin_score.set_alpha(spin_score_bonus_alpha*255)
+                    if spin_score_bonus_alpha < 1 :
 
-                                else :
+                        spin_score_bonus_alpha += 6/fps
+                        spin_score.set_alpha(spin_score_bonus_alpha*255)
 
-                                    spin_score_bonus_alpha = 0
+                else :
+
+                    if spin_score_bonus_alpha > 0 :
+
+                        spin_score_bonus_alpha -= 6/fps
+                        spin_score.set_alpha(spin_score_bonus_alpha*255)
 
             for p in show_spinners :
 
@@ -677,16 +685,16 @@ class Run :
 
                                         if difference < od_time/4 :
                                             hit_value = 300
-                                            show_ur.append([blue,278*difference/od_time/2])
+                                            show_ur.append([blue,278*difference/od_time/2,get_time(),0])
 
                                         if difference > od_time/4 and difference < od_time/2 :
                                             hit_value = 100
-                                            show_ur.append([green,278*difference/od_time/2])
+                                            show_ur.append([green,278*difference/od_time/2,get_time(),0])
                                             show_acc.append([acc_100,show_circles[v][4],get_time(),0])
                                         
                                         if difference > od_time/2 :
                                             hit_value = 50
-                                            show_ur.append([orange,278*difference/od_time/2])
+                                            show_ur.append([orange,278*difference/od_time/2,get_time(),0])
                                             show_acc.append([acc_50,show_circles[v][4],get_time(),0])
 
                                         acc.append(round(hit_value/3,2))
