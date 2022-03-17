@@ -67,7 +67,7 @@ def SkinSelect(font,skin,sounds,volume,volume_effects) :
                 loop = False
 
                 pygame.quit()
-                exit()
+                exit(0)
     
     return skin
 
@@ -125,7 +125,7 @@ def Score(accuracy) :
                 loop = False
 
                 pygame.quit()
-                exit()
+                exit(0)
 
 def get_time() :
     return int(round(time.time() * 1000))
@@ -179,3 +179,57 @@ def spinning(spin,pos2,spin_x,spin_y) :
             spin -= math.hypot(spin_x,spin_y)
 
     return spin
+
+def propose_offset(total_ur,font) :
+
+    pygame.mouse.set_visible(True)
+
+    ur_moy = 0
+
+    if total_ur != [] :
+
+        noir = pygame.Rect(0,0,wi,he)
+        pygame.draw.rect(my_settings.screen,(0,0,0),noir)
+        
+        for u in total_ur :
+            ur_moy += u
+
+        ur_moy /= len(total_ur)
+        ur_moy = round(ur_moy)
+
+        if ur_moy < 0 :
+            rep = font.render(f'You are tapping {abs(ur_moy)}ms earlier, do you want to apply a negative offset of {abs(ur_moy)}ms ?',False,(255,255,255)).convert()
+        
+        if ur_moy > 0 :
+            rep = font.render(f'You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?',False,(255,255,255)).convert()
+
+        rep_rect = rep.get_rect(center = (wi/2,he/2))
+
+        yes      = font.render(f'Yes',False,(255,255,255)).convert()
+        yes_rect = yes.get_rect(center = (wi/3,he/3*2))
+
+        no      = font.render(f'No',False,(255,255,255)).convert()
+        no_rect = no.get_rect(center = (wi/3*2,he/3*2))
+        
+        my_settings.screen.blit(rep,rep_rect) ; my_settings.screen.blit(yes,yes_rect) ; my_settings.screen.blit(no,no_rect)
+        
+        pygame.display.flip()
+        
+        loop = True
+        while loop :
+
+            for event in pygame.event.get() :
+
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT :
+
+                    pos = pygame.mouse.get_pos()
+
+                    if yes_rect.collidepoint(pos) :
+                        
+                        offset = - ur_moy
+
+                        return offset
+                    
+                    if no_rect.collidepoint(pos) :
+
+                        return 0

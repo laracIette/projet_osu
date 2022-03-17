@@ -2,7 +2,7 @@ import math
 import pygame
 from settings import Settings
 from math import inf
-from tools import load,SkinSelect,SongSelect,Score,get_time,import_sounds,play,rs,spinning
+from tools import load,SkinSelect,SongSelect,Score,get_time,import_sounds,play,rs,spinning,propose_offset
 
 my_settings = Settings()
 wi = my_settings.width
@@ -262,6 +262,7 @@ class Run :
         ur_300    = pygame.Rect(rs(928),rs(1050),rs(66),rs(8))
         ur_middle = pygame.Rect(rs(959),rs(1039),rs(4),rs(30))
         show_ur   = []
+        total_ur  = []
 
         score_txt = combo_font.render('0',False,white).convert()
         combo_txt = combo_font.render('0',False,white).convert()
@@ -337,6 +338,9 @@ class Run :
                     running = False
 
                     pygame.mixer.music.pause()
+
+                    if total_ur != [] :
+                        offset += propose_offset(total_ur,acc_font)
 
                     with open('assets\\settings.txt','w') as settings_file :
 
@@ -497,7 +501,7 @@ class Run :
 
                 if showed_time > 500 :
 
-                    show_acc.pop(s)
+                    show_acc.pop(0)
                     break
 
             if show_offset :
@@ -616,7 +620,7 @@ class Run :
 
             for u in show_ur :
                 
-                ur_hit = pygame.Rect(961-rs(u[1]),rs(1039),rs(2),rs(30))
+                ur_hit = pygame.Rect(rs(961+u[1]),rs(1039),rs(2),rs(30))
                 pygame.draw.rect(my_settings.screen,u[0],ur_hit)
 
             for s in show_acc :
@@ -679,20 +683,21 @@ class Run :
 
                                     acc_check = True
 
-                                    difference = abs(get_time() - (start_time + show_circles[v][5] + paused_time) + offset)
+                                    difference = get_time() - (start_time + show_circles[v][5] + paused_time) + offset
+                                    total_ur.append(difference)
 
-                                    if difference < od_time :
+                                    if abs(difference) < od_time :
 
-                                        if difference < od_time/4 :
+                                        if abs(difference) < od_time/4 :
                                             hit_value = 300
                                             show_ur.append([blue,278*difference/od_time/2,get_time(),0])
 
-                                        if difference > od_time/4 and difference < od_time/2 :
+                                        if abs(difference) > od_time/4 and abs(difference) < od_time/2 :
                                             hit_value = 100
                                             show_ur.append([green,278*difference/od_time/2,get_time(),0])
                                             show_acc.append([acc_100,show_circles[v][4],get_time(),0])
                                         
-                                        if difference > od_time/2 :
+                                        if abs(difference) > od_time/2 :
                                             hit_value = 50
                                             show_ur.append([orange,278*difference/od_time/2,get_time(),0])
                                             show_acc.append([acc_50,show_circles[v][4],get_time(),0])
@@ -751,12 +756,22 @@ class Run :
                         UI = True
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_EQUALS :
-                    offset     += 5
+
+                    if key[pygame.K_LSHIFT] :
+                        offset += 1
+                    else :
+                        offset += 5
+
                     offset_time = get_time()
                     show_offset = True
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_MINUS :
-                    offset     -= 5
+
+                    if key[pygame.K_LSHIFT] :
+                        offset -= 1
+                    else :
+                        offset -= 5
+
                     offset_time = get_time()
                     show_offset = True
 
