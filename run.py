@@ -136,10 +136,9 @@ class Run :
                 if k != ',' and k != 's' and k != '\n' :
                     tab.append(k)
 
-                else :
-                    if tab != [] :
-                        tab = ''.join(tab)
-                        spinners0.append(tab)
+                elif tab != [] :
+                    tab = ''.join(tab)
+                    spinners0.append(tab)
                     tab = []
         
         for r in range(len(spinners0)) :
@@ -154,6 +153,40 @@ class Run :
             
             h += 2
 
+        c = 0
+        u = 0
+        hit_objects = []
+        for i in range(len(circles) + len(spinners)) :
+
+            if spinners == [] or u == len(spinners) :
+                hit_objects.append([circles[c][2],0])
+                c += 1
+                continue
+
+            if circles == [] or c == len(circles) :
+                hit_objects.append([spinners[u][0],1])
+                hit_objects.append([spinners[u][1],1])
+                u += 1
+                continue
+
+            if circles[c][2] < spinners[u][0] :
+                hit_objects.append([circles[c][2],0])
+                
+                if c < len(circles) : c += 1
+
+            else :
+                hit_objects.append([spinners[u][0],1])
+                hit_objects.append([spinners[u][1],1])
+                
+                if u < len(spinners) : u += 1
+        
+        game_breaks = []
+        for p in range(len(hit_objects)-1) :
+            
+            if (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p][1] != 1) or\
+                (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
+                game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
+
         if offset != 0 :
             show_offset = True
         else :
@@ -161,7 +194,7 @@ class Run :
 
         offset_time = get_time()
 
-        del circles0,spinners0,tab,cs_t,ar_t,od_t,hp_t,num,cycle,a,h
+        del circles0,spinners0,tab,cs_t,ar_t,od_t,hp_t,num,cycle,a,h,c,u
 
         pause_screen = load('images\\pause_screen.png',(wi,he),False)
         #dim         = load('images\\noir93.png',(wi,he),False)
@@ -358,12 +391,24 @@ class Run :
                     
                     pygame.mixer.music.unpause()
                     menu()
+
+            for g in game_breaks :
+
+                if get_time() >= start_time + g[0] - paused_time + 1000 :
+                    game_break = True
+                
+                if get_time() >= start_time + g[1] - paused_time - 1000 :
+                    game_break = False
+                    game_breaks.pop(0)
                 
             if game_break == False :
                 pygame.draw.rect(my_settings.screen,black,noir)
+                UI = True
+
             else :
                 my_settings.screen.blit(bg,(0,0))
                 #my_settings.screen.blit(dim,(0,0))
+                UI = False
 
             for u in show_circles :
 
@@ -587,12 +632,10 @@ class Run :
                         spin_score_bonus_alpha += 6/fps
                         spin_score.set_alpha(spin_score_bonus_alpha*255)
 
-                else :
+                elif spin_score_bonus_alpha > 0 :
 
-                    if spin_score_bonus_alpha > 0 :
-
-                        spin_score_bonus_alpha -= 6/fps
-                        spin_score.set_alpha(spin_score_bonus_alpha*255)
+                    spin_score_bonus_alpha -= 6/fps
+                    spin_score.set_alpha(spin_score_bonus_alpha*255)
 
             for p in show_spinners :
 
