@@ -46,8 +46,8 @@ class Run :
 
         pause_screen = load('images\\pause_screen.png',(self.wi,self.he),False)
         #dim         = load('images\\noir93.png',(self.wi,self.he),False)
-        self.bg           = pygame.transform.scale(self.songs[self.ii][0],(self.wi,self.he)).convert()
-        self.noir         = pygame.Rect(0,0,self.wi,self.he)
+        self.bg      = pygame.transform.scale(self.songs[self.ii][0],(self.wi,self.he)).convert()
+        self.noir    = pygame.Rect(0,0,self.wi,self.he)
         
         self.game_break = True
         self.break_lock = False
@@ -59,8 +59,7 @@ class Run :
         self.a_circle = load(f'skins\\{skin}\\approachcircle.png',(self.a_c_s,self.a_c_s),True)
 
         self.cursor       = load(f'skins\\{skin}\\cursor.png',(self.c_s,self.c_s),True)
-        t_s          = self.c_s/4
-        self.cursor_trail = load(f'skins\\{skin}\\cursortrail.png',(t_s,t_s),True)
+        self.cursor_trail = load(f'skins\\{skin}\\cursortrail.png',(self.c_s/4,self.c_s/4),True)
         self.trail_pos    = []
         self.trail_count  = 0
 
@@ -71,7 +70,6 @@ class Run :
         self.spin_tot2    = 0
 
         self.pos  = pygame.mouse.get_pos()
-        pos1 = pygame.mouse.get_pos()
         self.pos3 = pygame.mouse.get_pos()
 
         self.click_check = False
@@ -97,7 +95,7 @@ class Run :
 
         self.start_time  = get_time()
         self.paused_time = 0
-        pause_time  = 0
+        pause_time       = 0
         self.end_time    = inf
 
         cs_od_hp = self.cs + self.od + self.hp
@@ -301,7 +299,8 @@ class Run :
                         for event in pygame.event.get() :
 
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
-                                loop    = False
+                                loop = False
+
                                 self.running = True
                                 self.waiting = True
 
