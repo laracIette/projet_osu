@@ -1,8 +1,23 @@
+import math
 import pygame
 from sounds import Play
-from tools import get_time, rs
-import math
+from tools import GetTime, ReSize
 
+def GetSpinner(self) :
+
+    if self.q < len(self.spinners) :
+
+        if GetTime() - self.paused_time  >=  self.start_time + self.spinners[self.q][0] - self.ar_time :
+            
+            self.show_spinners.append([GetTime()-self.paused_time,0,self.spinners[self.q][1]-self.spinners[self.q][0],self.spinner,0])
+
+            self.show_spinner     = True
+            self.spinner_fade     = True
+            self.click_time_check = False
+            self.spin_score_bonus = 0
+
+            self.q += 1
+            
 def SetSpinners(self) :
 
     if self.waiting == False :
@@ -11,7 +26,7 @@ def SetSpinners(self) :
 
             for p in self.show_spinners :
 
-                p[1] = get_time() - p[0] - self.paused_time
+                p[1] = GetTime() - p[0] - self.paused_time
                 if p[1] >= p[2] :
 
                     self.spinner_fade = True
@@ -36,7 +51,7 @@ def SetSpinners(self) :
                 if self.click_time_check == False :
                     self.click_time_check = True
 
-                    self.click_time = get_time()
+                    self.click_time = GetTime()
 
                 self.pos2 = pygame.mouse.get_pos()
 
@@ -48,7 +63,7 @@ def SetSpinners(self) :
                 
                 for p in self.show_spinners :
 
-                    if get_time() - self.click_time >= p[2] / 2 :
+                    if GetTime() - self.click_time >= p[2] / 2 :
 
                         if abs(self.spin - self.spin_tot2) > 66 :
                             self.spin_tot2 = self.spin
@@ -66,12 +81,12 @@ def SetSpinners(self) :
                             self.score   += 950
                             Play(self.sounds,'spinnerbonus',1,self.volume,self.volume_effects)
 
-                            self.spin_score_bonus_time = get_time()
+                            self.spin_score_bonus_time = GetTime()
                             self.spin_score_bonus     += 1
 
                             self.spin_score = self.combo_font.render(str(self.spin_score_bonus*1000),False,self.white).convert()
 
-        if get_time() < self.spin_score_bonus_time + 1000 :
+        if GetTime() < self.spin_score_bonus_time + 1000 :
 
             if self.spin_score_bonus_alpha < 1 :
 
@@ -89,21 +104,6 @@ def SetSpinners(self) :
         spinner_rect = spinner_spin.get_rect(center = (self.wi/2,self.he/2))
         
         self.my_settings.screen.blit(spinner_spin,spinner_rect)
-
-def GetSpinner(self) :
-
-    if self.q < len(self.spinners) :
-
-        if get_time() - self.paused_time  >=  self.start_time + self.spinners[self.q][0] - self.ar_time :
-            
-            self.show_spinners.append([get_time()-self.paused_time,0,self.spinners[self.q][1]-self.spinners[self.q][0],self.spinner,0])
-
-            self.show_spinner     = True
-            self.spinner_fade     = True
-            self.click_time_check = False
-            self.spin_score_bonus = 0
-
-            self.q += 1
 
 def Spinning(self) :
     
@@ -137,13 +137,38 @@ def Spinning(self) :
 
     return self.spin
 
+def GetCircle(self) :
+
+    if self.e < len(self.circles) :
+
+        if GetTime() - self.paused_time  >=  self.start_time + self.circles[self.e][2] - self.ar_time :
+
+            coor = [round(self.circles[self.e][0]/512*self.wi*3/4*0.86+ReSize(360),2),round(self.circles[self.e][1]/384*self.he*0.86+ReSize(75),2)]
+
+            if self.circles[self.e][3] == 1 :
+                self.numbers = 1
+            else :
+                self.numbers += 1
+
+            number = self.number_font.render(f'{self.numbers}',False,self.white).convert()
+
+            self.show_circles.append([GetTime()-self.paused_time,0,1,self.a_circle,coor,self.circles[self.e][2],number,self.circle,self.fade,1,self.acc_check,self.faded])
+
+            self.e += 1
+
+    elif self.e == len(self.circles) :
+
+        self.end_time = GetTime()
+
+        self.e += 1
+
 def SetCircles(self) :
 
     for u in self.show_circles :
 
         if self.waiting == False :
         
-            u[1] = get_time() - u[0] - self.paused_time
+            u[1] = GetTime() - u[0] - self.paused_time
 
             if u[1] >= self.ar_time and u[8] == False :
                 u[8] = True
@@ -178,7 +203,7 @@ def SetCircles(self) :
 
         self.my_settings.screen.blit(u[3],a_c_rect)
         self.my_settings.screen.blit(u[7],circle_rect)
-        self.my_settings.screen.blit(u[6],(number_rect[0]+rs(1),number_rect[1]+rs(8)))
+        self.my_settings.screen.blit(u[6],(number_rect[0]+ReSize(1),number_rect[1]+ReSize(8)))
     
         if u[1] >= self.ar_time + self.od_time :
             self.show_circles.pop(0)
@@ -186,7 +211,7 @@ def SetCircles(self) :
             if u[11] == False :
 
                 self.acc.append(0)
-                self.show_acc.append([self.acc_miss,u[4],get_time(),0])
+                self.show_acc.append([self.acc_miss,u[4],GetTime(),0])
 
                 self.acc_check = True
 
@@ -195,28 +220,3 @@ def SetCircles(self) :
                 if self.combo >= 20 :
                     Play(self.sounds,'miss',1,self.volume,self.volume_effects)
                 self.combo = 0
-
-def GetCircle(self) :
-
-    if self.e < len(self.circles) :
-
-        if get_time() - self.paused_time  >=  self.start_time + self.circles[self.e][2] - self.ar_time :
-
-            coor = [round(self.circles[self.e][0]/512*self.wi*3/4*0.86+rs(360),2),round(self.circles[self.e][1]/384*self.he*0.86+rs(75),2)]
-
-            if self.circles[self.e][3] == 1 :
-                self.numbers = 1
-            else :
-                self.numbers += 1
-
-            number = self.number_font.render(f'{self.numbers}',False,self.white).convert()
-
-            self.show_circles.append([get_time()-self.paused_time,0,1,self.a_circle,coor,self.circles[self.e][2],number,self.circle,self.fade,1,self.acc_check,self.faded])
-
-            self.e += 1
-
-    elif self.e == len(self.circles) :
-
-        self.end_time = get_time()
-
-        self.e += 1

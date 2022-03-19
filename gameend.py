@@ -1,6 +1,5 @@
 import pygame
-
-from tools import load
+from tools import Load
 
 def ProposeOffset(self) :
 
@@ -61,7 +60,7 @@ def ProposeOffset(self) :
 
 def Score(self) :
 
-    end_screen = load('images\\end_screen.png',(self.wi,self.he),False)
+    end_screen = Load('images\\end_screen.png',(self.wi,self.he),False)
 
     self.my_settings.screen.blit(end_screen,(0,0))
     pygame.display.flip()

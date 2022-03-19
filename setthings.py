@@ -1,7 +1,6 @@
 import math
-
-from tools import get_time
 from sounds import Play
+from tools import GetTime
 
 def SetAcc(self) :
 
@@ -15,24 +14,24 @@ def SetAcc(self) :
 
                 self.acc_check = True
 
-                difference = get_time() - (self.start_time + self.show_circles[v][5] + self.paused_time) + self.offset
+                difference = GetTime() - (self.start_time + self.show_circles[v][5] + self.paused_time) + self.offset
                 self.total_ur.append(difference)
 
                 if abs(difference) < self.od_time :
 
                     if abs(difference) < self.od_time/4 :
                         self.hit_value = 300
-                        self.show_ur.append([self.blue,278*difference/self.od_time/2,get_time(),0])
+                        self.show_ur.append([self.blue,278*difference/self.od_time/2,GetTime(),0])
 
                     if abs(difference) > self.od_time/4 and abs(difference) < self.od_time/2 :
                         self.hit_value = 100
-                        self.show_ur.append([self.green,278*difference/self.od_time/2,get_time(),0])
-                        self.show_acc.append([self.acc_100,self.show_circles[v][4],get_time(),0])
+                        self.show_ur.append([self.green,278*difference/self.od_time/2,GetTime(),0])
+                        self.show_acc.append([self.acc_100,self.show_circles[v][4],GetTime(),0])
                     
                     if abs(difference) > self.od_time/2 :
                         self.hit_value = 50
-                        self.show_ur.append([self.orange,278*difference/self.od_time/2,get_time(),0])
-                        self.show_acc.append([self.acc_50,self.show_circles[v][4],get_time(),0])
+                        self.show_ur.append([self.orange,278*difference/self.od_time/2,GetTime(),0])
+                        self.show_acc.append([self.acc_50,self.show_circles[v][4],GetTime(),0])
 
                     self.acc.append(round(self.hit_value/3,2))
                     health_bonus = round(self.hit_value/30,2)
@@ -50,7 +49,7 @@ def SetAcc(self) :
                     self.hit_value = 0
 
                     self.acc.append(0)
-                    self.show_acc.append([self.acc_miss,self.show_circles[v][4],get_time(),0])
+                    self.show_acc.append([self.acc_miss,self.show_circles[v][4],GetTime(),0])
 
                     self.health -= self.health_minus
 
@@ -60,3 +59,20 @@ def SetAcc(self) :
 
                 self.show_circles[v][8]  = True
                 self.show_circles[v][11] = True
+
+def SetMultiplier(self) :
+    
+    if self.cs_od_hp < 6 :
+        self.difficulty_multiplier = 2
+    
+    elif self.cs_od_hp >= 6 and self.cs_od_hp < 13 :
+        self.difficulty_multiplier = 3
+
+    elif self.cs_od_hp >= 13 and self.cs_od_hp < 18 :
+        self.difficulty_multiplier = 4
+    
+    elif self.cs_od_hp >= 18 and self.cs_od_hp < 25 :
+        self.difficulty_multiplier = 5
+
+    elif self.cs_od_hp >= 25 :
+        self.difficulty_multiplier = 6

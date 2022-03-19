@@ -1,25 +1,27 @@
+import math
 import pygame
-from gameend import ProposeOffset
-from tools import get_time
 from sounds import Play
+from tools import GetTime
+from setthings import SetAcc
+from gameend import ProposeOffset
 
 def SetBreak(self) :
     for g in self.game_breaks :
 
-        if get_time() >= self.start_time + g[0] - self.paused_time + 1000 :
+        if GetTime() >= self.start_time + g[0] - self.paused_time + 1000 :
             self.game_break = True
         
-        if get_time() >= self.start_time + g[1] - self.paused_time - 1000 :
+        if GetTime() >= self.start_time + g[1] - self.paused_time - 1000 :
             self.game_break = False
             self.game_breaks.pop(0)
 
 def ApplyBreaks(self) :
     
-    if get_time() >= self.music_start - self.start_offset/2.5 and self.break_lock == False :
+    if GetTime() >= self.music_start - self.start_offset/2.5 and self.break_lock == False :
         self.game_break = False
         self.break_lock = True
 
-    if get_time() >= self.end_time + self.start_offset/2.5 :
+    if GetTime() >= self.end_time + self.start_offset/2.5 :
         self.game_break = True
 
 def SetMap(self) :
@@ -205,6 +207,10 @@ def EndGame(self) :
 
     pygame.mixer.music.pause()
 
+    if self.health <= 0 :
+        Play(self.sounds,'fail',1,self.volume,self.volume_effects)
+        self.death = True
+
     if self.total_ur != [] :
         self.offset += ProposeOffset(self)
 
@@ -216,12 +222,8 @@ def EndGame(self) :
 
             settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
 
-    if self.health <= 0 :
-        Play(self.sounds,'fail',1,self.volume,self.volume_effects)
-        self.death = True
 
-
-def GameWrite(self) :
+def Write(self) :
 
     with open('assets\\settings.txt','w') as settings_file :
 
@@ -230,3 +232,105 @@ def GameWrite(self) :
         for a in range(len(self.lines)) :
 
             settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
+
+def GetPause(self) :
+    
+    if (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_ESCAPE) :
+        self.running = False
+        
+        if self.waiting :
+            self.paused_time += GetTime() - self.pause_time
+
+        self.pause_time = GetTime()
+
+        pygame.mouse.set_visible(True)
+        pygame.mixer.music.pause()
+
+        self.my_settings.screen.blit(self.pause_screen,(0,0))
+        pygame.display.flip()
+        
+        Write(self)
+
+        Pause(self)
+
+def Pause(self) :
+
+    loop = True
+    while loop :
+
+        for self.event in pygame.event.get() :
+
+            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_ESCAPE :
+                loop = False
+
+                self.running = True
+                self.waiting = True
+
+                pygame.mouse.set_visible(False)
+
+                self.fps_time += GetTime() - self.pause_time
+
+            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_q :
+                loop = False
+
+                self.to_menu = True
+
+            GameQuit(self)
+
+def UnPause(self) :
+
+    pos1 = pygame.mouse.get_pos()
+
+    if (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_x) or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_v) :
+        
+        distance1 = math.hypot(pos1[0]-self.pos[0],pos1[1]-self.pos[1])
+
+        if distance1 < 5 :
+
+            self.waiting = False
+
+            pygame.mixer.music.unpause()
+                                        
+            self.paused_time += GetTime() - self.pause_time
+
+def ChangeOffset(self) :
+    if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_EQUALS :
+
+        if self.key[pygame.K_LSHIFT] :
+            self.offset += 1
+        else :
+            self.offset += 5
+
+        self.offset_time = GetTime()
+        self.show_offset = True
+
+    if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_MINUS :
+
+        if self.key[pygame.K_LSHIFT] :
+            self.offset -= 1
+        else :
+            self.offset -= 5
+
+        self.offset_time = GetTime()
+        self.show_offset = True
+
+def GameQuit(self) :
+
+    if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
+
+        Write(self)
+
+        pygame.quit()
+        exit(0)
+
+def GetClicks(self) :
+
+    if self.event.type == pygame.KEYDOWN and (self.event.key == pygame.K_x or self.event.key == pygame.K_v) :
+
+        if self.click_check == False :
+            self.click_check = True
+        
+        SetAcc(self)
+        
+    if self.event.type == pygame.KEYUP and (self.event.key == pygame.K_x or self.event.key == pygame.K_v) :
+        self.click_check = False

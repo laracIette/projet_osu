@@ -1,12 +1,12 @@
-import pygame
 import time
+import pygame
 from settings import Settings
 
 my_settings = Settings()
 wi = my_settings.width
 he = my_settings.height
 
-def load(name,size,smooth) :
+def Load(name,size,smooth) :
 
     image = pygame.image.load(f'assets\\{name}').convert_alpha()
     if smooth :
@@ -16,8 +16,8 @@ def load(name,size,smooth) :
 
     return image
 
-def get_time() :
+def GetTime() :
     return int(round(time.time() * 1000))
 
-def rs(number):
+def ReSize(number):
     return number/1920*wi

@@ -1,11 +1,13 @@
-import pygame
-import glob
 import os
+import glob
+import pygame
+from game import Write
 from sounds import Play
-
-from tools import get_time
+from tools import GetTime
 
 def SkinSelect(self) :
+
+    pygame.draw.rect(self.my_settings.screen,self.black,self.noir)
 
     skins0 = []
     skins  = glob.glob('assets\\skins\\*')
@@ -54,21 +56,23 @@ def SkinSelect(self) :
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                 loop = False
 
+                Write(self)
+
                 pygame.quit()
                 exit(0)
 
 def SongSelect(self) :
 
-    maps  = glob.glob('assets\\songs\\*')
+    self.maps  = glob.glob('assets\\songs\\*')
     self.songs = []
 
-    for i in range(len(maps)) :
+    for i in range(len(self.maps)) :
 
-        audio = glob.glob(f'{maps[i]}\\*.mp3')
+        audio = glob.glob(f'{self.maps[i]}\\*.mp3')
         audio = audio[0]
 
         diffs = []
-        diff = glob.glob(f'{maps[i]}\\*.txt')
+        diff  = glob.glob(f'{self.maps[i]}\\*.txt')
         for v in range(len(diff)) :
             diffs.append(diff[v])
 
@@ -77,27 +81,13 @@ def SongSelect(self) :
 
             diff_names.append(os.path.basename(os.path.splitext(u)[0]))
 
-        bgs = glob.glob(f'{maps[i]}\\*.jpg')
-        bg = pygame.image.load(bgs[0]).convert()
-        bg = pygame.transform.scale(bg,(self.wi,self.he)).convert()
+        bgs = glob.glob(f'{self.maps[i]}\\*.jpg')
+        bg  = pygame.image.load(bgs[0]).convert()
+        bg  = pygame.transform.scale(bg,(self.wi,self.he)).convert()
         
         self.songs.append([bg,audio,diffs,diff_names])
 
-        bg = pygame.image.load(bgs[1]).convert()
-        bg = pygame.transform.scale(bg,(self.wi/5,self.he/5)).convert()
-        self.my_settings.screen.blit(bg,(0,self.he/5*i))
-
     return self.songs
-
-def MenuWrite(self) :
-
-    with open('assets\\settings.txt','w') as settings_file :
-                                            
-        modifs = [self.offset,self.volume,self.volume_music,self.volume_effects]
-
-        for a in range(len(self.lines)) :
-
-            settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
 
 def MenuShowVolume(self) :
 
@@ -105,7 +95,7 @@ def MenuShowVolume(self) :
             
         pygame.draw.rect(self.my_settings.screen,self.black,self.volume_noir)
 
-        if get_time() >= self.volume_time + 1000 :
+        if GetTime() >= self.volume_time + 1000 :
             self.show_volume = False
             return 0
 
@@ -145,3 +135,66 @@ def SetVolumes(self) :
             a += 1
                     
     self.volumes = [self.volume,self.volume_music,self.volume_effects]
+
+def ModifyVolumes(self) :
+
+    rects = [self.volume_rect,self.music_rect,self.effects_rect]
+
+    for i in range(len(rects)) :
+
+        if rects[i].collidepoint(self.pos) :
+        
+            if self.event.button == 4 :
+
+                if self.volumes[i] < 100 :
+
+                    self.volumes[i] += 1
+
+            if self.event.button == 5 :
+
+                if self.volumes[i] > 0 :
+
+                    self.volumes[i] -= 1
+
+    self.show_volume = True
+
+    self.volume         = self.volumes[0]
+    self.volume_music   = self.volumes[1]
+    self.volume_effects = self.volumes[2]
+
+    self.volume_txt  = self.volume_font.render(f'main : {self.volume}%',False,self.white).convert()
+    self.music_txt   = self.music_font.render(f'music : {self.volume_music}%',False,self.white).convert()
+    self.effects_txt = self.music_font.render(f'effects : {self.volume_effects}%',False,self.white).convert()
+    
+    self.volume_time = GetTime()
+
+def MapSelect(self) :
+
+    for self.ii in range(len(self.songs)) :
+
+        song = self.songs[self.ii][0]
+        song = pygame.transform.scale(song,(self.wi/5,self.he/5)).convert()
+
+        song_rect   = song.get_rect()
+        song_rect.y = self.my_settings.height/5*self.ii
+
+        if song_rect.collidepoint(self.pos) :
+
+            self.choosing_diff = True
+            self.iii = self.ii
+
+            Play(self.sounds,'click',1,self.volume,self.volume_effects)
+
+def DiffSelect(self) :
+
+    diff = self.font.render(self.diffs[self.i],False,self.white).convert()
+
+    diff_rect   = diff.get_rect()
+    diff_rect.x = self.wi/5
+    diff_rect.y = self.he/20*self.i+self.he/5*self.iii
+
+    if diff_rect.collidepoint(self.pos) :
+        self.diff_choice = True
+
+        Play(self.sounds,'click',1,self.volume,self.volume_effects)
+        pygame.mouse.set_visible(False)

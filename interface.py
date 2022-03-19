@@ -1,5 +1,5 @@
 import pygame
-from tools import rs, get_time
+from tools import GetTime, ReSize
 
 def DarkenScreen(self) :
 
@@ -9,17 +9,17 @@ def DarkenScreen(self) :
 
     else :
         self.my_settings.screen.blit(self.bg,(0,0))
-        #self.my_settings.screen.blit(dim,(0,0))
+        #self.my_settings.screen.blit(self.dim,(0,0))
         #self.UI = False
 
 def ShowOnScreen(self) :
 
     if self.UI :
 
-        self.my_settings.screen.blit(self.combo_txt,(rs(20),rs(960)))
-        self.my_settings.screen.blit(self.score_txt,(rs(1910)-self.score_txt.get_width(),rs(-20)))
-        self.my_settings.screen.blit(self.acc_txt,(rs(1910)-self.acc_txt.get_width(),rs(80)))
-        self.my_settings.screen.blit(self.fps_txt,(rs(1910)-self.fps_txt.get_width(),rs(1075)-self.fps_txt.get_height()))
+        self.my_settings.screen.blit(self.combo_txt,(ReSize(20),ReSize(960)))
+        self.my_settings.screen.blit(self.score_txt,(ReSize(1910)-self.score_txt.get_width(),ReSize(-20)))
+        self.my_settings.screen.blit(self.acc_txt,(ReSize(1910)-self.acc_txt.get_width(),ReSize(80)))
+        self.my_settings.screen.blit(self.fps_txt,(ReSize(1910)-self.fps_txt.get_width(),ReSize(1075)-self.fps_txt.get_height()))
 
         pygame.draw.rect(self.my_settings.screen,self.grey,self.health_bar_bg)
         pygame.draw.rect(self.my_settings.screen,self.white,self.health_bar)
@@ -31,17 +31,17 @@ def ShowOnScreen(self) :
 
     for u in self.show_ur :
         
-        ur_hit = pygame.Rect(rs(961+u[1]),rs(1039),rs(2),rs(30))
+        ur_hit = pygame.Rect(ReSize(961+u[1]),ReSize(1039),ReSize(2),ReSize(30))
         pygame.draw.rect(self.my_settings.screen,u[0],ur_hit)
 
     for s in self.show_acc :
 
-        show_acc_rect = s[0].get_rect(center = (s[1][0],s[1][1]-rs(60)))
+        show_acc_rect = s[0].get_rect(center = (s[1][0],s[1][1]-ReSize(60)))
         self.my_settings.screen.blit(s[0],show_acc_rect)
     
     if self.show_offset :
 
-        offset_txt_rect = self.offset_txt.get_rect(center = (self.wi/2,rs(20)))
+        offset_txt_rect = self.offset_txt.get_rect(center = (self.wi/2,ReSize(20)))
         self.my_settings.screen.blit(self.offset_txt,offset_txt_rect)
 
     if self.spin_score_bonus_alpha > 0 :
@@ -84,17 +84,17 @@ def SetShowOnScreen(self) :
             self.trail_pos.pop(0)
         
         self.health    -= self.passive_health*160/self.fps
-        self.health_bar = pygame.Rect(rs(20),rs(20),rs(600*self.health/600),rs(20))
+        self.health_bar = pygame.Rect(ReSize(20),ReSize(20),ReSize(600*self.health/600),ReSize(20))
 
     for s in self.show_ur :
-        s[3] = get_time() - s[2] - self.paused_time
+        s[3] = GetTime() - s[2] - self.paused_time
 
     if self.show_ur != [] and (len(self.show_ur) > 20 or self.show_ur[0][3] >= 8000) :
         self.show_ur.pop(0)
 
     for s in range(len(self.show_acc)) :
 
-        showed_time = get_time() - self.show_acc[s][2]
+        showed_time = GetTime() - self.show_acc[s][2]
 
         if showed_time < 300 :
 
@@ -123,12 +123,12 @@ def SetShowOnScreen(self) :
         else :
             self.offset_txt = self.fps_font.render(f'Local offset : +{self.offset}ms',False,self.white).convert()
 
-        if get_time() - self.offset_time - self.paused_time >= 1000 :
+        if GetTime() - self.offset_time - self.paused_time >= 1000 :
             self.show_offset = False
 
 def SetFps(self) :
 
-    self.fps = round(1000 / (get_time() - self.fps_time),2)
+    self.fps = round(1000 / (GetTime() - self.fps_time),2)
 
     self.fpss.append(self.fps)
     if len(self.fpss) > 40 :
@@ -137,7 +137,7 @@ def SetFps(self) :
     for i in self.fpss :
         self.avg_fps += i
 
-    self.fps_time = get_time()
+    self.fps_time = GetTime()
     self.avg_fps /= len(self.fpss)
     self.fps_txt  = self.fps_font.render(f'{round(self.avg_fps)}fps',False,self.white).convert()
     self.avg_fps  = 0
@@ -167,3 +167,13 @@ def UItextRenders(self) :
         self.score_txt  = self.combo_font.render(str(self.score),False,self.white).convert()
 
         self.acc_check = False
+
+def HideUI(self) :
+
+    if (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_TAB and self.key[pygame.K_LSHIFT]) or\
+       (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_LSHIFT and self.key[pygame.K_TAB]) :
+        
+        if self.UI :
+            self.UI = False
+        else :
+            self.UI = True
