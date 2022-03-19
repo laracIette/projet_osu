@@ -1,5 +1,7 @@
 import pygame
-from tools import get_time, play, propose_offset
+from gameend import ProposeOffset
+from tools import get_time
+from sounds import Play
 
 def SetBreak(self) :
     for g in self.game_breaks :
@@ -204,7 +206,7 @@ def EndGame(self) :
     pygame.mixer.music.pause()
 
     if self.total_ur != [] :
-        self.offset += propose_offset(self.total_ur,self.acc_font)
+        self.offset += ProposeOffset(self)
 
     with open('assets\\settings.txt','w') as settings_file :
 
@@ -215,11 +217,11 @@ def EndGame(self) :
             settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
 
     if self.health <= 0 :
-        play(self.sounds,'fail',1,self.volume,self.volume_effects)
+        Play(self.sounds,'fail',1,self.volume,self.volume_effects)
         self.death = True
 
 
-def WriteSettings(self) :
+def GameWrite(self) :
 
     with open('assets\\settings.txt','w') as settings_file :
 

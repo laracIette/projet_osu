@@ -1,6 +1,7 @@
 import math
 
-from tools import get_time, play
+from tools import get_time
+from sounds import Play
 
 def SetAcc(self) :
 
@@ -41,7 +42,7 @@ def SetAcc(self) :
                     else :
                         self.health = self.max_health
 
-                    play(self.sounds,'hit',0.5,self.volume,self.volume_effects)
+                    Play(self.sounds,'hit',0.5,self.volume,self.volume_effects)
                     self.combo += 1
 
                 else :
@@ -54,7 +55,7 @@ def SetAcc(self) :
                     self.health -= self.health_minus
 
                     if self.combo >= 20 :
-                        play(self.sounds,'miss',1,self.volume,self.volume_effects)
+                        Play(self.sounds,'miss',1,self.volume,self.volume_effects)
                     self.combo = 0
 
                 self.show_circles[v][8]  = True

@@ -1,21 +1,24 @@
 import math
 import pygame
-from setacc import SetAcc
-from settings import Settings
 from math import inf
-from tools import load, SkinSelect, SongSelect, Score, get_time, import_sounds, play, rs
+from gameend import Score
+from menu import MenuShowVolume, MenuWrite, SetVolumes, SkinSelect, SongSelect
+from settings import Settings
+from setacc import SetAcc
+from sounds import ImportSounds, Play
+from tools import load, get_time, rs
 from interface import DarkenScreen, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
-from game import ApplyBreaks, EndGame, SetBreak, SetMap, StartGame, WriteSettings
+from game import ApplyBreaks, EndGame, SetBreak, SetMap, StartGame, GameWrite
 from objects import GetCircle, GetSpinner, SetSpinners, SetCircles
-
-my_settings = Settings()
 
 class Run :
 
     def __init__(self,ii,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines) :
 
-        self.wi = my_settings.width
-        self.he = my_settings.height
+        self.my_settings = Settings()
+
+        self.wi = self.my_settings.width
+        self.he = self.my_settings.height
 
         self.offset = offset
         self.songs  = songs
@@ -164,7 +167,7 @@ class Run :
         self.running = True
         while self.running :
             
-            my_settings.clock.tick(my_settings.frequence)
+            self.my_settings.clock.tick(self.my_settings.frequence)
 
             if self.waiting == False :
 
@@ -184,10 +187,10 @@ class Run :
 
                     if self.death == False :
 
-                        Score(self.accuracy)
+                        Score(self)
         
                     pygame.mixer.music.unpause()
-                    menu()
+                    Menu()
 
             SetBreak(self)
                 
@@ -272,7 +275,7 @@ class Run :
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                     self.running = False
 
-                    WriteSettings(self)
+                    GameWrite(self)
 
                     pygame.quit()
                     exit(0)
@@ -288,10 +291,10 @@ class Run :
                     pygame.mouse.set_visible(True)
                     pygame.mixer.music.pause()
 
-                    my_settings.screen.blit(pause_screen,(0,0))
+                    self.my_settings.screen.blit(pause_screen,(0,0))
                     pygame.display.flip()
                     
-                    WriteSettings(self)
+                    GameWrite(self)
 
                     loop = True
                     while loop :
@@ -311,7 +314,7 @@ class Run :
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_q :
                                 loop  = False
 
-                                menu()
+                                Menu()
 
                             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                                 loop = False
@@ -319,240 +322,187 @@ class Run :
                                 pygame.quit()
                                 exit(0)
 
-def menu() :
+class Menu() :
 
-    pygame.mouse.set_visible(True)
+    def __init__(self) :
 
-    wi = my_settings.width
-    he = my_settings.height
+        pygame.mouse.set_visible(True)
 
-    black  = (  0,  0,  0)
-    white  = (255,255,255)
+        self.my_settings = Settings()
 
-    noir = pygame.Rect(0,0,wi,he)
-    font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(rs(45)))
+        self.wi = self.my_settings.width
+        self.he = self.my_settings.height
 
-    pygame.draw.rect(my_settings.screen,black,noir)
-    
-    skin   = 'whitecat'
-    songs  = SongSelect()
-    sounds = import_sounds(skin)
+        self.black  = (  0,  0,  0)
+        self.white  = (255,255,255)
 
-    with open('assets\\settings.txt','r') as settings_file :
+        noir = pygame.Rect(0,0,self.wi,self.he)
+        self.font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(rs(45)))
 
-            a = 0
-
-            lines = settings_file.readlines()
-            for i in lines :
-
-                if a == 0 :
-
-                    offset = int(i)
-                
-                if a == 1 :
-
-                    volume = int(i)
-                
-                if a == 2 :
-
-                    volume_music = int(i)
-
-                if a == 3 :
-
-                    volume_effects = int(i)
-
-                a += 1
-                
-    volumes = [volume,volume_music,volume_effects]
-
-    show_volume = True
-
-    volume_font = pygame.font.SysFont('arial',round(rs(60)))
-    music_font  = pygame.font.SysFont('arial',round(rs(40)))
-
-    volume_txt    = volume_font.render(f'main : {volume}%',False,white).convert()
-    volume_rect   = volume_txt.get_rect()
-    volume_rect.y = he-2*volume_txt.get_height()-rs(15)
-
-    music_txt    = music_font.render(f'music : {volume_music}%',False,white).convert()
-    music_rect   = music_txt.get_rect()
-    music_rect.y = he-2*music_txt.get_height()
-
-    effects_txt    = music_font.render(f'effects : {volume_effects}%',False,white).convert()
-    effects_rect   = effects_txt.get_rect()
-    effects_rect.y = he-effects_txt.get_height()
-
-    volume_noir = pygame.Rect(wi/3*2,he/3*2,wi/3,he/3)
-    
-    volume_time = get_time()
-
-    loop = True
-    while loop :
-
-        my_settings.clock.tick(my_settings.frequence)
-
-        if show_volume :
-            
-            pygame.draw.rect(my_settings.screen,black,volume_noir)
-
-            if get_time() >= volume_time + 1000 :
-                show_volume = False
-                continue
-
-            volume_rect.x = wi-volume_txt.get_width()
-            music_rect.x = wi-music_txt.get_width()
-            effects_rect.x = wi-effects_txt.get_width()
-
-            my_settings.screen.blit(volume_txt,(volume_rect.x,volume_rect.y))
-            my_settings.screen.blit(music_txt,(music_rect.x,music_rect.y))
-            my_settings.screen.blit(effects_txt,(effects_rect.x,effects_rect.y))
+        pygame.draw.rect(self.my_settings.screen,self.black,noir)
         
-        pygame.display.flip()
+        self.skin   = 'whitecat'
+        self.songs  = SongSelect(self)
+        self.sounds = ImportSounds(self.skin)
 
-        key = pygame.key.get_pressed()
-        for event in pygame.event.get() :
+        SetVolumes(self)
 
-            pos = pygame.mouse.get_pos()
+        self.show_volume = True
 
-            if event.type == pygame.MOUSEBUTTONDOWN :
+        volume_font = pygame.font.SysFont('arial',round(rs(60)))
+        music_font  = pygame.font.SysFont('arial',round(rs(40)))
 
-                if event.button == pygame.BUTTON_LEFT :
+        self.volume_txt    = volume_font.render(f'main : {self.volume}%',False,self.white).convert()
+        self.volume_rect   = self.volume_txt.get_rect()
+        self.volume_rect.y = self.he-2*self.volume_txt.get_height()-rs(15)
 
-                    for ii in range(len(songs)) :
+        self.music_txt    = music_font.render(f'music : {self.volume_music}%',False,self.white).convert()
+        self.music_rect   = self.music_txt.get_rect()
+        self.music_rect.y = self.he-2*self.music_txt.get_height()
 
-                        song = songs[ii][0]
-                        song = pygame.transform.scale(song,(wi/5,he/5)).convert()
+        self.effects_txt    = music_font.render(f'effects : {self.volume_effects}%',False,self.white).convert()
+        self.effects_rect   = self.effects_txt.get_rect()
+        self.effects_rect.y = self.he-self.effects_txt.get_height()
 
-                        song_rect   = song.get_rect()
-                        song_rect.y = my_settings.height/5*ii
+        self.volume_noir = pygame.Rect(self.wi/3*2,self.he/3*2,self.wi/3,self.he/3)
+        
+        self.volume_time = get_time()
 
-                        if song_rect.collidepoint(pos) :
-                            loop = False
+        loop = True
+        while loop :
 
-                            play(sounds,'click',1,volume,volume_effects)
+            self.my_settings.clock.tick(self.my_settings.frequence)
 
-                            diffs = songs[ii][3]
-                            for i in range(len(diffs)) :
-                        
-                                diff = font.render(diffs[i],False,white).convert()
-                                my_settings.screen.blit(diff,(wi/5,he/20*i+he/5*ii))
+            MenuShowVolume(self)
+            
+            pygame.display.flip()
+
+            key = pygame.key.get_pressed()
+            for event in pygame.event.get() :
+
+                pos = pygame.mouse.get_pos()
+
+                if event.type == pygame.MOUSEBUTTONDOWN :
+
+                    if event.button == pygame.BUTTON_LEFT :
+
+                        for ii in range(len(self.songs)) :
+
+                            song = self.songs[ii][0]
+                            song = pygame.transform.scale(song,(self.wi/5,self.he/5)).convert()
+
+                            song_rect   = song.get_rect()
+                            song_rect.y = self.my_settings.height/5*ii
+
+                            if song_rect.collidepoint(pos) :
+                                loop = False
+
+                                Play(self.sounds,'click',1,self.volume,self.volume_effects)
+
+                                diffs = self.songs[ii][3]
+                                for i in range(len(diffs)) :
                             
-                            loop2 = True
-                            while loop2 :
+                                    diff = self.font.render(diffs[i],False,self.white).convert()
+                                    self.my_settings.screen.blit(diff,(self.wi/5,self.he/20*i+self.he/5*ii))
                                 
-                                my_settings.clock.tick(my_settings.frequence)
-                                pygame.display.flip()
-                                
-                                key = pygame.key.get_pressed()
-                                for event in pygame.event.get() :
-
-                                    if event.type == pygame.MOUSEBUTTONDOWN :
-                                        pos = pygame.mouse.get_pos()
+                                loop2 = True
+                                while loop2 :
                                     
-                                        for i in range(len(diffs)) :
+                                    self.my_settings.clock.tick(self.my_settings.frequence)
+                                    pygame.display.flip()
                                     
-                                            diff = font.render(diffs[i],False,white).convert()
+                                    key = pygame.key.get_pressed()
+                                    for event in pygame.event.get() :
 
-                                            diff_rect   = diff.get_rect()
-                                            diff_rect.x = wi/5
-                                            diff_rect.y = he/20*i+he/5*ii
-
-                                            if diff_rect.collidepoint(pos) :
-                                                loop2 = False
-
-                                                play(sounds,'click',1,volume,volume_effects)
-
-                                                pygame.mouse.set_visible(False)
-                                                Run(ii,i,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines)
-
-                                    if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
-                                        loop2 = False
-
-                                        pygame.draw.rect(my_settings.screen,black,noir)
-
-                                        skin   = SkinSelect(font,skin,sounds,volume,volume_effects)
-                                        songs  = SongSelect()
-                                        sounds = import_sounds(skin)
-
-                                        loop = True
-
-                                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
-                                        loop2 = False
-
-                                        with open('assets\\settings.txt','w') as settings_file :
-                                            
-                                            modifs = [offset,volume,volume_music,volume_effects]
-
-                                            for a in range(len(lines)) :
-
-                                                settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
+                                        if event.type == pygame.MOUSEBUTTONDOWN :
+                                            pos = pygame.mouse.get_pos()
                                         
-                                        menu()
+                                            for i in range(len(diffs)) :
+                                        
+                                                diff = self.font.render(diffs[i],False,self.white).convert()
 
-                                    if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
-                                        loop2 = False
+                                                diff_rect   = diff.get_rect()
+                                                diff_rect.x = self.wi/5
+                                                diff_rect.y = self.he/20*i+self.he/5*ii
 
-                                        with open('assets\\settings.txt','w') as settings_file :
+                                                if diff_rect.collidepoint(pos) :
+                                                    loop2 = False
+
+                                                    Play(self.sounds,'click',1,self.volume,self.volume_effects)
+
+                                                    pygame.mouse.set_visible(False)
+                                                    Run(ii,i,self.songs,self.skin,self.sounds,self.volume,self.volume_music,self.volume_effects,self.offset,self.lines)
+
+                                        if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
+                                            loop2 = False
+
+                                            pygame.draw.rect(self.my_settings.screen,self.black,noir)
+
+                                            self.skin   = SkinSelect(self)
+                                            self.songs  = SongSelect(self)
+                                            self.sounds = ImportSounds(self.skin)
+
+                                            loop = True
+
+                                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
+                                            loop2 = False
+
+                                            MenuWrite(self)
                                             
-                                            modifs = [offset,volume,volume_music,volume_effects]
+                                            Menu()
 
-                                            for a in range(len(lines)) :
+                                        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
+                                            loop2 = False
 
-                                                settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
+                                            MenuWrite(self)
 
-                                        pygame.quit()
-                                        exit(0)
+                                            pygame.quit()
+                                            exit(0)
 
-                if event.button == 4 or event.button == 5 :
+                    if event.button == 4 or event.button == 5 :
 
-                    rects   = [volume_rect,music_rect,effects_rect]
+                        rects = [self.volume_rect,self.music_rect,self.effects_rect]
 
-                    for i in range(len(rects)) :
+                        for i in range(len(rects)) :
 
-                        if rects[i].collidepoint(pos) :
-                        
-                            if event.button == 4 :
+                            if rects[i].collidepoint(pos) :
+                            
+                                if event.button == 4 :
 
-                                if volumes[i] < 100 :
+                                    if self.volumes[i] < 100 :
 
-                                    volumes[i] += 1
-                
-                            if event.button == 5 :
-
-                                if volumes[i] > 0 :
-
-                                    volumes[i] -= 1
-
-                    show_volume = True
-
-                    volume         = volumes[0]
-                    volume_music   = volumes[1]
-                    volume_effects = volumes[2]
-
-                    volume_txt  = volume_font.render(f'main : {volume}%',False,white).convert()
-                    music_txt   = music_font.render(f'music : {volume_music}%',False,white).convert()
-                    effects_txt = music_font.render(f'effects : {volume_effects}%',False,white).convert()
+                                        self.volumes[i] += 1
                     
-                    volume_time = get_time()
+                                if event.button == 5 :
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
+                                    if self.volumes[i] > 0 :
 
-                pygame.draw.rect(my_settings.screen,black,noir)
+                                        self.volumes[i] -= 1
 
-                skin   = SkinSelect(font,skin,sounds,volume,volume_effects)
-                songs  = SongSelect()
-                sounds = import_sounds(skin)
-                
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
-                loop = False
+                        self.show_volume = True
 
-                with open('assets\\settings.txt','w') as settings_file :
-                                            
-                    modifs = [offset,volume,volume_music,volume_effects]
+                        self.volume         = self.volumes[0]
+                        self.volume_music   = self.volumes[1]
+                        self.volume_effects = self.volumes[2]
 
-                    for a in range(len(lines)) :
+                        self.volume_txt  = volume_font.render(f'main : {self.volume}%',False,self.white).convert()
+                        self.music_txt   = music_font.render(f'music : {self.volume_music}%',False,self.white).convert()
+                        self.effects_txt = music_font.render(f'effects : {self.volume_effects}%',False,self.white).convert()
+                        
+                        self.volume_time = get_time()
 
-                        settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_s :
 
-                pygame.quit()
-                exit(0)
+                    pygame.draw.rect(self.my_settings.screen,self.black,noir)
+
+                    self.skin   = SkinSelect(self)
+                    self.songs  = SongSelect(self)
+                    self.sounds = ImportSounds(self.skin)
+                    
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
+                    loop = False
+
+                    MenuWrite(self)
+
+                    pygame.quit()
+                    exit(0)

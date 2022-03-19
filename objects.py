@@ -1,9 +1,7 @@
 import pygame
-from tools import get_time,spinning,play,rs
-from settings import Settings
+from sounds import Play
+from tools import get_time, rs
 import math
-
-my_settings = Settings()
 
 def SetSpinners(self) :
 
@@ -40,13 +38,13 @@ def SetSpinners(self) :
 
                     self.click_time = get_time()
 
-                pos2 = pygame.mouse.get_pos()
+                self.pos2 = pygame.mouse.get_pos()
 
                 spin_center = math.hypot(self.wi/2-self.pos[0],self.he/2-self.pos[1])
-                spin_x      = (self.pos[0]-pos2[0])/spin_center*60
-                spin_y      = (self.pos[1]-pos2[1])/spin_center*60
+                self.spin_x      = (self.pos[0]-self.pos2[0])/spin_center*60
+                self.spin_y      = (self.pos[1]-self.pos2[1])/spin_center*60
                 
-                self.spin = spinning(self.spin,pos2,spin_x,spin_y)
+                self.spin = Spinning(self)
                 
                 for p in self.show_spinners :
 
@@ -61,12 +59,12 @@ def SetSpinners(self) :
                             else :
                                 self.health = self.max_health
                             
-                            play(self.sounds,'spinnerspin',0.5,self.volume,self.volume_effects)
+                            Play(self.sounds,'spinnerspin',0.5,self.volume,self.volume_effects)
                             
                         if abs(self.spin - self.spin_tot) > 330 :
                             self.spin_tot = self.spin
                             self.score   += 950
-                            play(self.sounds,'spinnerbonus',1,self.volume,self.volume_effects)
+                            Play(self.sounds,'spinnerbonus',1,self.volume,self.volume_effects)
 
                             self.spin_score_bonus_time = get_time()
                             self.spin_score_bonus     += 1
@@ -90,7 +88,7 @@ def SetSpinners(self) :
         spinner_spin = pygame.transform.rotate(p[3],self.spin).convert_alpha()
         spinner_rect = spinner_spin.get_rect(center = (self.wi/2,self.he/2))
         
-        my_settings.screen.blit(spinner_spin,spinner_rect)
+        self.my_settings.screen.blit(spinner_spin,spinner_rect)
 
 def GetSpinner(self) :
 
@@ -106,6 +104,38 @@ def GetSpinner(self) :
             self.spin_score_bonus = 0
 
             self.q += 1
+
+def Spinning(self) :
+    
+    if self.spin_x >= 0 and self.spin_y >= 0 :
+
+        if self.pos2[0] < self.wi/2 and self.pos2[1] >= self.he/2 :
+            self.spin -= math.hypot(self.spin_x,self.spin_y)
+        if self.pos2[0] >= self.wi/2 and self.pos2[1] < self.he/2 :
+            self.spin += math.hypot(self.spin_x,self.spin_y)
+
+    if self.spin_x >= 0 and self.spin_y < 0 :
+
+        if self.pos2[0] < self.wi/2 and self.pos2[1] < self.he/2 :
+            self.spin += math.hypot(self.spin_x,self.spin_y)
+        if self.pos2[0] >= self.wi/2 and self.pos2[1] >= self.he/2 :
+            self.spin -= math.hypot(self.spin_x,self.spin_y)
+
+    if self.spin_x < 0 and self.spin_y >= 0 :
+
+        if self.pos2[0] < self.wi/2 and self.pos2[1] < self.he/2 :
+            self.spin -= math.hypot(self.spin_x,self.spin_y)
+        if self.pos2[0] >= self.wi/2 and self.pos2[1] >= self.he/2 :
+            self.spin += math.hypot(self.spin_x,self.spin_y)
+
+    if self.spin_x < 0 and self.spin_y < 0 :
+
+        if self.pos2[0] < self.wi/2 and self.pos2[1] >= self.he/2 :
+            self.spin += math.hypot(self.spin_x,self.spin_y)
+        if self.pos2[0] >= self.wi/2 and self.pos2[1] < self.he/2 :
+            self.spin -= math.hypot(self.spin_x,self.spin_y)
+
+    return self.spin
 
 def SetCircles(self) :
 
@@ -146,9 +176,9 @@ def SetCircles(self) :
         circle_rect = u[7].get_rect(center = center_rect)
         number_rect = u[6].get_rect(center = center_rect)
 
-        my_settings.screen.blit(u[3],a_c_rect)
-        my_settings.screen.blit(u[7],circle_rect)
-        my_settings.screen.blit(u[6],(number_rect[0]+rs(1),number_rect[1]+rs(8)))
+        self.my_settings.screen.blit(u[3],a_c_rect)
+        self.my_settings.screen.blit(u[7],circle_rect)
+        self.my_settings.screen.blit(u[6],(number_rect[0]+rs(1),number_rect[1]+rs(8)))
     
         if u[1] >= self.ar_time + self.od_time :
             self.show_circles.pop(0)
@@ -163,7 +193,7 @@ def SetCircles(self) :
                 self.health -= self.health_minus
 
                 if self.combo >= 20 :
-                    play(self.sounds,'miss',1,self.volume,self.volume_effects)
+                    Play(self.sounds,'miss',1,self.volume,self.volume_effects)
                 self.combo = 0
 
 def GetCircle(self) :

@@ -1,56 +1,53 @@
 import pygame
-from settings import Settings
-from tools import rs,get_time
-
-my_settings = Settings()
+from tools import rs, get_time
 
 def DarkenScreen(self) :
 
     if self.game_break == False :
-        pygame.draw.rect(my_settings.screen,(0,0,0),self.noir)
+        pygame.draw.rect(self.my_settings.screen,(0,0,0),self.noir)
         #self.UI = True
 
     else :
-        my_settings.screen.blit(self.bg,(0,0))
-        #my_settings.screen.blit(dim,(0,0))
+        self.my_settings.screen.blit(self.bg,(0,0))
+        #self.my_settings.screen.blit(dim,(0,0))
         #self.UI = False
 
 def ShowOnScreen(self) :
 
     if self.UI :
 
-        my_settings.screen.blit(self.combo_txt,(rs(20),rs(960)))
-        my_settings.screen.blit(self.score_txt,(rs(1910)-self.score_txt.get_width(),rs(-20)))
-        my_settings.screen.blit(self.acc_txt,(rs(1910)-self.acc_txt.get_width(),rs(80)))
-        my_settings.screen.blit(self.fps_txt,(rs(1910)-self.fps_txt.get_width(),rs(1075)-self.fps_txt.get_height()))
+        self.my_settings.screen.blit(self.combo_txt,(rs(20),rs(960)))
+        self.my_settings.screen.blit(self.score_txt,(rs(1910)-self.score_txt.get_width(),rs(-20)))
+        self.my_settings.screen.blit(self.acc_txt,(rs(1910)-self.acc_txt.get_width(),rs(80)))
+        self.my_settings.screen.blit(self.fps_txt,(rs(1910)-self.fps_txt.get_width(),rs(1075)-self.fps_txt.get_height()))
 
-        pygame.draw.rect(my_settings.screen,self.grey,self.health_bar_bg)
-        pygame.draw.rect(my_settings.screen,self.white,self.health_bar)
+        pygame.draw.rect(self.my_settings.screen,self.grey,self.health_bar_bg)
+        pygame.draw.rect(self.my_settings.screen,self.white,self.health_bar)
         
-    pygame.draw.rect(my_settings.screen,self.orange,self.ur_50)
-    pygame.draw.rect(my_settings.screen,self.green,self.ur_100)
-    pygame.draw.rect(my_settings.screen,self.blue,self.ur_300)
-    pygame.draw.rect(my_settings.screen,self.white,self.ur_middle)
+    pygame.draw.rect(self.my_settings.screen,self.orange,self.ur_50)
+    pygame.draw.rect(self.my_settings.screen,self.green,self.ur_100)
+    pygame.draw.rect(self.my_settings.screen,self.blue,self.ur_300)
+    pygame.draw.rect(self.my_settings.screen,self.white,self.ur_middle)
 
     for u in self.show_ur :
         
         ur_hit = pygame.Rect(rs(961+u[1]),rs(1039),rs(2),rs(30))
-        pygame.draw.rect(my_settings.screen,u[0],ur_hit)
+        pygame.draw.rect(self.my_settings.screen,u[0],ur_hit)
 
     for s in self.show_acc :
 
         show_acc_rect = s[0].get_rect(center = (s[1][0],s[1][1]-rs(60)))
-        my_settings.screen.blit(s[0],show_acc_rect)
+        self.my_settings.screen.blit(s[0],show_acc_rect)
     
     if self.show_offset :
 
         offset_txt_rect = self.offset_txt.get_rect(center = (self.wi/2,rs(20)))
-        my_settings.screen.blit(self.offset_txt,offset_txt_rect)
+        self.my_settings.screen.blit(self.offset_txt,offset_txt_rect)
 
     if self.spin_score_bonus_alpha > 0 :
 
         spin_score_rect = self.spin_score.get_rect(center = (self.wi/2,self.he/4*3))
-        my_settings.screen.blit(self.spin_score,spin_score_rect)
+        self.my_settings.screen.blit(self.spin_score,spin_score_rect)
 
     for t in self.trail_pos :
 
@@ -60,18 +57,18 @@ def ShowOnScreen(self) :
         t[1].set_alpha(t[2])
 
         trail_rect = t[1].get_rect(center = t[0])
-        my_settings.screen.blit(t[1],trail_rect)
+        self.my_settings.screen.blit(t[1],trail_rect)
 
     if self.waiting == False :
         self.pos3 = pygame.mouse.get_pos()
     
     cursor_rect = self.cursor.get_rect(center = self.pos3)
-    my_settings.screen.blit(self.cursor,cursor_rect)
+    self.my_settings.screen.blit(self.cursor,cursor_rect)
 
     if self.waiting :
 
         waiting_cursor_rect = self.cursor.get_rect(center = self.pos)
-        my_settings.screen.blit(self.cursor,waiting_cursor_rect)
+        self.my_settings.screen.blit(self.cursor,waiting_cursor_rect)
 
 def SetShowOnScreen(self) :
 
