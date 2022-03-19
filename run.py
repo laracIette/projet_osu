@@ -1,779 +1,232 @@
 import math
 import pygame
+from setacc import SetAcc
 from settings import Settings
 from math import inf
-from tools import load,SkinSelect,SongSelect,Score,get_time,import_sounds,play,rs,spinning,propose_offset
+from tools import load, SkinSelect, SongSelect, Score, get_time, import_sounds, play, rs
+from interface import DarkenScreen, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
+from game import ApplyBreaks, EndGame, SetBreak, SetMap, StartGame, WriteSettings
+from objects import GetCircle, GetSpinner, SetSpinners, SetCircles
 
 my_settings = Settings()
-wi = my_settings.width
-he = my_settings.height
-
-white  = (255,255,255)
-grey   = ( 48, 48, 48)
-black  = (  0,  0,  0)
-orange = (218,174, 70)
-green  = ( 87,227, 19)
-blue   = ( 50,188,231)
 
 class Run :
 
     def __init__(self,ii,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines) :
 
-        circles0,circles = [],[]
-        show_circles     = []
+        self.wi = my_settings.width
+        self.he = my_settings.height
 
-        cs_t,ar_t,od_t,hp_t = [],[],[],[]
+        self.offset = offset
+        self.songs  = songs
+        self.diff   = diff
+        self.ii     = ii
+        self.lines  = lines
 
-        spinner_lock       = False
-        spinners0,spinners = [],[]
-        show_spinners      = []
-
-        a   = 0
-        map = songs[ii][2][diff]
-        with open(map,'r') as map_file :
-
-            for i in map_file :
-
-                if spinner_lock == False :
-                    
-                    for o in i:
-
-                        if o == 's' :
-
-                            spinner_lock = True
-
-                if spinner_lock == False :
-
-                    a += 1
-
-                    if i == '\n' :
-                        continue
-
-                    elif a == 1 :
-                        for o in i :
-                            if o != '\n' :
-                                cs_t.append(o)
-
-                        cs = ''.join(cs_t)
-                        cs = float(cs)
-
-                    elif a == 2 :
-                        for o in i :
-                            if o != '\n' :
-                                ar_t.append(o)
-
-                        ar = ''.join(ar_t)
-                        ar = float(ar)
-
-                        ar_time = 450*10/ar
-
-                    elif a == 3 :
-                        for o in i :
-                            if o != '\n' :
-                                od_t.append(o)
-
-                        od = ''.join(od_t)
-                        od = float(od)
-
-                        od_time = 100*10/od
-                    
-                    elif a == 4 :
-                        for o in i :
-                            if o != '\n' :
-                                hp_t.append(o)
-
-                        hp = ''.join(hp_t)
-                        hp = float(hp)
-
-                    else :
-                        circles0.append(i)
-
-                else :
-                    spinners.append(i)
-
-        cycle = 1
-        for c in circles0[0] :
-            if c == ',' :
-                    cycle += 1
-
-        tab = []
-        for j in circles0 :
-
-            for k in j :
-
-                if k != ',' and k != '\n' :
-                    tab.append(k)
-
-                else :
-                    tab = ''.join(tab)
-                    circles.append(tab)
-                    tab = []
-
-        circles0 = []
-        for m in circles :
-            circles0.append(int(m))
+        self.sounds         = sounds
+        self.volume         = volume
+        self.volume_effects = volume_effects
+        self.volume_music   = volume_music
         
-        num     = 0
-        circles = []
+        self.white  = (255,255,255)
+        self.grey   = ( 48, 48, 48)
+        self.black  = (  0,  0,  0)
+        self.orange = (218,174, 70)
+        self.green  = ( 87,227, 19)
+        self.blue   = ( 50,188,231)
 
-        start_offset = 2500-circles0[2]
-
-        for i in range(int(len(circles0)/cycle)) :
-            circles0[i*cycle+2] += start_offset
-
-            for j in range(cycle) :
-
-                tab.append(circles0[num])
-                num += 1
-
-            circles.append(tab)
-            tab = []
-        
-        for j in spinners :
-
-            for k in j :
-
-                if k != ',' and k != 's' and k != '\n' :
-                    tab.append(k)
-
-                elif tab != [] :
-                    tab = ''.join(tab)
-                    spinners0.append(tab)
-                    tab = []
-        
-        for r in range(len(spinners0)) :
-            spinners0[r]  = int(spinners0[r])
-            spinners0[r] += start_offset
-
-        spinners = []
-        h        = 0
-        for r in range(int(len(spinners0)/2)) :
-
-            spinners.append([spinners0[h],spinners0[h+1]])
-            
-            h += 2
-
-        c = 0
-        u = 0
-        hit_objects = []
-        for i in range(len(circles) + len(spinners)) :
-
-            if spinners == [] or u == len(spinners) :
-                hit_objects.append([circles[c][2],0])
-                c += 1
-                continue
-
-            if circles == [] or c == len(circles) :
-                hit_objects.append([spinners[u][0],1])
-                hit_objects.append([spinners[u][1],1])
-                u += 1
-                continue
-
-            if circles[c][2] < spinners[u][0] :
-                hit_objects.append([circles[c][2],0])
-                
-                if c < len(circles) : c += 1
-
-            else :
-                hit_objects.append([spinners[u][0],1])
-                hit_objects.append([spinners[u][1],1])
-                
-                if u < len(spinners) : u += 1
-        
-        game_breaks = []
-        for p in range(len(hit_objects)-1) :
-            
-            if (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p][1] != 1) or\
-                (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
-                game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
-
-        if offset != 0 :
-            show_offset = True
+        if self.offset != 0 :
+            self.show_offset = True
         else :
-            show_offset = False
+            self.show_offset = False
 
-        offset_time = get_time()
+        self.offset_time = get_time()
 
-        del circles0,spinners0,tab,cs_t,ar_t,od_t,hp_t,num,cycle,a,h,c,u
+        SetMap(self)
 
-        pause_screen = load('images\\pause_screen.png',(wi,he),False)
-        #dim         = load('images\\noir93.png',(wi,he),False)
-        bg           = pygame.transform.scale(songs[ii][0],(wi,he)).convert()
-        noir         = pygame.Rect(0,0,wi,he)
+        pause_screen = load('images\\pause_screen.png',(self.wi,self.he),False)
+        #dim         = load('images\\noir93.png',(self.wi,self.he),False)
+        self.bg           = pygame.transform.scale(self.songs[self.ii][0],(self.wi,self.he)).convert()
+        self.noir         = pygame.Rect(0,0,self.wi,self.he)
         
-        game_break = True
-        break_lock = False
+        self.game_break = True
+        self.break_lock = False
         
-        c_s     = rs(121/cs*4.9)
-        circle  = load(f'skins\\{skin}\\hitcircle.png',(c_s,c_s),True)
+        self.c_s     = rs(121/self.cs*4.9)
+        self.circle  = load(f'skins\\{skin}\\hitcircle.png',(self.c_s,self.c_s),True)
 
-        a_c_s    = c_s*4
-        a_circle = load(f'skins\\{skin}\\approachcircle.png',(a_c_s,a_c_s),True)
+        self.a_c_s    = self.c_s*4
+        self.a_circle = load(f'skins\\{skin}\\approachcircle.png',(self.a_c_s,self.a_c_s),True)
 
-        cursor       = load(f'skins\\{skin}\\cursor.png',(c_s,c_s),True)
-        t_s          = c_s/4
-        cursor_trail = load(f'skins\\{skin}\\cursortrail.png',(t_s,t_s),True)
-        trail_pos    = []
-        trail_count  = 0
+        self.cursor       = load(f'skins\\{skin}\\cursor.png',(self.c_s,self.c_s),True)
+        t_s          = self.c_s/4
+        self.cursor_trail = load(f'skins\\{skin}\\cursortrail.png',(t_s,t_s),True)
+        self.trail_pos    = []
+        self.trail_count  = 0
 
-        spinner      = load(f'skins\\{skin}\\spinner.png',(rs(400),rs(400)),True)
-        spin         = 0
-        show_spinner = False
-        spin_tot     = 0
-        spin_tot2    = 0
+        self.spinner      = load(f'skins\\{skin}\\spinner.png',(rs(400),rs(400)),True)
+        self.spin         = 0
+        self.show_spinner = False
+        self.spin_tot     = 0
+        self.spin_tot2    = 0
 
-        pos  = pygame.mouse.get_pos()
+        self.pos  = pygame.mouse.get_pos()
         pos1 = pygame.mouse.get_pos()
-        pos2 = pygame.mouse.get_pos()
-        pos3 = pygame.mouse.get_pos()
+        self.pos3 = pygame.mouse.get_pos()
 
-        click_check = False
+        self.click_check = False
 
-        fpss     = []
-        avg_fps  = 0
-        fps_time = get_time()
-        fps_font = pygame.font.SysFont('arial',round(rs(30)))
+        self.fpss     = []
+        self.avg_fps  = 0
+        self.fps_time = get_time()
+        self.fps_font = pygame.font.SysFont('arial',round(rs(30)))
 
-        number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf',round(c_s/2))
+        self.number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf',round(self.c_s/2))
         
-        acc       = []
-        acc_check = False
-        acc_font  = pygame.font.SysFont('segoeuisemibold',round(rs(45)))
+        self.acc       = []
+        self.acc_check = False
+        self.acc_font  = pygame.font.SysFont('segoeuisemibold',round(rs(45)))
 
-        show_acc = []
-        acc_miss = load(f'skins\\{skin}\\miss.png',(c_s/2,c_s/2),True)
-        acc_100  = load(f'skins\\{skin}\\100.png',(c_s/2,c_s/2),True)
-        acc_50   = load(f'skins\\{skin}\\50.png',(c_s/2,c_s/2),True)
+        self.show_acc = []
+        self.acc_miss = load(f'skins\\{skin}\\miss.png',(self.c_s/2,self.c_s/2),True)
+        self.acc_100  = load(f'skins\\{skin}\\100.png',(self.c_s/2,self.c_s/2),True)
+        self.acc_50   = load(f'skins\\{skin}\\50.png',(self.c_s/2,self.c_s/2),True)
 
-        fade  = False
-        faded = False
+        self.fade  = False
+        self.faded = False
 
-        start_time  = get_time()
-        paused_time = 0
+        self.start_time  = get_time()
+        self.paused_time = 0
         pause_time  = 0
-        end_time    = inf
+        self.end_time    = inf
 
-        cs_od_hp = cs + od + hp
+        cs_od_hp = self.cs + self.od + self.hp
 
         if cs_od_hp < 6 :
-            difficulty_multiplier = 2
+            self.difficulty_multiplier = 2
         
         elif cs_od_hp >= 6 and cs_od_hp < 13 :
-            difficulty_multiplier = 3
+            self.difficulty_multiplier = 3
 
         elif cs_od_hp >= 13 and cs_od_hp < 18 :
-            difficulty_multiplier = 4
+            self.difficulty_multiplier = 4
         
         elif cs_od_hp >= 18 and cs_od_hp < 25 :
-            difficulty_multiplier = 5
+            self.difficulty_multiplier = 5
 
         elif cs_od_hp >= 25 :
-            difficulty_multiplier = 6
+            self.difficulty_multiplier = 6
 
-        mod_multiplier = 1
-        hit_value      = 0
-        score          = 0
-        combo          = 0
-        combo_font     = pygame.font.SysFont('segoeuisemibold',round(rs(90)))
+        self.mod_multiplier = 1
+        self.hit_value      = 0
+        self.score          = 0
+        self.combo          = 0
+        self.combo_font     = pygame.font.SysFont('segoeuisemibold',round(rs(90)))
 
-        max_health       = 600
-        health           = max_health
-        health_minus     = 50*hp/6
-        passive_health   = health_minus/500
-        spin_health      = max_health/300
-        spinner_fade     = False
-        health_bar_bg    = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
-        click_time       = 0
-        click_time_check = False
+        self.max_health       = 600
+        self.health           = self.max_health
+        self.health_minus     = 50*self.hp/6
+        self.passive_health   = self.health_minus/500
+        self.spin_health      = self.max_health/300
+        self.spinner_fade     = False
+        self.health_bar_bg    = pygame.Rect(rs(20),rs(20),rs(600),rs(20))
+        self.click_time       = 0
+        self.click_time_check = False
         
-        spin_score_bonus       = 0
-        spin_score_bonus_time  = 0
-        spin_score_bonus_alpha = 0
+        self.spin_score_bonus       = 0
+        self.spin_score_bonus_time  = 0
+        self.spin_score_bonus_alpha = 0
 
-        ur_50     = pygame.Rect(rs(821),rs(1050),rs(278),rs(8))
-        ur_100    = pygame.Rect(rs(875),rs(1050),rs(172),rs(8))
-        ur_300    = pygame.Rect(rs(928),rs(1050),rs(66),rs(8))
-        ur_middle = pygame.Rect(rs(959),rs(1039),rs(4),rs(30))
-        show_ur   = []
-        total_ur  = []
+        self.ur_50     = pygame.Rect(rs(821),rs(1050),rs(278),rs(8))
+        self.ur_100    = pygame.Rect(rs(875),rs(1050),rs(172),rs(8))
+        self.ur_300    = pygame.Rect(rs(928),rs(1050),rs(66),rs(8))
+        self.ur_middle = pygame.Rect(rs(959),rs(1039),rs(4),rs(30))
+        self.show_ur   = []
+        self.total_ur  = []
 
-        score_txt = combo_font.render('0',False,white).convert()
-        combo_txt = combo_font.render('0',False,white).convert()
-        acc_txt   = acc_font.render('100.00%',False,white).convert()
+        self.score_txt = self.combo_font.render('0',False,self.white).convert()
+        self.combo_txt = self.combo_font.render('0',False,self.white).convert()
+        self.acc_txt   = self.acc_font.render('100.00%',False,self.white).convert()
 
-        music_start = get_time() + start_offset
-        playing     = False
-        waiting     = False
+        self.music_start = get_time() + self.start_offset
+        self.playing     = False
+        self.waiting     = False
 
-        pygame.mixer.music.load(songs[ii][1])
-        pygame.mixer.music.set_volume(volume*volume_music/100)
+        self.death = False
 
-        e  = 0
-        q  = 0
-        UI = True
+        self.numbers = 0
 
-        running = True
-        while running :
+        pygame.mixer.music.load(self.songs[self.ii][1])
+        pygame.mixer.music.set_volume(self.volume*self.volume_music/100)
+
+        self.e  = 0
+        self.q  = 0
+        self.UI = True
+
+        self.running = True
+        while self.running :
             
             my_settings.clock.tick(my_settings.frequence)
 
-            if waiting == False :
+            if self.waiting == False :
 
-                if get_time() - paused_time >= music_start and playing == False :
+                if get_time() - self.paused_time >= self.music_start and self.playing == False :
                 
-                    pygame.mixer.music.play()
-                    playing = True
+                    StartGame(self)
 
-                if q < len(spinners) :
-
-                    if get_time() - paused_time  >=  start_time + spinners[q][0] - ar_time :
-                        
-                        show_spinners.append([get_time()-paused_time,0,spinners[q][1]-spinners[q][0],spinner,0])
-
-                        show_spinner     = True
-                        spinner_fade     = True
-                        click_time_check = False
-                        spin_score_bonus = 0
-
-                        q += 1
+                GetSpinner(self)
                 
-                if e < len(circles) :
+                GetCircle(self)
 
-                    if get_time() - paused_time  >=  start_time + circles[e][2] - ar_time :
+                ApplyBreaks(self)
 
-                        coor = [round(circles[e][0]/512*wi*3/4*0.86+rs(360),2),round(circles[e][1]/384*he*0.86+rs(75),2)]
+                if get_time() >= self.end_time + self.start_offset or self.health <= 0 :
 
-                        if circles[e][3] == 1 :
-                            numbers = 1
-                        else :
-                            numbers += 1
+                    EndGame(self)
 
-                        number = number_font.render(f'{numbers}',False,white).convert()
+                    if self.death == False :
 
-                        show_circles.append([get_time()-paused_time,0,1,a_circle,coor,circles[e][2],number,circle,fade,1,acc_check,faded])
-
-                        e += 1
-
-                elif e == len(circles) :
-
-                    end_time = get_time()
-
-                    e += 1
-
-                if get_time() >= music_start - start_offset/2.5 and break_lock == False :
-                    game_break = False
-                    break_lock = True
-
-                if get_time() >= end_time + start_offset/2.5 :
-                    game_break = True
-
-                if get_time() >= end_time + start_offset or health <= 0 :
-                    running = False
-
-                    pygame.mixer.music.pause()
-
-                    if total_ur != [] :
-                        offset += propose_offset(total_ur,acc_font)
-
-                    with open('assets\\settings.txt','w') as settings_file :
-
-                        modifs = [offset,volume,volume_music,volume_effects]
-
-                        for a in range(len(lines)) :
-
-                            settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
-
-                    if health <= 0 :
-                        play(sounds,'fail',1,volume,volume_effects)
-                        menu()
-
-                    Score(accuracy)
-                    
+                        Score(self.accuracy)
+        
                     pygame.mixer.music.unpause()
                     menu()
 
-            for g in game_breaks :
-
-                if get_time() >= start_time + g[0] - paused_time + 1000 :
-                    game_break = True
+            SetBreak(self)
                 
-                if get_time() >= start_time + g[1] - paused_time - 1000 :
-                    game_break = False
-                    game_breaks.pop(0)
-                
-            if game_break == False :
-                pygame.draw.rect(my_settings.screen,black,noir)
-                UI = True
+            DarkenScreen(self)
 
-            else :
-                my_settings.screen.blit(bg,(0,0))
-                #my_settings.screen.blit(dim,(0,0))
-                UI = False
-
-            for u in show_circles :
-
-                if waiting == False :
-                
-                    u[1] = get_time() - u[0] - paused_time
-
-                    if u[1] >= ar_time and u[8] == False :
-                        u[8] = True
-
-                    if u[2] < 4 :
-
-                        a_c_rescale = a_c_s/u[2]
-                        u[3]        = pygame.transform.smoothscale(a_circle,(a_c_rescale,a_c_rescale)).convert_alpha()
-                    
-                    if u[8] == False :
-
-                        u[3].set_alpha(255*u[2]/2-255/2)
-                        u[7].set_alpha(255*u[2]-255)
-                        u[6].set_alpha(255*u[2]-255)
-
-                        u[2] += 6/fps
-                        u[2]  = round(u[2],2)
-                    
-                    else :
-
-                        u[3].set_alpha(255*u[9])
-                        u[7].set_alpha(255*u[9])
-                        u[6].set_alpha(255*u[9])
-
-                        u[9] -= 6/fps
-                        u[9]  = round(u[9],2)
-
-                center_rect = (u[4][0],u[4][1])
-                a_c_rect    = u[3].get_rect(center = center_rect)
-                circle_rect = u[7].get_rect(center = center_rect)
-                number_rect = u[6].get_rect(center = center_rect)
-
-                my_settings.screen.blit(u[3],a_c_rect)
-                my_settings.screen.blit(u[7],circle_rect)
-                my_settings.screen.blit(u[6],(number_rect[0]+rs(1),number_rect[1]+rs(8)))
+            SetCircles(self)
             
-                if u[1] >= ar_time + od_time :
-                    show_circles.pop(0)
-                    
-                    if u[11] == False :
-
-                        acc.append(0)
-                        show_acc.append([acc_miss,u[4],get_time(),0])
-
-                        acc_check = True
-
-                        health -= health_minus
-
-                        if combo >= 20 :
-                            play(sounds,'miss',1,volume,volume_effects)
-                        combo = 0
+            UItextRenders(self)
             
-            if acc_check :
-
-                accuracy = 0
-
-                if len(acc) != 0 :
-
-                    for w in acc :
-                        accuracy += w
-
-                    accuracy /= len(acc)
-
-                if combo > 2 :
-                    combo_multiplier = combo - 2
-                else :
-                    combo_multiplier = 0
-
-                score += round(hit_value + (hit_value * ((combo_multiplier * difficulty_multiplier * mod_multiplier) / 25)))
-                
-                acc_txt    = acc_font.render(f'{round(accuracy,2)}%',False,white).convert()
-                combo_txt  = combo_font.render(f'{combo}x',False,white).convert()
-                score_txt  = combo_font.render(str(score),False,white).convert()
-
-                acc_check = False
+            SetFps(self)
             
-            fps = round(1000 / (get_time() - fps_time),2)
-
-            fpss.append(fps)
-            if len(fpss) > 40 :
-                fpss.pop(0)
-
-            for i in fpss :
-                avg_fps += i
-
-            fps_time = get_time()
-            avg_fps /= len(fpss)
-            fps_txt  = fps_font.render(f'{round(avg_fps)}fps',False,white).convert()
-            avg_fps  = 0
+            SetShowOnScreen(self)
             
-            if waiting == False :
+            SetSpinners(self)
 
-                trail_count += round(5000/fps)
-                if trail_count > 100 :
+            self.score_txt = self.combo_font.render(str(self.score),False,self.white).convert()
 
-                    trail_pos.append([pos,cursor_trail,255])
-                    trail_count = 0
-                
-                if len(trail_pos) > 8 :
-                    trail_pos.pop(0)
-                
-                health    -= passive_health*160/fps
-                health_bar = pygame.Rect(rs(20),rs(20),rs(600*health/600),rs(20))
+            ShowOnScreen(self)
 
-            for s in show_ur :
-                s[3] = get_time() - s[2] - paused_time
-
-            if show_ur != [] and (len(show_ur) > 20 or show_ur[0][3] >= 8000) :
-                show_ur.pop(0)
-
-            for s in range(len(show_acc)) :
-
-                showed_time = get_time() - show_acc[s][2]
-
-                if showed_time < 300 :
-
-                    show_acc[s][3] += 255/300*1000/fps
-
-                if showed_time >= 300 :
-
-                    show_acc[s][1][1] += 0.5*160/fps
-        
-                if showed_time > 400 :
-
-                    show_acc[s][3] -= 255/100*1000/fps
-
-                show_acc[s][0].set_alpha(show_acc[s][3])
-                show_acc[s][0].convert_alpha()
-
-                if showed_time > 500 :
-
-                    show_acc.pop(0)
-                    break
-
-            if show_offset :
-                
-                if offset < 0 :
-                    offset_txt = fps_font.render(f'Local offset : {offset}ms',False,white).convert()
-                else :
-                    offset_txt = fps_font.render(f'Local offset : +{offset}ms',False,white).convert()
-
-                if get_time() - offset_time - paused_time >= 1000 :
-                    show_offset = False
-            
-            if waiting == False :
-
-                if show_spinner :
-
-                    for p in show_spinners :
-
-                        p[1] = get_time() - p[0] - paused_time
-                        if p[1] >= p[2] :
-
-                            spinner_fade = True
-
-                            if p[4] > 0 :
-
-                                p[4] -= 0.6/fps
-                                p[3].set_alpha(p[4]*255)
-
-                            else :
-                                
-                                show_spinner = False
-                                show_spinners.pop(0)
-
-                        if p[4] < 1 and spinner_fade == False :
-                            
-                            p[3].set_alpha(p[4]*255)
-                            p[4] += 0.6/fps
-
-                    if click_check :
-
-                        if click_time_check == False :
-                            click_time_check = True
-
-                            click_time = get_time()
-
-                        pos2 = pygame.mouse.get_pos()
-
-                        spin_center = math.hypot(wi/2-pos[0],he/2-pos[1])
-                        spin_x      = (pos[0]-pos2[0])/spin_center*60
-                        spin_y      = (pos[1]-pos2[1])/spin_center*60
-                        
-                        spin = spinning(spin,pos2,spin_x,spin_y)
-                        
-                        for p in show_spinners :
-
-                            if get_time() - click_time >= p[2] / 2 :
-
-                                if abs(spin - spin_tot2) > 66 :
-                                    spin_tot2 = spin
-                                    score    += 10
-
-                                    if health < max_health - spin_health :
-                                        health += spin_health
-                                    else :
-                                        health = max_health
-                                    
-                                    play(sounds,'spinnerspin',0.5,volume,volume_effects)
-                                    
-                                if abs(spin - spin_tot) > 330 :
-                                    spin_tot = spin
-                                    score   += 950
-                                    play(sounds,'spinnerbonus',1,volume,volume_effects)
-
-                                    spin_score_bonus_time = get_time()
-                                    spin_score_bonus     += 1
-
-                                    spin_score = combo_font.render(str(spin_score_bonus*1000),False,white).convert()
-
-                if get_time() < spin_score_bonus_time + 1000 :
-
-                    if spin_score_bonus_alpha < 1 :
-
-                        spin_score_bonus_alpha += 6/fps
-                        spin_score.set_alpha(spin_score_bonus_alpha*255)
-
-                elif spin_score_bonus_alpha > 0 :
-
-                    spin_score_bonus_alpha -= 6/fps
-                    spin_score.set_alpha(spin_score_bonus_alpha*255)
-
-            for p in show_spinners :
-
-                spinner_spin = pygame.transform.rotate(p[3],spin).convert_alpha()
-                spinner_rect = spinner_spin.get_rect(center = (wi/2,he/2))
-                
-                my_settings.screen.blit(spinner_spin,spinner_rect)
-
-            score_txt = combo_font.render(str(score),False,white).convert()
-
-            if UI :
-
-                my_settings.screen.blit(combo_txt,(rs(20),rs(960)))
-                my_settings.screen.blit(score_txt,(rs(1910)-score_txt.get_width(),rs(-20)))
-                my_settings.screen.blit(acc_txt,(rs(1910)-acc_txt.get_width(),rs(80)))
-                my_settings.screen.blit(fps_txt,(rs(1910)-fps_txt.get_width(),rs(1075)-fps_txt.get_height()))
-
-                pygame.draw.rect(my_settings.screen,grey,health_bar_bg)
-                pygame.draw.rect(my_settings.screen,white,health_bar)
-                
-            pygame.draw.rect(my_settings.screen,orange,ur_50)
-            pygame.draw.rect(my_settings.screen,green,ur_100)
-            pygame.draw.rect(my_settings.screen,blue,ur_300)
-            pygame.draw.rect(my_settings.screen,white,ur_middle)
-
-            for u in show_ur :
-                
-                ur_hit = pygame.Rect(rs(961+u[1]),rs(1039),rs(2),rs(30))
-                pygame.draw.rect(my_settings.screen,u[0],ur_hit)
-
-            for s in show_acc :
-
-                show_acc_rect = s[0].get_rect(center = (s[1][0],s[1][1]-rs(60)))
-                my_settings.screen.blit(s[0],show_acc_rect)
-            
-            if show_offset :
-
-                offset_txt_rect = offset_txt.get_rect(center = (wi/2,rs(20)))
-                my_settings.screen.blit(offset_txt,offset_txt_rect)
-
-            if spin_score_bonus_alpha > 0 :
-
-                spin_score_rect = spin_score.get_rect(center = (wi/2,he/4*3))
-                my_settings.screen.blit(spin_score,spin_score_rect)
-
-            for t in trail_pos :
-
-                if waiting == False :
-
-                    t[2] -= 7*160/fps
-                t[1].set_alpha(t[2])
-
-                trail_rect = t[1].get_rect(center = t[0])
-                my_settings.screen.blit(t[1],trail_rect)
-
-            if waiting == False :
-                pos3 = pygame.mouse.get_pos()
-            
-            cursor_rect = cursor.get_rect(center = pos3)
-            my_settings.screen.blit(cursor,cursor_rect)
-
-            if waiting :
-
-                waiting_cursor_rect = cursor.get_rect(center = pos)
-                my_settings.screen.blit(cursor,waiting_cursor_rect)
-
-            pos = pygame.mouse.get_pos()
+            self.pos = pygame.mouse.get_pos()
 
             pygame.display.flip()
             
             key = pygame.key.get_pressed()
             for event in pygame.event.get() :
 
-                if waiting == False :
+                if self.waiting == False :
 
                     if event.type == pygame.KEYDOWN and (event.key == pygame.K_x or event.key == pygame.K_v) :
 
-                        if click_check == False :
-                            click_check = True
+                        if self.click_check == False :
+                            self.click_check = True
                         
-                        for v in range(len(show_circles)) :
-
-                            if acc_check == False and show_circles[v][11] == False :
-
-                                distance = math.hypot(show_circles[v][4][0]-pos[0],show_circles[v][4][1]-pos[1])
-
-                                if distance < c_s/2*115/121 :
-
-                                    acc_check = True
-
-                                    difference = get_time() - (start_time + show_circles[v][5] + paused_time) + offset
-                                    total_ur.append(difference)
-
-                                    if abs(difference) < od_time :
-
-                                        if abs(difference) < od_time/4 :
-                                            hit_value = 300
-                                            show_ur.append([blue,278*difference/od_time/2,get_time(),0])
-
-                                        if abs(difference) > od_time/4 and abs(difference) < od_time/2 :
-                                            hit_value = 100
-                                            show_ur.append([green,278*difference/od_time/2,get_time(),0])
-                                            show_acc.append([acc_100,show_circles[v][4],get_time(),0])
-                                        
-                                        if abs(difference) > od_time/2 :
-                                            hit_value = 50
-                                            show_ur.append([orange,278*difference/od_time/2,get_time(),0])
-                                            show_acc.append([acc_50,show_circles[v][4],get_time(),0])
-
-                                        acc.append(round(hit_value/3,2))
-                                        health_bonus = round(hit_value/30,2)
-
-                                        if health + health_bonus < max_health :
-                                            health += health_bonus
-                                        else :
-                                            health = max_health
-
-                                        play(sounds,'hit',0.5,volume,volume_effects)
-                                        combo += 1
-
-                                    else :
-
-                                        hit_value = 0
-
-                                        acc.append(0)
-                                        show_acc.append([acc_miss,show_circles[v][4],get_time(),0])
-
-                                        health -= health_minus
-
-                                        if combo >= 20 :
-                                            play(sounds,'miss',1,volume,volume_effects)
-                                        combo = 0
-
-                                    show_circles[v][8]  = True
-                                    show_circles[v][11] = True
-
+                        SetAcc(self)
+                        
                     if event.type == pygame.KEYUP and (event.key == pygame.K_x or event.key == pygame.K_v) :
-                        click_check = False
+                        self.click_check = False
 
                 else :
 
@@ -781,62 +234,56 @@ class Run :
 
                     if (event.type == pygame.KEYDOWN and event.key == pygame.K_x) or (event.type == pygame.KEYDOWN and event.key == pygame.K_v) :
                         
-                        distance1 = math.hypot(pos1[0]-pos[0],pos1[1]-pos[1])
+                        distance1 = math.hypot(pos1[0]-self.pos[0],pos1[1]-self.pos[1])
 
                         if distance1 < 5 :
 
-                            waiting = False
+                            self.waiting = False
 
                             pygame.mixer.music.unpause()
                                                         
-                            paused_time += get_time() - pause_time
+                            self.paused_time += get_time() - pause_time
                         
                 if  (event.type == pygame.KEYDOWN and event.key == pygame.K_TAB and key[pygame.K_LSHIFT]) or\
                     (event.type == pygame.KEYDOWN and event.key == pygame.K_LSHIFT and key[pygame.K_TAB]) :
-                    if UI :
-                        UI = False
+                    if self.UI :
+                        self.UI = False
                     else :
-                        UI = True
+                        self.UI = True
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_EQUALS :
 
                     if key[pygame.K_LSHIFT] :
-                        offset += 1
+                        self.offset += 1
                     else :
-                        offset += 5
+                        self.offset += 5
 
-                    offset_time = get_time()
-                    show_offset = True
+                    self.offset_time = get_time()
+                    self.show_offset = True
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_MINUS :
 
                     if key[pygame.K_LSHIFT] :
-                        offset -= 1
+                        self.offset -= 1
                     else :
-                        offset -= 5
+                        self.offset -= 5
 
-                    offset_time = get_time()
-                    show_offset = True
+                    self.offset_time = get_time()
+                    self.show_offset = True
 
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
-                    running = False
+                    self.running = False
 
-                    with open('assets\\settings.txt','w') as settings_file :
-
-                        modifs = [offset,volume,volume_music,volume_effects]
-
-                        for a in range(len(lines)) :
-
-                            settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
+                    WriteSettings(self)
 
                     pygame.quit()
                     exit(0)
 
                 if (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) :
-                    running = False
+                    self.running = False
                     
-                    if waiting :
-                        paused_time += get_time() - pause_time
+                    if self.waiting :
+                        self.paused_time += get_time() - pause_time
 
                     pause_time = get_time()
 
@@ -846,13 +293,7 @@ class Run :
                     my_settings.screen.blit(pause_screen,(0,0))
                     pygame.display.flip()
                     
-                    with open('assets\\settings.txt','w') as settings_file :
-
-                        modifs = [offset,volume,volume_music,volume_effects]
-
-                        for a in range(len(lines)) :
-
-                            settings_file.write(lines[a].replace(lines[a],f'{modifs[a]}\n'))
+                    WriteSettings(self)
 
                     loop = True
                     while loop :
@@ -861,12 +302,12 @@ class Run :
 
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
                                 loop    = False
-                                running = True
-                                waiting = True
+                                self.running = True
+                                self.waiting = True
 
                                 pygame.mouse.set_visible(False)
 
-                                fps_time += get_time() - pause_time
+                                self.fps_time += get_time() - pause_time
 
                             if event.type == pygame.KEYDOWN and event.key == pygame.K_q :
                                 loop  = False
@@ -882,6 +323,12 @@ class Run :
 def menu() :
 
     pygame.mouse.set_visible(True)
+
+    wi = my_settings.width
+    he = my_settings.height
+
+    black  = (  0,  0,  0)
+    white  = (255,255,255)
 
     noir = pygame.Rect(0,0,wi,he)
     font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(rs(45)))
