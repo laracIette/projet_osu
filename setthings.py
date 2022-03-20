@@ -1,64 +1,173 @@
-import math
-from sounds import Play
-from tools import GetTime
+def SetMap(self) :
 
-def SetAcc(self) :
+    circles0,self.circles = [],[]
 
-    for v in range(len(self.show_circles)) :
+    cs_t,ar_t,od_t,hp_t = [],[],[],[]
 
-        if self.acc_check == False and self.show_circles[v][11] == False :
+    spinner_lock       = False
+    spinners0,self.spinners = [],[]
 
-            distance = math.hypot(self.show_circles[v][4][0]-self.pos[0],self.show_circles[v][4][1]-self.pos[1])
+    a   = 0
+    map = self.songs[self.map][2][self.diff]
+        
 
-            if distance < self.c_s/2*115/121 :
+    with open(map,'r') as map_file :
 
-                self.acc_check = True
+        for i in map_file :
 
-                difference = GetTime() - (self.start_time + self.show_circles[v][5] + self.paused_time) + self.offset
-                self.total_ur.append(difference)
+            if spinner_lock == False :
+                
+                for o in i:
 
-                if abs(difference) < self.od_time :
+                    if o == 's' :
 
-                    if abs(difference) < self.od_time/4 :
-                        self.hit_value = 300
-                        self.show_ur.append([self.blue,278*difference/self.od_time/2,GetTime(),0])
+                        spinner_lock = True
 
-                    if abs(difference) > self.od_time/4 and abs(difference) < self.od_time/2 :
-                        self.hit_value = 100
-                        self.show_ur.append([self.green,278*difference/self.od_time/2,GetTime(),0])
-                        self.show_acc.append([self.acc_100,self.show_circles[v][4],GetTime(),0])
-                    
-                    if abs(difference) > self.od_time/2 :
-                        self.hit_value = 50
-                        self.show_ur.append([self.orange,278*difference/self.od_time/2,GetTime(),0])
-                        self.show_acc.append([self.acc_50,self.show_circles[v][4],GetTime(),0])
+            if spinner_lock == False :
 
-                    self.acc.append(round(self.hit_value/3,2))
-                    health_bonus = round(self.hit_value/30,2)
+                a += 1
 
-                    if self.health + health_bonus < self.max_health :
-                        self.health += health_bonus
-                    else :
-                        self.health = self.max_health
+                if i == '\n' :
+                    continue
 
-                    Play(self.sounds,'hit',0.5,self.volume,self.volume_effects)
-                    self.combo += 1
+                elif a == 1 :
+                    for o in i :
+                        if o != '\n' :
+                            cs_t.append(o)
+
+                    self.cs = ''.join(cs_t)
+                    self.cs = float(self.cs)
+
+                elif a == 2 :
+                    for o in i :
+                        if o != '\n' :
+                            ar_t.append(o)
+
+                    ar = ''.join(ar_t)
+                    ar = float(ar)
+
+                    self.ar_time = 450*10/ar
+
+                elif a == 3 :
+                    for o in i :
+                        if o != '\n' :
+                            od_t.append(o)
+
+                    self.od = ''.join(od_t)
+                    self.od = float(self.od)
+
+                    self.od_time = 100*10/self.od
+                
+                elif a == 4 :
+                    for o in i :
+                        if o != '\n' :
+                            hp_t.append(o)
+
+                    self.hp = ''.join(hp_t)
+                    self.hp = float(self.hp)
 
                 else :
+                    circles0.append(i)
 
-                    self.hit_value = 0
+            else :
+                self.spinners.append(i)
 
-                    self.acc.append(0)
-                    self.show_acc.append([self.acc_miss,self.show_circles[v][4],GetTime(),0])
+    cycle = 1
+    for c in circles0[0] :
+        if c == ',' :
+                cycle += 1
 
-                    self.health -= self.health_minus
+    tab = []
+    for j in circles0 :
 
-                    if self.combo >= 20 :
-                        Play(self.sounds,'miss',1,self.volume,self.volume_effects)
-                    self.combo = 0
+        for k in j :
 
-                self.show_circles[v][8]  = True
-                self.show_circles[v][11] = True
+            if k != ',' and k != '\n' :
+                tab.append(k)
+
+            else :
+                tab = ''.join(tab)
+                self.circles.append(tab)
+                tab = []
+
+    circles0 = []
+    for m in self.circles :
+        circles0.append(int(m))
+    
+    num     = 0
+    self.circles = []
+
+    self.start_offset = 2500-circles0[2]
+
+    for i in range(int(len(circles0)/cycle)) :
+        circles0[i*cycle+2] += self.start_offset
+
+        for j in range(cycle) :
+
+            tab.append(circles0[num])
+            num += 1
+
+        self.circles.append(tab)
+        tab = []
+    
+    for j in self.spinners :
+
+        for k in j :
+
+            if k != ',' and k != 's' and k != '\n' :
+                tab.append(k)
+
+            elif tab != [] :
+                tab = ''.join(tab)
+                spinners0.append(tab)
+                tab = []
+    
+    for r in range(len(spinners0)) :
+        spinners0[r]  = int(spinners0[r])
+        spinners0[r] += self.start_offset
+
+    self.spinners = []
+    h = 0
+    for r in range(int(len(spinners0)/2)) :
+
+        self.spinners.append([spinners0[h],spinners0[h+1]])
+        
+        h += 2
+
+    c = 0
+    u = 0
+    hit_objects = []
+    for i in range(len(self.circles) + len(self.spinners)) :
+
+        if self.spinners == [] or u == len(self.spinners) :
+            hit_objects.append([self.circles[c][2],0])
+            c += 1
+            continue
+
+        if self.circles == [] or c == len(self.circles) :
+            hit_objects.append([self.spinners[u][0],1])
+            hit_objects.append([self.spinners[u][1],1])
+            u += 1
+            continue
+
+        if self.circles[c][2] < self.spinners[u][0] :
+            hit_objects.append([self.circles[c][2],0])
+            
+            if c < len(self.circles) : c += 1
+
+        else :
+            hit_objects.append([self.spinners[u][0],1])
+            hit_objects.append([self.spinners[u][1],1])
+            
+            if u < len(self.spinners) : u += 1
+    
+    self.game_breaks = []
+    for p in range(len(hit_objects)-1) :
+        
+        if (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p][1] != 1) or\
+           (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
+           
+            self.game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
 
 def SetMultiplier(self) :
     

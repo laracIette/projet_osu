@@ -14,7 +14,16 @@ def DarkenScreen(self) :
 
 def ShowOnScreen(self) :
 
-    if self.UI :
+    if self.UI == False and self.UI_alpha > 0 :
+            
+        self.UI_alpha -= 20*160/self.fps
+
+    if self.UI_alpha > 0 :
+
+        self.combo_txt.set_alpha(self.UI_alpha)
+        self.score_txt.set_alpha(self.UI_alpha)
+        self.acc_txt.set_alpha(self.UI_alpha)
+        self.fps_txt.set_alpha(self.UI_alpha)
 
         self.my_settings.screen.blit(self.combo_txt,(ReSize(20),ReSize(960)))
         self.my_settings.screen.blit(self.score_txt,(ReSize(1910)-self.score_txt.get_width(),ReSize(-20)))
@@ -23,7 +32,7 @@ def ShowOnScreen(self) :
 
         pygame.draw.rect(self.my_settings.screen,self.grey,self.health_bar_bg)
         pygame.draw.rect(self.my_settings.screen,self.white,self.health_bar)
-        
+
     pygame.draw.rect(self.my_settings.screen,self.orange,self.ur_50)
     pygame.draw.rect(self.my_settings.screen,self.green,self.ur_100)
     pygame.draw.rect(self.my_settings.screen,self.blue,self.ur_300)
@@ -176,4 +185,5 @@ def HideUI(self) :
         if self.UI :
             self.UI = False
         else :
-            self.UI = True
+            self.UI       = True
+            self.UI_alpha = 255

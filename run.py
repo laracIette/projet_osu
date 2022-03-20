@@ -1,15 +1,17 @@
 import glob
 import pygame
 from math import inf
+import pygame.freetype
 from gameend import Score
 from settings import Settings
 from sounds import ImportSounds
-from setthings import SetMultiplier
 from tools import GetTime, Load, ReSize
+from setthings import SetMultiplier, SetMap
+from objects import GetCircle, GetSpinner, SetCircles, SetSpinners
 from interface import DarkenScreen, HideUI, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
-from objects import GetCircle, GetFollowPoints, GetSpinner, SetFollowPoints, SetSpinners, SetCircles
+#from objects import GetCircle, GetFollowPoint, GetSpinner, SetCircles, SetFollowPoints, SetSpinners
+from game import ApplyBreaks, ChangeOffset, EndGame, GameQuit, GetClicks, GetPause, SetBreak, StartGame, UnPause
 from menu import DiffSelect, MapSelect, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
-from game import ApplyBreaks, ChangeOffset, EndGame, GameQuit, GetClicks, GetPause, SetBreak, SetMap, StartGame, UnPause
 
 class Run :
 
@@ -48,11 +50,12 @@ class Run :
 
         SetMap(self)
 
-        self.pause_screen = Load('images\\pause_screen.png',(self.wi,self.he),False)
-        #self.dim         = Load('images\\noir93.png',(self.wi,self.he),False)
+        self.pause_screen = Load(f'skins\\{self.skin}\\pausescreen.png',(self.wi,self.he),False)
+        self.end_screen   = Load(f'skins\\{self.skin}\\endscreen.png',(self.wi,self.he),False)
         self.bg           = pygame.transform.scale(self.songs[self.map][0],(self.wi,self.he)).convert()
         self.noir         = pygame.Rect(0,0,self.wi,self.he)
-        
+        #self.dim         = Load('images\\noir93.png',(self.wi,self.he),False)
+
         self.game_break = True
         self.break_lock = False
         
@@ -84,15 +87,23 @@ class Run :
         self.fps_font = pygame.font.SysFont('arial',round(ReSize(30)))
 
         self.number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf',round(self.c_s/2))
+        self.score_font  = pygame.freetype.SysFont('segoeuisemibold',round(75))
         
         self.acc       = []
         self.acc_check = False
         self.acc_font  = pygame.font.SysFont('segoeuisemibold',round(ReSize(45)))
 
+        self.rep_font = pygame.freetype.SysFont('segoeuisemibold',round(ReSize(45)))
+        
         self.show_acc = []
         self.acc_miss = Load(f'skins\\{self.skin}\\miss.png',(self.c_s/2,self.c_s/2),True)
         self.acc_100  = Load(f'skins\\{self.skin}\\100.png',(self.c_s/2,self.c_s/2),True)
         self.acc_50   = Load(f'skins\\{self.skin}\\50.png',(self.c_s/2,self.c_s/2),True)
+
+        self.t_miss = 0
+        self.t_300  = 0
+        self.t_100  = 0
+        self.t_50   = 0
 
         self.fade  = False
         self.faded = False
@@ -156,10 +167,12 @@ class Run :
         pygame.mixer.music.load(self.songs[self.map][1])
         pygame.mixer.music.set_volume(self.volume*self.volume_music/100)
 
-        self.e  = 0
-        self.q  = 0
-        self.f  = 0
-        self.UI = True
+        self.UI_alpha = 255
+        self.UI       = True
+
+        self.e = 0
+        self.q = 0
+        self.f = 0
 
         self.running = True
         while self.running :
@@ -176,7 +189,7 @@ class Run :
                 
                 GetCircle(self)
 
-                GetFollowPoints(self)
+                #GetFollowPoint(self)
 
                 ApplyBreaks(self)
 
@@ -195,7 +208,7 @@ class Run :
                 
             DarkenScreen(self)
 
-            SetFollowPoints(self)
+            #SetFollowPoints(self)
 
             SetCircles(self)
             

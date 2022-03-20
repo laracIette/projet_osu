@@ -1,5 +1,5 @@
 import pygame
-from tools import Load
+from tools import Load, ReSize
 
 def ProposeOffset(self) :
 
@@ -19,22 +19,25 @@ def ProposeOffset(self) :
         ur_moy = round(ur_moy)
 
         if ur_moy < 0 :
-            rep = self.acc_font.render(f'You are tapping {abs(ur_moy)}ms earlier, do you want to apply a negative offset of {abs(ur_moy)}ms ?',False,self.white).convert()
+            rep_txt = f'You are tapping {abs(ur_moy)}ms earlier, do you want to apply a negative offset of {abs(ur_moy)}ms ?'
         
         if ur_moy > 0 :
-            rep = self.acc_font.render(f'You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?',False,self.white).convert()
+            rep_txt = f'You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?'
 
-        rep_rect = rep.get_rect(center = (self.wi/2,self.he/2))
+        rep_rect        = self.rep_font.get_rect(rep_txt)
+        rep_rect.center = (self.wi/2,self.he/2)
 
-        yes      = self.acc_font.render(f'Yes',False,self.white).convert()
-        yes_rect = yes.get_rect(center = (self.wi/3,self.he/3*2))
+        yes_txt         = 'Yes'
+        yes_rect        = self.rep_font.get_rect(yes_txt)
+        yes_rect.center = (self.wi/3,self.he/3*2)
 
-        no      = self.acc_font.render(f'No',False,self.white).convert()
-        no_rect = no.get_rect(center = (self.wi/3*2,self.he/3*2))
+        no_txt         = 'No'
+        no_rect        = self.rep_font.get_rect(no_txt)
+        no_rect.center = (self.wi/3*2,self.he/3*2)
         
-        self.my_settings.screen.blit(rep,rep_rect)
-        self.my_settings.screen.blit(yes,yes_rect)
-        self.my_settings.screen.blit(no,no_rect)
+        self.rep_font.render_to(self.my_settings.screen,rep_rect,rep_txt,self.white)
+        self.rep_font.render_to(self.my_settings.screen,yes_rect,yes_txt,self.white)
+        self.rep_font.render_to(self.my_settings.screen,no_rect,no_txt,self.white)
         
         pygame.display.flip()
         
@@ -57,15 +60,17 @@ def ProposeOffset(self) :
 
                         return 0
 
-
 def Score(self) :
 
-    end_screen = Load('images\\end_screen.png',(self.wi,self.he),False)
+    self.my_settings.screen.blit(self.bg,(0,0))
+    self.my_settings.screen.blit(self.end_screen,(0,0))
 
-    self.my_settings.screen.blit(end_screen,(0,0))
+    self.score_font.render_to(self.my_settings.screen,(ReSize(305),ReSize(585)),str(self.t_miss),self.white)
+    self.score_font.render_to(self.my_settings.screen,(ReSize(154),ReSize(175)),str(self.t_300),self.white)
+    self.score_font.render_to(self.my_settings.screen,(ReSize(154),ReSize(307)),str(self.t_100),self.white)
+    self.score_font.render_to(self.my_settings.screen,(ReSize(154),ReSize(439)),str(self.t_50),self.white)
+
     pygame.display.flip()
-
-    #print('accuracy :',round(self.accuracy,2))
 
     loop = True
     while loop :

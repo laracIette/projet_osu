@@ -9,6 +9,8 @@ def GetSpinner(self) :
 
         if GetTime() - self.paused_time  >=  self.start_time + self.spinners[self.q][0] - self.ar_time :
 
+            self.show_spinners.append([GetTime()-self.paused_time,0,self.spinners[self.q][1]-self.spinners[self.q][0],self.spinner,0])
+
             self.show_spinner     = True
             self.spinner_fade     = True
             self.click_time_check = False
@@ -21,7 +23,7 @@ def SetSpinners(self) :
     if self.waiting == False :
 
         if self.show_spinner :
-
+            
             for p in self.show_spinners :
 
                 p[1] = GetTime() - p[0] - self.paused_time
@@ -143,7 +145,8 @@ def GetCircle(self) :
 
         if GetTime() - self.paused_time  >=  self.start_time + self.circles[self.e][2] - self.ar_time :
 
-            coor = [round(self.circles[self.e][0]/512*self.wi*3/4*0.86+ReSize(360),2),round(self.circles[self.e][1]/384*self.he*0.86+ReSize(75),2)]
+            coor = [round(self.circles[self.e][0] / 512 * self.wi * 3/4 * 0.86 + ReSize(360),2),
+                    round(self.circles[self.e][1] / 384 * self.he       * 0.86 + ReSize(75), 2)]
 
             if self.circles[self.e][3] == 1 :
                 self.numbers = 1
@@ -210,6 +213,8 @@ def SetCircles(self) :
             
             if u[11] == False :
 
+                self.t_miss += 1
+
                 self.acc.append(0)
                 self.show_acc.append([self.acc_miss,u[4],GetTime(),0])
 
@@ -220,32 +225,34 @@ def SetCircles(self) :
                 if self.combo >= 20 :
                     Play(self.sounds,'miss',1,self.volume,self.volume_effects)
                 self.combo = 0
-
-def GetFollowPoints(self) :
+'''
+def GetFollowPoint(self) :
 
     if self.f < len(self.circles) - 1 :
 
         if GetTime() - self.paused_time  >=  self.start_time + self.circles[self.f][2] - self.ar_time :
 
-            coor1 = [round(self.circles[self.f][0]/512*self.wi*3/4*0.86+ReSize(360),2),round(self.circles[self.f][1]/384*self.he*0.86+ReSize(75),2)]
-            coor2 = [round(self.circles[self.f+1][0]/512*self.wi*3/4*0.86+ReSize(360),2),round(self.circles[self.f+1][1]/384*self.he*0.86+ReSize(75),2)]
+            coor1 = [round(self.circles[self.f][0]   / 512 * self.wi * 3/4 * 0.86 + ReSize(360),2),
+                     round(self.circles[self.f][1]   / 384 * self.he       * 0.86 + ReSize(75), 2)]
+            coor2 = [round(self.circles[self.f+1][0] / 512 * self.wi * 3/4 * 0.86 + ReSize(360),2),
+                     round(self.circles[self.f+1][1] / 384 * self.he       * 0.86 + ReSize(75), 2)]
+
+            if coor1 != coor2 and self.circles[self.f+1][3] != 1 :
+
+                followpoint_angle = math.degrees(math.atan((coor2[0]-coor1[0]) / math.hypot((coor2[0]-coor1[0]),(coor2[1]-coor1[1]))))
+
+                followpoint = pygame.transform.rotate(self.followpoint,followpoint_angle).convert_alpha()
+
+                if coor1[0] >= coor2[0] : x = coor2[0]
+                if coor1[1] >= coor2[1] : y = coor2[1]
+                if coor1[0] <  coor2[0] : x = coor1[0]
+                if coor1[1] <  coor2[1] : y = coor1[1]
+
+                center_rect      = (abs((coor2[0]-coor1[0])/2) + x,
+                                    abs((coor2[1]-coor1[1])/2) + y)
+                followpoint_rect = self.followpoint.get_rect(center = center_rect)
             
-            followpoint_angle = 0
-
-            followpoint = pygame.transform.rotate(self.followpoint,followpoint_angle).convert_alpha()
-
-            if coor1[0] > coor2[0] : x = coor2[0]
-            if coor1[1] > coor2[1] : y = coor2[1]
-            if coor1[0] == coor2[0] : x = coor1[0]
-            if coor1[1] == coor2[1] : y = coor1[1]
-            if coor1[0] < coor2[0] : x = coor1[0]
-            if coor1[1] < coor2[1] : y = coor1[1]
-
-            center_rect      = (abs((coor2[0]-coor1[0])/2) + x,
-                                abs((coor2[1]-coor1[1])/2) + y)
-            followpoint_rect = self.followpoint.get_rect(center = center_rect)
-            
-            self.show_followpoints.append([GetTime()-self.paused_time,0,followpoint_angle,followpoint_rect,followpoint,0])
+                self.show_followpoints.append([GetTime()-self.paused_time,0,followpoint_rect,followpoint,0])
 
             self.f += 1
 
@@ -257,19 +264,20 @@ def SetFollowPoints(self) :
         
             f[1] = GetTime() - f[0] - self.paused_time
 
-            if f[5] < 1 and f[1] < self.ar_time :
+            if f[4] < 1 and f[1] < self.ar_time :
 
-                f[5] += 6/self.fps
-                f[5]  = round(f[5],2)
+                f[4] += 6/self.fps
+                f[4]  = round(f[4],2)
 
-            f[4].set_alpha(f[5]*255)
+            f[3].set_alpha(f[4]*255)
 
-            self.my_settings.screen.blit(f[4],f[3])
+            self.my_settings.screen.blit(f[3],f[2])
 
             if f[1] > self.ar_time :
 
-                f[5] -= 6/self.fps
-                f[5]  = round(f[5],2)
+                f[4] -= 6/self.fps
+                f[4]  = round(f[4],2)
 
                 if f[1] > self.ar_time + self.od_time :
                     self.show_followpoints.pop(0)
+'''
