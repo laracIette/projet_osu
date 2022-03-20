@@ -27,16 +27,14 @@ def ApplyBreaks(self) :
 def SetMap(self) :
 
     circles0,self.circles = [],[]
-    self.show_circles     = []
 
     cs_t,ar_t,od_t,hp_t = [],[],[],[]
 
     spinner_lock       = False
     spinners0,self.spinners = [],[]
-    self.show_spinners      = []
 
     a   = 0
-    map = self.songs[self.ii][2][self.diff]
+    map = self.songs[self.map][2][self.diff]
         
 
     with open(map,'r') as map_file :
@@ -155,7 +153,7 @@ def SetMap(self) :
         spinners0[r] += self.start_offset
 
     self.spinners = []
-    h        = 0
+    h = 0
     for r in range(int(len(spinners0)/2)) :
 
         self.spinners.append([spinners0[h],spinners0[h+1]])
@@ -193,7 +191,8 @@ def SetMap(self) :
     for p in range(len(hit_objects)-1) :
         
         if (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p][1] != 1) or\
-            (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
+           (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
+           
             self.game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
 
 def StartGame(self) :
@@ -222,12 +221,11 @@ def EndGame(self) :
 
             settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
 
-
 def Write(self) :
 
     with open('assets\\settings.txt','w') as settings_file :
 
-        modifs = [self.offset,self.volume,self.volume_music,self.volume_effects]
+        modifs = [self.offset,self.volume,self.volume_music,self.volume_effects,self.skin]
 
         for a in range(len(self.lines)) :
 

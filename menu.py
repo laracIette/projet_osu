@@ -107,7 +107,7 @@ def MenuShowVolume(self) :
         self.my_settings.screen.blit(self.music_txt,(self.music_rect.x,self.music_rect.y))
         self.my_settings.screen.blit(self.effects_txt,(self.effects_rect.x,self.effects_rect.y))
 
-def SetVolumes(self) :
+def SetVolumeOffsetSkin(self) :
 
     with open('assets\\settings.txt','r') as settings_file :
 
@@ -131,6 +131,14 @@ def SetVolumes(self) :
             if a == 3 :
 
                 self.volume_effects = int(i)
+
+            if a == 4 :
+
+                skin_t = []
+                for s in self.lines[a] :
+                    if s != '\n' :
+                        skin_t.append(s)
+                self.skin = ''.join(skin_t)
 
             a += 1
                     
@@ -181,17 +189,17 @@ def MapSelect(self) :
         if song_rect.collidepoint(self.pos) :
 
             self.choosing_diff = True
-            self.iii = self.ii
+            self.map = self.ii
 
             Play(self.sounds,'click',1,self.volume,self.volume_effects)
 
 def DiffSelect(self) :
 
-    diff = self.font.render(self.diffs[self.i],False,self.white).convert()
+    diff = self.font.render(self.diffs[self.diff],False,self.white).convert()
 
     diff_rect   = diff.get_rect()
     diff_rect.x = self.wi/5
-    diff_rect.y = self.he/20*self.i+self.he/5*self.iii
+    diff_rect.y = self.he/20*self.diff+self.he/5*self.map
 
     if diff_rect.collidepoint(self.pos) :
         self.diff_choice = True

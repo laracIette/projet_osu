@@ -6,14 +6,14 @@ from settings import Settings
 from sounds import ImportSounds
 from setthings import SetMultiplier
 from tools import GetTime, Load, ReSize
-from objects import GetCircle, GetSpinner, SetSpinners, SetCircles
 from interface import DarkenScreen, HideUI, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
-from menu import DiffSelect, MapSelect, ModifyVolumes, MenuShowVolume, SetVolumes, SkinSelect, SongSelect
+from objects import GetCircle, GetFollowPoints, GetSpinner, SetFollowPoints, SetSpinners, SetCircles
+from menu import DiffSelect, MapSelect, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
 from game import ApplyBreaks, ChangeOffset, EndGame, GameQuit, GetClicks, GetPause, SetBreak, SetMap, StartGame, UnPause
 
 class Run :
 
-    def __init__(self,ii,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines) :
+    def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines) :
 
         self.my_settings = Settings()
 
@@ -23,8 +23,9 @@ class Run :
         self.offset = offset
         self.songs  = songs
         self.diff   = diff
-        self.ii     = ii
+        self.map    = map
         self.lines  = lines
+        self.skin   = skin
 
         self.sounds         = sounds
         self.volume         = volume
@@ -49,24 +50,24 @@ class Run :
 
         self.pause_screen = Load('images\\pause_screen.png',(self.wi,self.he),False)
         #self.dim         = Load('images\\noir93.png',(self.wi,self.he),False)
-        self.bg           = pygame.transform.scale(self.songs[self.ii][0],(self.wi,self.he)).convert()
+        self.bg           = pygame.transform.scale(self.songs[self.map][0],(self.wi,self.he)).convert()
         self.noir         = pygame.Rect(0,0,self.wi,self.he)
         
         self.game_break = True
         self.break_lock = False
         
         self.c_s     = ReSize(121/self.cs*4.9)
-        self.circle  = Load(f'skins\\{skin}\\hitcircle.png',(self.c_s,self.c_s),True)
+        self.circle  = Load(f'skins\\{self.skin}\\hitcircle.png',(self.c_s,self.c_s),True)
 
         self.a_c_s    = self.c_s*4
-        self.a_circle = Load(f'skins\\{skin}\\approachcircle.png',(self.a_c_s,self.a_c_s),True)
+        self.a_circle = Load(f'skins\\{self.skin}\\approachcircle.png',(self.a_c_s,self.a_c_s),True)
 
-        self.cursor       = Load(f'skins\\{skin}\\cursor.png',(self.c_s,self.c_s),True)
-        self.cursor_trail = Load(f'skins\\{skin}\\cursortrail.png',(self.c_s/4,self.c_s/4),True)
+        self.cursor       = Load(f'skins\\{self.skin}\\cursor.png',(self.c_s,self.c_s),True)
+        self.cursor_trail = Load(f'skins\\{self.skin}\\cursortrail.png',(self.c_s/4,self.c_s/4),True)
         self.trail_pos    = []
         self.trail_count  = 0
 
-        self.spinner      = Load(f'skins\\{skin}\\spinner.png',(ReSize(400),ReSize(400)),True)
+        self.spinner      = Load(f'skins\\{self.skin}\\spinner.png',(ReSize(400),ReSize(400)),True)
         self.spin         = 0
         self.show_spinner = False
         self.spin_tot     = 0
@@ -89,9 +90,9 @@ class Run :
         self.acc_font  = pygame.font.SysFont('segoeuisemibold',round(ReSize(45)))
 
         self.show_acc = []
-        self.acc_miss = Load(f'skins\\{skin}\\miss.png',(self.c_s/2,self.c_s/2),True)
-        self.acc_100  = Load(f'skins\\{skin}\\100.png',(self.c_s/2,self.c_s/2),True)
-        self.acc_50   = Load(f'skins\\{skin}\\50.png',(self.c_s/2,self.c_s/2),True)
+        self.acc_miss = Load(f'skins\\{self.skin}\\miss.png',(self.c_s/2,self.c_s/2),True)
+        self.acc_100  = Load(f'skins\\{self.skin}\\100.png',(self.c_s/2,self.c_s/2),True)
+        self.acc_50   = Load(f'skins\\{self.skin}\\50.png',(self.c_s/2,self.c_s/2),True)
 
         self.fade  = False
         self.faded = False
@@ -132,6 +133,13 @@ class Run :
         self.show_ur   = []
         self.total_ur  = []
 
+        self.followpoint  = Load(f'skins\\{self.skin}\\followpoint.png',(ReSize(128),ReSize(20)),True)
+        self.followpoints = []
+
+        self.show_circles      = []
+        self.show_spinners     = []
+        self.show_followpoints = []
+
         self.score_txt = self.combo_font.render('0',False,self.white).convert()
         self.combo_txt = self.combo_font.render('0',False,self.white).convert()
         self.acc_txt   = self.acc_font.render('100.00%',False,self.white).convert()
@@ -145,11 +153,12 @@ class Run :
 
         self.numbers = 0
 
-        pygame.mixer.music.load(self.songs[self.ii][1])
+        pygame.mixer.music.load(self.songs[self.map][1])
         pygame.mixer.music.set_volume(self.volume*self.volume_music/100)
 
         self.e  = 0
         self.q  = 0
+        self.f  = 0
         self.UI = True
 
         self.running = True
@@ -167,6 +176,8 @@ class Run :
                 
                 GetCircle(self)
 
+                GetFollowPoints(self)
+
                 ApplyBreaks(self)
 
                 if GetTime() >= self.end_time + self.start_offset or self.health <= 0 :
@@ -183,6 +194,8 @@ class Run :
             SetBreak(self)
                 
             DarkenScreen(self)
+
+            SetFollowPoints(self)
 
             SetCircles(self)
             
@@ -223,7 +236,7 @@ class Run :
                 
                 GameQuit(self)
 
-class Menu() :
+class Menu :
 
     def __init__(self) :
 
@@ -240,11 +253,10 @@ class Menu() :
         self.noir = pygame.Rect(0,0,self.wi,self.he)
         self.font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(ReSize(45)))
         
-        self.skin   = 'whitecat'
+        SetVolumeOffsetSkin(self)
+
         self.songs  = SongSelect(self)
         self.sounds = ImportSounds(self.skin)
-
-        SetVolumes(self)
 
         self.show_volume = True
 
@@ -289,20 +301,20 @@ class Menu() :
 
             if self.choosing_diff :
 
-                self.diffs = self.songs[self.iii][3]
+                self.diffs = self.songs[self.map][3]
                 for i in range(len(self.diffs)) :
             
                     diff = self.font.render(self.diffs[i],False,self.white).convert()
-                    self.my_settings.screen.blit(diff,(self.wi/5,self.he/20*i+self.he/5*self.iii))
+                    self.my_settings.screen.blit(diff,(self.wi/5,self.he/20*i+self.he/5*self.map))
 
                 if self.event.type == pygame.MOUSEBUTTONDOWN and self.event.button == pygame.BUTTON_LEFT :
 
-                    for self.i in range(len(self.diffs)) :
+                    for self.diff in range(len(self.diffs)) :
                     
                         DiffSelect(self)
 
                         if self.diff_choice == True :
-                            Run(self.iii,self.i,self.songs,self.skin,self.sounds,self.volume,self.volume_music,self.volume_effects,self.offset,self.lines)          
+                            Run(self.map,self.diff,self.songs,self.skin,self.sounds,self.volume,self.volume_music,self.volume_effects,self.offset,self.lines)          
 
             MenuShowVolume(self)
 

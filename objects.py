@@ -8,8 +8,6 @@ def GetSpinner(self) :
     if self.q < len(self.spinners) :
 
         if GetTime() - self.paused_time  >=  self.start_time + self.spinners[self.q][0] - self.ar_time :
-            
-            self.show_spinners.append([GetTime()-self.paused_time,0,self.spinners[self.q][1]-self.spinners[self.q][0],self.spinner,0])
 
             self.show_spinner     = True
             self.spinner_fade     = True
@@ -17,7 +15,7 @@ def GetSpinner(self) :
             self.spin_score_bonus = 0
 
             self.q += 1
-            
+
 def SetSpinners(self) :
 
     if self.waiting == False :
@@ -56,8 +54,8 @@ def SetSpinners(self) :
                 self.pos2 = pygame.mouse.get_pos()
 
                 spin_center = math.hypot(self.wi/2-self.pos[0],self.he/2-self.pos[1])
-                self.spin_x      = (self.pos[0]-self.pos2[0])/spin_center*60
-                self.spin_y      = (self.pos[1]-self.pos2[1])/spin_center*60
+                self.spin_x = (self.pos[0]-self.pos2[0])/spin_center*60
+                self.spin_y = (self.pos[1]-self.pos2[1])/spin_center*60
                 
                 self.spin = Spinning(self)
                 
@@ -77,8 +75,10 @@ def SetSpinners(self) :
                             Play(self.sounds,'spinnerspin',0.5,self.volume,self.volume_effects)
                             
                         if abs(self.spin - self.spin_tot) > 330 :
+
                             self.spin_tot = self.spin
                             self.score   += 950
+                            
                             Play(self.sounds,'spinnerbonus',1,self.volume,self.volume_effects)
 
                             self.spin_score_bonus_time = GetTime()
@@ -196,7 +196,7 @@ def SetCircles(self) :
                 u[9] -= 6/self.fps
                 u[9]  = round(u[9],2)
 
-        center_rect = (u[4][0],u[4][1])
+        center_rect = u[4]
         a_c_rect    = u[3].get_rect(center = center_rect)
         circle_rect = u[7].get_rect(center = center_rect)
         number_rect = u[6].get_rect(center = center_rect)
@@ -220,3 +220,56 @@ def SetCircles(self) :
                 if self.combo >= 20 :
                     Play(self.sounds,'miss',1,self.volume,self.volume_effects)
                 self.combo = 0
+
+def GetFollowPoints(self) :
+
+    if self.f < len(self.circles) - 1 :
+
+        if GetTime() - self.paused_time  >=  self.start_time + self.circles[self.f][2] - self.ar_time :
+
+            coor1 = [round(self.circles[self.f][0]/512*self.wi*3/4*0.86+ReSize(360),2),round(self.circles[self.f][1]/384*self.he*0.86+ReSize(75),2)]
+            coor2 = [round(self.circles[self.f+1][0]/512*self.wi*3/4*0.86+ReSize(360),2),round(self.circles[self.f+1][1]/384*self.he*0.86+ReSize(75),2)]
+            
+            followpoint_angle = 0
+
+            followpoint = pygame.transform.rotate(self.followpoint,followpoint_angle).convert_alpha()
+
+            if coor1[0] > coor2[0] : x = coor2[0]
+            if coor1[1] > coor2[1] : y = coor2[1]
+            if coor1[0] == coor2[0] : x = coor1[0]
+            if coor1[1] == coor2[1] : y = coor1[1]
+            if coor1[0] < coor2[0] : x = coor1[0]
+            if coor1[1] < coor2[1] : y = coor1[1]
+
+            center_rect      = (abs((coor2[0]-coor1[0])/2) + x,
+                                abs((coor2[1]-coor1[1])/2) + y)
+            followpoint_rect = self.followpoint.get_rect(center = center_rect)
+            
+            self.show_followpoints.append([GetTime()-self.paused_time,0,followpoint_angle,followpoint_rect,followpoint,0])
+
+            self.f += 1
+
+def SetFollowPoints(self) :
+
+    for f in self.show_followpoints :
+
+        if self.waiting == False :
+        
+            f[1] = GetTime() - f[0] - self.paused_time
+
+            if f[5] < 1 and f[1] < self.ar_time :
+
+                f[5] += 6/self.fps
+                f[5]  = round(f[5],2)
+
+            f[4].set_alpha(f[5]*255)
+
+            self.my_settings.screen.blit(f[4],f[3])
+
+            if f[1] > self.ar_time :
+
+                f[5] -= 6/self.fps
+                f[5]  = round(f[5],2)
+
+                if f[1] > self.ar_time + self.od_time :
+                    self.show_followpoints.pop(0)
