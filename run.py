@@ -7,9 +7,8 @@ from settings import Settings
 from sounds import ImportSounds
 from tools import GetTime, Load, ReSize
 from setthings import SetMultiplier, SetMap
-from objects import GetCircle, GetSpinner, SetCircles, SetSpinners
 from interface import DarkenScreen, HideUI, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
-#from objects import GetCircle, GetFollowPoint, GetSpinner, SetCircles, SetFollowPoints, SetSpinners
+from objects import GetCircle, GetFollowPoint, GetSpinner, SetCircles, SetFollowPoints, SetSpinners
 from game import ApplyBreaks, ChangeOffset, EndGame, GameQuit, GetClicks, GetPause, SetBreak, StartGame, UnPause
 from menu import DiffSelect, MapSelect, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
 
@@ -189,7 +188,7 @@ class Run :
                 
                 GetCircle(self)
 
-                #GetFollowPoint(self)
+                GetFollowPoint(self)
 
                 ApplyBreaks(self)
 
@@ -208,7 +207,7 @@ class Run :
                 
             DarkenScreen(self)
 
-            #SetFollowPoints(self)
+            SetFollowPoints(self)
 
             SetCircles(self)
             
