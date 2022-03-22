@@ -43,10 +43,10 @@ def SetMap(self) :
                         if o != '\n' :
                             ar_t.append(o)
 
-                    ar = ''.join(ar_t)
-                    ar = float(ar)
+                    self.ar = ''.join(ar_t)
+                    self.ar = float(self.ar)
 
-                    self.ar_time = 450*10/ar
+                    SetAR(self)
 
                 elif a == 3 :
                     for o in i :
@@ -56,7 +56,7 @@ def SetMap(self) :
                     self.od = ''.join(od_t)
                     self.od = float(self.od)
 
-                    self.od_time = 100*10/self.od
+                    SetOD(self)
                 
                 elif a == 4 :
                     for o in i :
@@ -168,6 +168,36 @@ def SetMap(self) :
            (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
            
             self.game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
+
+def SetAR(self) :
+
+    ars = {
+        0  : [1800,120],
+        1  : [1680,120],
+        2  : [1560,120],
+        3  : [1440,120],
+        4  : [1320,120],
+        5  : [1200,150],
+        6  : [1050,150],
+        7  : [900,150],
+        8  : [750,150],
+        9  : [600,150],
+        10 : [450,150],
+        11 : [300,150],
+    }
+
+    self.ar_int  = ars[round(self.ar)][0]
+    self.ar_rest = round(self.ar,1)-round(self.ar)
+    self.ar_time = ars[round(self.ar)][0] - ars[round(self.ar)][1]*self.ar_rest
+    self.ar_time = round(self.ar_time)
+
+def SetOD(self) :
+
+    self.od_time = 79.5 - self.od*6
+
+def SetHP(self) :
+
+    pass
 
 def SetMultiplier(self) :
     

@@ -51,14 +51,14 @@ class Run :
 
         self.pause_screen = Load(f'skins\\{self.skin}\\pausescreen.png',(self.wi,self.he),False)
         self.end_screen   = Load(f'skins\\{self.skin}\\endscreen.png',(self.wi,self.he),False)
+        self.dim          = Load('images\\noir93.png',(self.wi,self.he),False)
         self.bg           = pygame.transform.scale(self.songs[self.map][0],(self.wi,self.he)).convert()
         self.noir         = pygame.Rect(0,0,self.wi,self.he)
-        #self.dim         = Load('images\\noir93.png',(self.wi,self.he),False)
 
         self.game_break = True
         self.break_lock = False
         
-        self.c_s     = ReSize(121/self.cs*4.9)
+        self.c_s     = round(ReSize(218 - self.cs*18))
         self.circle  = Load(f'skins\\{self.skin}\\hitcircle.png',(self.c_s,self.c_s),True)
 
         self.a_c_s    = self.c_s*4
@@ -206,7 +206,7 @@ class Run :
             SetBreak(self)
                 
             DarkenScreen(self)
-
+            
             SetFollowPoints(self)
 
             SetCircles(self)
@@ -306,7 +306,7 @@ class Menu :
             for i in range(len(self.maps)) :
 
                 bgs = glob.glob(f'{self.maps[i]}\\*.jpg')
-                bg  = pygame.image.load(bgs[1]).convert()
+                bg  = pygame.image.load(bgs[0]).convert()
                 bg  = pygame.transform.scale(bg,(self.wi/5,self.he/5)).convert()
 
                 self.my_settings.screen.blit(bg,(0,self.he/5*i))

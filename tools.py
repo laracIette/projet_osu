@@ -9,6 +9,10 @@ he = my_settings.height
 def Load(name,size,smooth) :
 
     image = pygame.image.load(f'assets\\{name}').convert_alpha()
+
+    if image.get_width() == size[0] and image.get_height() == size[1] :
+        return image
+
     if smooth :
         image = pygame.transform.smoothscale(image,size).convert_alpha()
     else :

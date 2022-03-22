@@ -9,8 +9,64 @@ def DarkenScreen(self) :
 
     else :
         self.my_settings.screen.blit(self.bg,(0,0))
-        #self.my_settings.screen.blit(self.dim,(0,0))
+        self.my_settings.screen.blit(self.dim,(0,0))
         #self.UI = False
+
+def SetShowOnScreen(self) :
+
+    if self.waiting == False :
+
+        self.trail_count += round(5000/self.fps)
+        if self.trail_count > 100 :
+
+            self.trail_pos.append([self.pos,self.cursor_trail,255])
+            self.trail_count = 0
+        
+        if len(self.trail_pos) > 8 :
+            self.trail_pos.pop(0)
+        
+        self.health    -= self.passive_health*160/self.fps
+        self.health_bar = pygame.Rect(ReSize(20),ReSize(20),ReSize(600*self.health/600),ReSize(20))
+
+    for s in self.show_ur :
+        s[3] = GetTime() - s[2] - self.paused_time
+
+    if self.show_ur != [] and (len(self.show_ur) > 20 or self.show_ur[0][3] >= 8000) :
+        self.show_ur.pop(0)
+
+    for s in range(len(self.show_acc)) :
+
+        showed_time = GetTime() - self.show_acc[s][2]
+
+        if showed_time < 300 :
+
+            self.show_acc[s][3] += 255/300*1000/self.fps
+
+        if showed_time >= 300 :
+
+            self.show_acc[s][1][1] += 0.5*160/self.fps
+
+        if showed_time > 400 :
+
+            self.show_acc[s][3] -= 255/100*1000/self.fps
+
+        self.show_acc[s][0].set_alpha(self.show_acc[s][3])
+        self.show_acc[s][0].convert_alpha()
+
+        if showed_time > 500 :
+
+            self.show_acc.pop(0)
+            break
+
+    if self.show_offset :
+        
+        if self.offset < 0 :
+            self.offset_txt = self.fps_font.render(f'Local offset : {self.offset}ms',False,self.white).convert()
+        else :
+            self.offset_txt = self.fps_font.render(f'Local offset : +{self.offset}ms',False,self.white).convert()
+
+        if GetTime() - self.offset_time - self.paused_time >= 1000 :
+            self.show_offset = False
 
 def ShowOnScreen(self) :
 
@@ -78,62 +134,6 @@ def ShowOnScreen(self) :
 
         waiting_cursor_rect = self.cursor.get_rect(center = self.pos)
         self.my_settings.screen.blit(self.cursor,waiting_cursor_rect)
-
-def SetShowOnScreen(self) :
-
-    if self.waiting == False :
-
-        self.trail_count += round(5000/self.fps)
-        if self.trail_count > 100 :
-
-            self.trail_pos.append([self.pos,self.cursor_trail,255])
-            self.trail_count = 0
-        
-        if len(self.trail_pos) > 8 :
-            self.trail_pos.pop(0)
-        
-        self.health    -= self.passive_health*160/self.fps
-        self.health_bar = pygame.Rect(ReSize(20),ReSize(20),ReSize(600*self.health/600),ReSize(20))
-
-    for s in self.show_ur :
-        s[3] = GetTime() - s[2] - self.paused_time
-
-    if self.show_ur != [] and (len(self.show_ur) > 20 or self.show_ur[0][3] >= 8000) :
-        self.show_ur.pop(0)
-
-    for s in range(len(self.show_acc)) :
-
-        showed_time = GetTime() - self.show_acc[s][2]
-
-        if showed_time < 300 :
-
-            self.show_acc[s][3] += 255/300*1000/self.fps
-
-        if showed_time >= 300 :
-
-            self.show_acc[s][1][1] += 0.5*160/self.fps
-
-        if showed_time > 400 :
-
-            self.show_acc[s][3] -= 255/100*1000/self.fps
-
-        self.show_acc[s][0].set_alpha(self.show_acc[s][3])
-        self.show_acc[s][0].convert_alpha()
-
-        if showed_time > 500 :
-
-            self.show_acc.pop(0)
-            break
-
-    if self.show_offset :
-        
-        if self.offset < 0 :
-            self.offset_txt = self.fps_font.render(f'Local offset : {self.offset}ms',False,self.white).convert()
-        else :
-            self.offset_txt = self.fps_font.render(f'Local offset : +{self.offset}ms',False,self.white).convert()
-
-        if GetTime() - self.offset_time - self.paused_time >= 1000 :
-            self.show_offset = False
 
 def SetFps(self) :
 
