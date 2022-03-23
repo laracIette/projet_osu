@@ -94,7 +94,7 @@ def SetMap(self) :
     for m in self.circles :
         circles0.append(int(m))
     
-    num     = 0
+    num = 0
     self.circles = []
 
     self.start_offset = 2500-circles0[2]

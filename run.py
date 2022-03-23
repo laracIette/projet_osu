@@ -2,19 +2,19 @@ import glob
 import pygame
 from math import inf
 import pygame.freetype
-from gameend import Score
 from settings import Settings
 from sounds import ImportSounds
+from gameend import Score, GameQuit
 from tools import GetTime, Load, ReSize
 from setthings import SetMultiplier, SetMap
 from interface import DarkenScreen, HideUI, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
 from objects import GetCircle, GetFollowPoint, GetSpinner, SetCircles, SetFollowPoints, SetSpinners
-from game import ApplyBreaks, ChangeOffset, EndGame, GameQuit, GetClicks, GetPause, SetBreak, StartGame, UnPause
+from game import ApplyBreaks, ChangeOffset, EndGame, GetClicks, GetPause, SetBreak, StartGame, UnPause
 from menu import DiffSelect, MapSelect, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
 
 class Run :
 
-    def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines) :
+    def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines,map_name,diff_name) :
 
         self.my_settings = Settings()
 
@@ -27,6 +27,9 @@ class Run :
         self.map    = map
         self.lines  = lines
         self.skin   = skin
+
+        self.map_name  = map_name
+        self.diff_name = diff_name
 
         self.sounds         = sounds
         self.volume         = volume
@@ -120,6 +123,7 @@ class Run :
         self.hit_value      = 0
         self.score          = 0
         self.combo          = 0
+        self.max_combo      = 0
         self.combo_font     = pygame.font.SysFont('segoeuisemibold',round(ReSize(90)))
 
         self.max_health       = 600
@@ -157,6 +161,8 @@ class Run :
         self.music_start = GetTime() + self.start_offset
         self.playing     = False
         self.waiting     = False
+
+        self.replay_clicks = []
 
         self.death   = False
         self.to_menu = False
@@ -326,7 +332,7 @@ class Menu :
                         DiffSelect(self)
 
                         if self.diff_choice == True :
-                            Run(self.map,self.diff,self.songs,self.skin,self.sounds,self.volume,self.volume_music,self.volume_effects,self.offset,self.lines)          
+                            Run(self.map,self.diff,self.songs,self.skin,self.sounds,self.volume,self.volume_music,self.volume_effects,self.offset,self.lines,self.map_names[self.map],self.diffs[self.diff])          
 
             MenuShowVolume(self)
 

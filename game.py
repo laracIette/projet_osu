@@ -2,7 +2,7 @@ import math
 import pygame
 from sounds import Play
 from tools import GetTime
-from gameend import ProposeOffset
+from gameend import GameQuit, ProposeOffset, Write
 
 def SetBreak(self) :
     for g in self.game_breaks :
@@ -42,16 +42,6 @@ def EndGame(self) :
         self.offset += ProposeOffset(self)
 
     Write(self)
-
-def Write(self) :
-
-    with open('assets\\settings.txt','w') as settings_file :
-
-        modifs = [self.offset,self.volume,self.volume_music,self.volume_effects,self.skin]
-
-        for a in range(len(self.lines)) :
-
-            settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
 
 def GetPause(self) :
     
@@ -134,21 +124,13 @@ def ChangeOffset(self) :
         self.offset_time = GetTime()
         self.show_offset = True
 
-def GameQuit(self) :
-
-    if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
-
-        Write(self)
-
-        pygame.quit()
-        exit(0)
-
 def GetClicks(self) :
 
     if self.event.type == pygame.KEYDOWN and (self.event.key == pygame.K_x or self.event.key == pygame.K_v) :
-
-        if self.click_check == False :
-            self.click_check = True
+        
+        self.click_check = True
+        
+        self.replay_clicks.append(self.pos)
         
         GetAcc(self)
         
@@ -201,7 +183,9 @@ def GetAcc(self) :
                         self.health = self.max_health
 
                     Play(self.sounds,'hit',0.5,self.volume,self.volume_effects)
+                    
                     self.combo += 1
+                    if self.combo > self.max_combo : self.max_combo = self.combo
 
                 else :
                     

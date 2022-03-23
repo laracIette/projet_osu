@@ -1,5 +1,6 @@
+from datetime import datetime
 import pygame
-from tools import Load, ReSize
+from tools import ReSize
 
 def ProposeOffset(self) :
 
@@ -44,9 +45,16 @@ def ProposeOffset(self) :
         loop = True
         while loop :
 
-            for event in pygame.event.get() :
+            self.key = pygame.key.get_pressed()
+            for self.event in pygame.event.get() :
 
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT :
+                GameQuit(self)
+
+                if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F2 :
+
+                    WriteReplay(self)
+
+                if self.event.type == pygame.MOUSEBUTTONDOWN and self.event.button == pygame.BUTTON_LEFT :
 
                     pos = pygame.mouse.get_pos()
 
@@ -75,14 +83,53 @@ def Score(self) :
     loop = True
     while loop :
 
-        key = pygame.key.get_pressed()
-        for event in pygame.event.get() :
+        self.key = pygame.key.get_pressed()
+        for self.event in pygame.event.get() :
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_q :
+            GameQuit(self)
+
+            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F2 :
+
+                WriteReplay(self)
+
+            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_q :
                 loop = False
 
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
-                loop = False
+def WriteReplay(self) :
 
-                pygame.quit()
-                exit(0)
+    now = datetime.now()
+    replay_name = now.strftime(f'{self.map_name} [{self.diff_name}] (%Y-%m-%d - %H.%M.%S)')
+
+    with open(f'assets\\replays\\{replay_name}.txt', 'w') as replay :
+        
+        replay.write(f'{self.score}\n')
+        replay.write(f'{self.t_300}\n')
+        replay.write(f'{self.t_100}\n')
+        replay.write(f'{self.t_50}\n')
+        replay.write(f'{self.t_miss}\n')
+        replay.write(f'{self.accuracy}\n')
+        replay.write(f'{self.max_combo}\n')
+
+        for i in self.replay_clicks :
+
+            replay.write(f'{i}\n')
+
+def Write(self) :
+
+    with open('assets\\settings.txt','w') as settings_file :
+
+        modifs = [self.offset,self.volume,self.volume_music,self.volume_effects,self.skin]
+
+        for a in range(len(self.lines)) :
+
+            settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
+
+
+def GameQuit(self) :
+
+    if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
+
+        Write(self)
+        
+        pygame.quit()
+        exit(0)

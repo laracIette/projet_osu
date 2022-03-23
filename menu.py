@@ -1,8 +1,8 @@
 import os
 import glob
 import pygame
-from game import Write
 from sounds import Play
+from gameend import Write
 from tools import GetTime
 
 def SkinSelect(self) :
@@ -70,6 +70,11 @@ def SongSelect(self) :
 
         audio = glob.glob(f'{self.maps[i]}\\*.mp3')
         audio = audio[0]
+        
+        self.map_names = []
+        for j in self.maps :
+
+            self.map_names.append(os.path.basename(j))
 
         diffs = []
         diff  = glob.glob(f'{self.maps[i]}\\*.txt')
