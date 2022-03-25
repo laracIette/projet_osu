@@ -2,4 +2,6 @@
 
 i try to recreate osu with python and pygame
 
-osu! : https://github.com/ppy/osu
+notes are in French
+
+osu! : <https://github.com/ppy/osu>
