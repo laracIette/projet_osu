@@ -5,7 +5,7 @@ from sounds import Play
 from gameend import Write
 from tools import GetTime
 
-def SkinSelect(self) :
+def SkinSelect(self) : # selection du skin
 
     pygame.draw.rect(self.my_settings.screen,self.black,self.noir)
 
@@ -61,7 +61,7 @@ def SkinSelect(self) :
                 pygame.quit()
                 exit(0)
 
-def SongSelect(self) :
+def SongSelect(self) : # definition des maps possibles
 
     self.maps  = glob.glob('assets\\songs\\*')
     self.songs = []
@@ -94,7 +94,7 @@ def SongSelect(self) :
 
     return self.songs
 
-def MenuShowVolume(self) :
+def MenuShowVolume(self) : # affiche le volume dans le menu
 
     if self.show_volume :
             
@@ -104,15 +104,15 @@ def MenuShowVolume(self) :
             self.show_volume = False
             return 0
 
-        self.volume_rect.x = self.wi-self.volume_txt.get_width()
-        self.music_rect.x = self.wi-self.music_txt.get_width()
+        self.volume_rect.x  = self.wi-self.volume_txt.get_width()
+        self.music_rect.x   = self.wi-self.music_txt.get_width()
         self.effects_rect.x = self.wi-self.effects_txt.get_width()
 
         self.my_settings.screen.blit(self.volume_txt,(self.volume_rect.x,self.volume_rect.y))
         self.my_settings.screen.blit(self.music_txt,(self.music_rect.x,self.music_rect.y))
         self.my_settings.screen.blit(self.effects_txt,(self.effects_rect.x,self.effects_rect.y))
 
-def SetVolumeOffsetSkin(self) :
+def SetVolumeOffsetSkin(self) : # recupere et attribut les donnees de settings.txt
 
     with open('assets\\settings.txt','r') as settings_file :
 
@@ -149,7 +149,7 @@ def SetVolumeOffsetSkin(self) :
                     
     self.volumes = [self.volume,self.volume_music,self.volume_effects]
 
-def ModifyVolumes(self) :
+def ModifyVolumes(self) : # detecte si besoin et applique changement de volume
 
     rects = [self.volume_rect,self.music_rect,self.effects_rect]
 
@@ -181,7 +181,7 @@ def ModifyVolumes(self) :
     
     self.volume_time = GetTime()
 
-def MapSelect(self) :
+def MapSelect(self) : # selection de la map
 
     for self.ii in range(len(self.songs)) :
 
@@ -198,7 +198,7 @@ def MapSelect(self) :
 
             Play(self.sounds,'click',1,self.volume,self.volume_effects)
 
-def DiffSelect(self) :
+def DiffSelect(self) : # selection de la difficulte
 
     diff = self.font.render(self.diffs[self.diff],False,self.white).convert()
 

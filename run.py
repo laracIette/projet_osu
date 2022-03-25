@@ -1,7 +1,10 @@
+# bibliotheques systeme
 import glob
 import pygame
 from math import inf
 import pygame.freetype
+
+# mes bibliotheques
 from settings import Settings
 from sounds import ImportSounds
 from gameend import Score, GameQuit
@@ -12,7 +15,7 @@ from objects import GetCircle, GetFollowPoint, GetSpinner, SetCircles, SetFollow
 from game import ApplyBreaks, ChangeOffset, EndGame, GetClicks, GetPause, SetBreak, StartGame, UnPause
 from menu import DiffSelect, MapSelect, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
 
-class Run :
+class Osu : # classe correspondante a une partie (une seule map)
 
     def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines,map_name,diff_name) :
 
@@ -180,81 +183,84 @@ class Run :
         self.f = 0
 
         self.running = True
-        while self.running :
+
+    def OsuRun(osu) : # deroulement de la partie
+
+        while osu.running :
             
-            self.my_settings.clock.tick(self.my_settings.frequence)
+            osu.my_settings.clock.tick(osu.my_settings.frequence)
 
-            if self.waiting == False :
+            if osu.waiting == False :
 
-                if GetTime() - self.paused_time >= self.music_start and self.playing == False :
+                if GetTime() - osu.paused_time >= osu.music_start and osu.playing == False :
                 
-                    StartGame(self)
+                    StartGame(osu)
 
-                GetSpinner(self)
+                GetSpinner(osu)
                 
-                GetCircle(self)
+                GetCircle(osu)
 
-                GetFollowPoint(self)
+                GetFollowPoint(osu)
 
-                ApplyBreaks(self)
+                ApplyBreaks(osu)
 
-                if GetTime() >= self.end_time + self.start_offset or self.health <= 0 :
+                if GetTime() >= osu.end_time + osu.start_offset or osu.health <= 0 :
 
-                    EndGame(self)
+                    EndGame(osu)
 
-                    if self.death == False :
+                    if osu.death == False :
 
-                        Score(self)
+                        Score(osu)
         
                     pygame.mixer.music.unpause()
                     Menu()
 
-            SetBreak(self)
+            SetBreak(osu)
                 
-            DarkenScreen(self)
+            DarkenScreen(osu)
             
-            SetFollowPoints(self)
+            SetFollowPoints(osu)
 
-            SetCircles(self)
+            SetCircles(osu)
             
-            UItextRenders(self)
+            UItextRenders(osu)
             
-            SetFps(self)
+            SetFps(osu)
             
-            SetShowOnScreen(self)
+            SetShowOnScreen(osu)
             
-            SetSpinners(self)
+            SetSpinners(osu)
 
-            self.score_txt = self.combo_font.render(str(self.score),False,self.white).convert()
+            osu.score_txt = osu.combo_font.render(str(osu.score),False,osu.white).convert()
 
-            ShowOnScreen(self)
+            ShowOnScreen(osu)
 
-            self.pos = pygame.mouse.get_pos()
+            osu.pos = pygame.mouse.get_pos()
 
             pygame.display.flip()
             
-            self.key = pygame.key.get_pressed()
-            for self.event in pygame.event.get() :
+            osu.key = pygame.key.get_pressed()
+            for osu.event in pygame.event.get() :
 
-                if self.waiting == False :
-                    GetClicks(self)
+                if osu.waiting == False :
+                    GetClicks(osu)
 
                 else :
-                    UnPause(self)
+                    UnPause(osu)
                         
-                HideUI(self)
+                HideUI(osu)
 
-                ChangeOffset(self)
+                ChangeOffset(osu)
 
-                GetPause(self)
+                GetPause(osu)
 
-                if self.to_menu :
+                if osu.to_menu :
 
-                    Menu()
+                    Menu.MenuChoice()
                 
-                GameQuit(self)
+                GameQuit(osu)
 
-class Menu :
+class Menu : # classe correspondante au menu du jeu
 
     def __init__(self) :
 
@@ -300,61 +306,65 @@ class Menu :
         self.diff_choice   = False
         self.choosing_diff = False
 
-        loop = True
-        while loop :
+        self.loop = True
 
-            self.my_settings.clock.tick(self.my_settings.frequence)
+    def MenuChoice(menu) : # determine les options a prendre en compte pour le lancement d'une partie
+
+        while menu.loop :
+
+            menu.my_settings.clock.tick(menu.my_settings.frequence)
             
             pygame.display.flip()
 
-            pygame.draw.rect(self.my_settings.screen,self.black,self.noir)
+            pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
             
-            for i in range(len(self.maps)) :
+            for i in range(len(menu.maps)) :
 
-                bgs = glob.glob(f'{self.maps[i]}\\*.jpg')
+                bgs = glob.glob(f'{menu.maps[i]}\\*.jpg')
                 bg  = pygame.image.load(bgs[0]).convert()
-                bg  = pygame.transform.scale(bg,(self.wi/5,self.he/5)).convert()
+                bg  = pygame.transform.scale(bg,(menu.wi/5,menu.he/5)).convert()
 
-                self.my_settings.screen.blit(bg,(0,self.he/5*i))
+                menu.my_settings.screen.blit(bg,(0,menu.he/5*i))
 
-            if self.choosing_diff :
+            if menu.choosing_diff :
 
-                self.diffs = self.songs[self.map][3]
-                for i in range(len(self.diffs)) :
+                menu.diffs = menu.songs[menu.map][3]
+                for i in range(len(menu.diffs)) :
             
-                    diff = self.font.render(self.diffs[i],False,self.white).convert()
-                    self.my_settings.screen.blit(diff,(self.wi/5,self.he/20*i+self.he/5*self.map))
+                    diff = menu.font.render(menu.diffs[i],False,menu.white).convert()
+                    menu.my_settings.screen.blit(diff,(menu.wi/5,menu.he/20*i+menu.he/5*menu.map))
 
-                if self.event.type == pygame.MOUSEBUTTONDOWN and self.event.button == pygame.BUTTON_LEFT :
+                if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
 
-                    for self.diff in range(len(self.diffs)) :
+                    for menu.diff in range(len(menu.diffs)) :
                     
-                        DiffSelect(self)
+                        DiffSelect(menu)
 
-                        if self.diff_choice == True :
-                            Run(self.map,self.diff,self.songs,self.skin,self.sounds,self.volume,self.volume_music,self.volume_effects,self.offset,self.lines,self.map_names[self.map],self.diffs[self.diff])          
+                        if menu.diff_choice == True :
+                            osu = Osu(menu.map,menu.diff,menu.songs,menu.skin,menu.sounds,menu.volume,menu.volume_music,menu.volume_effects,menu.offset,menu.lines,menu.map_names[menu.map],menu.diffs[menu.diff])
+                            osu.OsuRun()
 
-            MenuShowVolume(self)
+            MenuShowVolume(menu)
 
-            self.key = pygame.key.get_pressed()
-            for self.event in pygame.event.get() :
+            menu.key = pygame.key.get_pressed()
+            for menu.event in pygame.event.get() :
 
-                self.pos = pygame.mouse.get_pos()
+                menu.pos = pygame.mouse.get_pos()
 
-                if self.event.type == pygame.MOUSEBUTTONDOWN :
+                if menu.event.type == pygame.MOUSEBUTTONDOWN :
 
-                    if self.event.button == 4 or self.event.button == 5 :
+                    if menu.event.button == 4 or menu.event.button == 5 :
 
-                        ModifyVolumes(self)
+                        ModifyVolumes(menu)
 
-                    if self.event.button == pygame.BUTTON_LEFT :
+                    if menu.event.button == pygame.BUTTON_LEFT :
 
-                        MapSelect(self)
+                        MapSelect(menu)
                     
-                if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_s :
-                    self.skin = SkinSelect(self)
+                if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_s :
+                    menu.skin = SkinSelect(menu)
 
-                if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_ESCAPE and self.choosing_diff :
-                    self.choosing_diff = False
+                if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_ESCAPE and menu.choosing_diff :
+                    menu.choosing_diff = False
                     
-                GameQuit(self)
+                GameQuit(menu)

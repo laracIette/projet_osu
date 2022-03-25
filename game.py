@@ -4,7 +4,8 @@ from sounds import Play
 from tools import GetTime
 from gameend import GameQuit, ProposeOffset, Write
 
-def SetBreak(self) :
+def SetBreak(self) : # determine les pauses dans la partie (pas manuelles)
+
     for g in self.game_breaks :
 
         if GetTime() >= self.start_time + g[0] - self.paused_time + 1000 :
@@ -14,7 +15,7 @@ def SetBreak(self) :
             self.game_break = False
             self.game_breaks.pop(0)
 
-def ApplyBreaks(self) :
+def ApplyBreaks(self) : # declenche les pauses dans la partie (pas manuelles)
     
     if GetTime() >= self.music_start - self.start_offset/2.5 and self.break_lock == False :
         self.game_break = False
@@ -23,12 +24,12 @@ def ApplyBreaks(self) :
     if GetTime() >= self.end_time + self.start_offset/2.5 :
         self.game_break = True
 
-def StartGame(self) :
+def StartGame(self) : # elements declenchants la partie
     
     pygame.mixer.music.play()
     self.playing = True
     
-def EndGame(self) :
+def EndGame(self) : # elements pouvants terminer une partie
 
     self.running = False
 
@@ -43,7 +44,7 @@ def EndGame(self) :
 
     Write(self)
 
-def GetPause(self) :
+def GetPause(self) : # captation des touches necessaires a la pause de la partie
     
     if (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_ESCAPE) :
         self.running = False
@@ -63,7 +64,7 @@ def GetPause(self) :
 
         Pause(self)
 
-def Pause(self) :
+def Pause(self) : # declenche la pause manuelle
 
     loop = True
     while loop :
@@ -87,7 +88,7 @@ def Pause(self) :
 
             GameQuit(self)
 
-def UnPause(self) :
+def UnPause(self) : # verifie et si possible quitte la pause
 
     pos1 = pygame.mouse.get_pos()
 
@@ -103,7 +104,8 @@ def UnPause(self) :
                                         
             self.paused_time += GetTime() - self.pause_time
 
-def ChangeOffset(self) :
+def ChangeOffset(self) : # detecte si le joueur presse les touche de + ou - d'offset et l'applique
+
     if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_EQUALS :
 
         if self.key[pygame.K_LSHIFT] :
@@ -124,7 +126,7 @@ def ChangeOffset(self) :
         self.offset_time = GetTime()
         self.show_offset = True
 
-def GetClicks(self) :
+def GetClicks(self) : # capte les touches clavier pouvant interagir avec un objet de la partie
 
     if self.event.type == pygame.KEYDOWN and (self.event.key == pygame.K_x or self.event.key == pygame.K_v) :
         
@@ -137,7 +139,7 @@ def GetClicks(self) :
     if self.event.type == pygame.KEYUP and (self.event.key == pygame.K_x or self.event.key == pygame.K_v) :
         self.click_check = False
 
-def GetAcc(self) :
+def GetAcc(self) : # detecte et applique le changement d'accuracy du joueur dans la partie
 
     for v in range(len(self.show_circles)) :
 

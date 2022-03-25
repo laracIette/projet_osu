@@ -2,7 +2,7 @@ import pygame
 
 pygame.init()
 
-class Settings :
+class Settings : # classe contenant les parametres systemes du programme
 
     def __init__(self) :
         

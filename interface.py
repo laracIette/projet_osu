@@ -1,7 +1,7 @@
 import pygame
 from tools import GetTime, ReSize
 
-def DarkenScreen(self) :
+def DarkenScreen(self) : # assombri/eclairci l'ecran en fonction des pauses
 
     if self.game_break == False :
         pygame.draw.rect(self.my_settings.screen,(0,0,0),self.noir)
@@ -12,7 +12,7 @@ def DarkenScreen(self) :
         self.my_settings.screen.blit(self.dim,(0,0))
         #self.UI = False
 
-def SetShowOnScreen(self) :
+def SetShowOnScreen(self) : # determine des elements a afficher pendant une partie
 
     if self.waiting == False :
 
@@ -68,7 +68,7 @@ def SetShowOnScreen(self) :
         if GetTime() - self.offset_time - self.paused_time >= 1000 :
             self.show_offset = False
 
-def ShowOnScreen(self) :
+def ShowOnScreen(self) : # affichage des elements
 
     if self.UI == False and self.UI_alpha > 0 :
             
@@ -135,7 +135,7 @@ def ShowOnScreen(self) :
         waiting_cursor_rect = self.cursor.get_rect(center = self.pos)
         self.my_settings.screen.blit(self.cursor,waiting_cursor_rect)
 
-def SetFps(self) :
+def SetFps(self) : # calcule et affiche les fps
 
     self.fps = round(1000 / (GetTime() - self.fps_time),2)
 
@@ -151,7 +151,7 @@ def SetFps(self) :
     self.fps_txt  = self.fps_font.render(f'{round(self.avg_fps)}fps',False,self.white).convert()
     self.avg_fps  = 0
 
-def UItextRenders(self) :
+def UItextRenders(self) : # affiche les elements texte de la partie
 
     if self.acc_check :
 
@@ -177,7 +177,7 @@ def UItextRenders(self) :
 
         self.acc_check = False
 
-def HideUI(self) :
+def HideUI(self) : # cache/montre l'interface
 
     if (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_TAB and self.key[pygame.K_LSHIFT]) or\
        (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_LSHIFT and self.key[pygame.K_TAB]) :

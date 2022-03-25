@@ -1,4 +1,4 @@
-def SetMap(self) :
+def SetMap(self) : # determination et classage dans des tableau des elements a afficher pendant une partie
 
     circles0,self.circles = [],[]
 
@@ -169,7 +169,7 @@ def SetMap(self) :
            
             self.game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
 
-def SetAR(self) :
+def SetAR(self) : # reglages correspondants au temps d'approche des objets d'une partie
 
     ars = {
         0  : [1800,120],
@@ -191,15 +191,15 @@ def SetAR(self) :
     self.ar_time = ars[round(self.ar)][0] - ars[round(self.ar)][1]*self.ar_rest
     self.ar_time = round(self.ar_time)
 
-def SetOD(self) :
+def SetOD(self) : # reglages correspondants a la difficulte des objets d'une partie
 
     self.od_time = 79.5 - self.od*6
 
-def SetHP(self) :
+def SetHP(self) : # reglages correspondants au gain et perte de points de vie
 
     pass
 
-def SetMultiplier(self) :
+def SetMultiplier(self) : # multiplier pris en compte lors du calcul du score
     
     if self.cs_od_hp < 6 :
         self.difficulty_multiplier = 2

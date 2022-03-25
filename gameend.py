@@ -2,7 +2,7 @@ from datetime import datetime
 import pygame
 from tools import ReSize
 
-def ProposeOffset(self) :
+def ProposeOffset(self) : # propose un offset au joueur si possible
 
     pygame.mouse.set_visible(True)
 
@@ -68,7 +68,7 @@ def ProposeOffset(self) :
 
                         return 0
 
-def Score(self) :
+def Score(self) : # affichage de l'ecran de fin
 
     self.my_settings.screen.blit(self.bg,(0,0))
     self.my_settings.screen.blit(self.end_screen,(0,0))
@@ -95,7 +95,7 @@ def Score(self) :
             if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_q :
                 loop = False
 
-def WriteReplay(self) :
+def WriteReplay(self) : # ecriture du replay dans un fichier .txt
 
     now = datetime.now()
     replay_name = now.strftime(f'{self.map_name} [{self.diff_name}] (%Y-%m-%d - %H.%M.%S)')
@@ -114,7 +114,7 @@ def WriteReplay(self) :
 
             replay.write(f'{i}\n')
 
-def Write(self) :
+def Write(self) : # ecriture et modification des parametres du jeu sauvegardes dans settings.txt
 
     with open('assets\\settings.txt','w') as settings_file :
 
@@ -125,7 +125,7 @@ def Write(self) :
             settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
 
 
-def GameQuit(self) :
+def GameQuit(self) : # quitte la partie/menu et le programme
 
     if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
 

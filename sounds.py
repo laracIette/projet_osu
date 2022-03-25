@@ -1,6 +1,6 @@
 import pygame
 
-def ImportSounds(skin) :
+def ImportSounds(skin) : # cree un dictionnaire des sons
     sounds = {
                'click' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\click.ogg'),
                 'fail' : pygame.mixer.Sound(f'assets\\skins\\{skin}\\fail.ogg'),
@@ -11,6 +11,7 @@ def ImportSounds(skin) :
     }
     return sounds
 
-def Play(sounds,name,volume,percentage,type) :
+def Play(sounds,name,volume,percentage,type) : # joue un son
+
     sounds[name].set_volume(volume*percentage/100*type/100)
     sounds[name].play()

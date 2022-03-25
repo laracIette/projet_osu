@@ -3,7 +3,9 @@ import pygame
 from sounds import Play
 from tools import GetTime, ReSize
 
-def GetSpinner(self) :
+# self est l'objet qui represente la partie en cours
+
+def GetSpinner(self) : # verifie si doit afficher un spinner, si oui le cree
 
     if self.q < len(self.spinners) :
 
@@ -18,7 +20,7 @@ def GetSpinner(self) :
 
             self.q += 1
 
-def SetSpinners(self) :
+def SetSpinners(self) : # affiche et modifie le/les spinners si mouvement
 
     if self.waiting == False :
 
@@ -107,7 +109,7 @@ def SetSpinners(self) :
         
         self.my_settings.screen.blit(spinner_spin,spinner_rect)
 
-def Spinning(self) :
+def Spinning(self) : # mouvement de rotation du spinner
     
     if self.spin_x >= 0 and self.spin_y >= 0 :
 
@@ -139,7 +141,7 @@ def Spinning(self) :
 
     return self.spin
 
-def GetCircle(self) :
+def GetCircle(self) : # verifie si doit afficher un cercle, si oui le cree
 
     if self.e < len(self.circles) :
 
@@ -165,7 +167,7 @@ def GetCircle(self) :
 
         self.e += 1
 
-def SetCircles(self) :
+def SetCircles(self) : # affiche et modifie le/les cercles
 
     for u in self.show_circles :
 
@@ -226,7 +228,7 @@ def SetCircles(self) :
                     Play(self.sounds,'miss',1,self.volume,self.volume_effects)
                 self.combo = 0
 
-def GetFollowPoint(self) :
+def GetFollowPoint(self) : # verifie si doit afficher un followpoint, si oui le cree
 
     if self.f < len(self.circles) - 1 :
 
@@ -270,7 +272,7 @@ def GetFollowPoint(self) :
 
             self.f += 1
 
-def SetFollowPoints(self) :
+def SetFollowPoints(self) : # affiche et modifie le/les followpoints
 
     for f in self.show_followpoints :
 
