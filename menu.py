@@ -212,7 +212,7 @@ def DiffSelect(menu) : # selection de la difficulte
         Play(menu.sounds,'click',1,menu.volume,menu.volume_effects)
         pygame.mouse.set_visible(False)
 
-def GetMods(menu) :
+def GetMods(menu) : # definir les modes de jeu
 
     menu.mods = ['easy',    'nofail',     'halftime',
             'hardrock','suddendeath','doubletime','hidden',  'flashlight',
@@ -222,11 +222,10 @@ def GetMods(menu) :
     h = 0
     menu.mods_icons = []
     for i in range(len(menu.mods)) :
-
-        mod_icon   = Load(f'skins\\{menu.skin}\\mods\\{menu.mods[i]}.jpg',(ReSize(130),ReSize(130)),False)
-        mod_rect   = mod_icon.get_rect()
-        mod_rect.x = ReSize(455+220*w)
-        mod_rect.y = ReSize(255+220*h)
+    
+        center_rect = (ReSize(505+220*w),ReSize(305+220*h))
+        mod_icon    = Load(f'skins\\{menu.skin}\\mods\\{menu.mods[i]}.png',(ReSize(180),ReSize(180)),False)
+        mod_rect    = mod_icon.get_rect(center = center_rect)
 
         w += 1
 
@@ -234,21 +233,21 @@ def GetMods(menu) :
             h += 1
             w  = 0
 
-        menu.mods_icons.append([mod_icon,mod_rect])
+        menu.mods_icons.append([mod_icon,mod_rect,center_rect,False])
 
-def ModChoice(menu) :
+def ModChoice(menu) : # choisir un mode de jeu
+
+    for mod in menu.mods_icons :
+
+        mod_icon = mod[0]
+        mod_rect = mod[1]
+
+        menu.my_settings.screen.blit(mod_icon,mod_rect)
 
     loop = True
     while loop :
 
-        for mod in menu.mods_icons :
-
-            mod_icon = mod[0]
-            mod_rect = mod[1]
-
-            menu.my_settings.screen.blit(mod_icon,mod_rect)
-
-        pygame.display.flip()
+        menu.my_settings.clock.tick(menu.my_settings.frequence)
 
         pos = pygame.mouse.get_pos()
         for menu.event in pygame.event.get() :
@@ -257,12 +256,28 @@ def ModChoice(menu) :
 
                 for i in range(len(menu.mods_icons)) :
 
-                    mod_icon = menu.mods_icons[i][0]
                     mod_rect = menu.mods_icons[i][1]
 
                     if mod_rect.collidepoint(pos) :
 
-                        return menu.mods[i]
+                        menu.mod = menu.mods[i]
+                        
+                        if menu.mods_icons[i][3] == False :
+                            menu.mods_icons[i][3] = True
+                        else :
+                            menu.mods_icons[i][3] = False
+
+                        for e in range(20) :
+
+                            if menu.mods_icons[i][3] == True :
+                                mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],-e).convert()
+                            else :
+                                mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],0).convert()
+
+                            mod_rect = mod_icon.get_rect(center = menu.mods_icons[i][2])
+
+                            menu.my_settings.screen.blit(mod_icon,mod_rect)
+                            pygame.display.flip()
 
             if menu.event.type == pygame.KEYDOWN and (menu.event.key == pygame.K_F1 or menu.event.key == pygame.K_ESCAPE) :
 
@@ -271,3 +286,5 @@ def ModChoice(menu) :
                 return menu.mod
 
             GameQuit(menu)
+
+        pygame.display.flip()
