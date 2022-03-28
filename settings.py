@@ -7,7 +7,7 @@ class Settings : # classe contenant les parametres systemes du programme
     def __init__(self) :
         
         self.clock      = pygame.time.Clock()
-        self.frequence  = 160
+        self.frequence  = 165
         self.resolution = pygame.display.Info()
         self.width      = self.resolution.current_w
         self.height     = self.resolution.current_h

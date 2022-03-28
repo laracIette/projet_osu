@@ -13,17 +13,20 @@ from setthings import SetMultiplier, SetMap
 from interface import DarkenScreen, HideUI, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
 from objects import GetCircle, GetFollowPoint, GetSpinner, SetCircles, SetFollowPoints, SetSpinners
 from game import ApplyBreaks, ChangeOffset, EndGame, GetClicks, GetPause, SetBreak, StartGame, UnPause
-from menu import DiffSelect, MapSelect, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
+from menu import DiffSelect, GetMods, MapSelect, ModChoice, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
 
 class Osu : # classe correspondante a une partie (une seule map)
 
-    def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines,map_name,diff_name) :
+    def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines,map_name,diff_name,mod,menu) :
 
         self.my_settings = Settings()
 
         self.wi = self.my_settings.width
         self.he = self.my_settings.height
 
+        self.menu = menu
+
+        self.mod    = mod
         self.offset = offset
         self.songs  = songs
         self.diff   = diff
@@ -71,7 +74,7 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.a_circle = Load(f'skins\\{self.skin}\\approachcircle.png',(self.a_c_s,self.a_c_s),True)
 
         self.cursor       = Load(f'skins\\{self.skin}\\cursor.png',(self.c_s,self.c_s),True)
-        self.cursor_trail = Load(f'skins\\{self.skin}\\cursortrail.png',(self.c_s/4,self.c_s/4),True)
+        self.cursor_trail = Load(f'skins\\{self.skin}\\cursortrail.png',(self.c_s/3.3,self.c_s/3.3),True)
         self.trail_pos    = []
         self.trail_count  = 0
 
@@ -81,8 +84,7 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.spin_tot     = 0
         self.spin_tot2    = 0
 
-        self.pos  = pygame.mouse.get_pos()
-        self.pos3 = pygame.mouse.get_pos()
+        self.pos = pygame.mouse.get_pos()
 
         self.click_check = False
 
@@ -117,8 +119,6 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.paused_time = 0
         self.pause_time  = 0
         self.end_time    = inf
-
-        self.cs_od_hp = self.cs + self.od + self.hp
 
         SetMultiplier(self)
 
@@ -178,9 +178,9 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.UI_alpha = 255
         self.UI       = True
 
-        self.e = 0
-        self.q = 0
-        self.f = 0
+        self.c_num = 0
+        self.s_num = 0
+        self.f_num = 0
 
         self.running = True
 
@@ -213,7 +213,7 @@ class Osu : # classe correspondante a une partie (une seule map)
                         Score(osu)
         
                     pygame.mixer.music.unpause()
-                    Menu()
+                    Menu.MenuChoice(osu.menu)
 
             SetBreak(osu)
                 
@@ -256,7 +256,7 @@ class Osu : # classe correspondante a une partie (une seule map)
 
                 if osu.to_menu :
 
-                    Menu.MenuChoice()
+                    Menu.MenuChoice(osu.menu)
                 
                 GameQuit(osu)
 
@@ -306,6 +306,10 @@ class Menu : # classe correspondante au menu du jeu
         self.diff_choice   = False
         self.choosing_diff = False
 
+        self.mod = 'nomod'
+        
+        GetMods(self)
+
         self.loop = True
 
     def MenuChoice(menu) : # determine les options a prendre en compte pour le lancement d'une partie
@@ -313,7 +317,6 @@ class Menu : # classe correspondante au menu du jeu
         while menu.loop :
 
             menu.my_settings.clock.tick(menu.my_settings.frequence)
-            
             pygame.display.flip()
 
             pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
@@ -341,7 +344,11 @@ class Menu : # classe correspondante au menu du jeu
                         DiffSelect(menu)
 
                         if menu.diff_choice == True :
-                            osu = Osu(menu.map,menu.diff,menu.songs,menu.skin,menu.sounds,menu.volume,menu.volume_music,menu.volume_effects,menu.offset,menu.lines,menu.map_names[menu.map],menu.diffs[menu.diff])
+
+                            menu.diff_choice   = False
+                            menu.choosing_diff = False
+
+                            osu = Osu(menu.map,menu.diff,menu.songs,menu.skin,menu.sounds,menu.volume,menu.volume_music,menu.volume_effects,menu.offset,menu.lines,menu.map_names[menu.map],menu.diffs[menu.diff],menu.mod,menu)
                             osu.OsuRun()
 
             MenuShowVolume(menu)
@@ -363,6 +370,9 @@ class Menu : # classe correspondante au menu du jeu
                     
                 if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_s :
                     menu.skin = SkinSelect(menu)
+
+                if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_F1 :
+                    menu.mod = ModChoice(menu)
 
                 if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_ESCAPE and menu.choosing_diff :
                     menu.choosing_diff = False

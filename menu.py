@@ -2,12 +2,12 @@ import os
 import glob
 import pygame
 from sounds import Play
-from gameend import Write
-from tools import GetTime
+from gameend import GameQuit, Write
+from tools import GetTime, Load, ReSize
 
-def SkinSelect(self) : # selection du skin
+def SkinSelect(menu) : # selection du skin
 
-    pygame.draw.rect(self.my_settings.screen,self.black,self.noir)
+    pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
 
     skins0 = []
     skins  = glob.glob('assets\\skins\\*')
@@ -17,8 +17,8 @@ def SkinSelect(self) : # selection du skin
     skins = []
     for z in range(len(skins0)) :
 
-        text = self.font.render(skins0[z],False,self.white)
-        self.my_settings.screen.blit(text,(0,self.he/15*z))
+        text = menu.font.render(skins0[z],False,menu.white)
+        menu.my_settings.screen.blit(text,(0,menu.he/15*z))
 
         skins.append(text)
 
@@ -38,46 +38,46 @@ def SkinSelect(self) : # selection du skin
                     skin1 = skins[w]
 
                     skin1_rect   = skin1.get_rect()
-                    skin1_rect.y = self.he/15*w
+                    skin1_rect.y = menu.he/15*w
 
                     if skin1_rect.collidepoint(pos) :
                         loop = False
 
-                        Play(self.sounds,'click',1,self.volume,self.volume_effects)
+                        Play(menu.sounds,'click',1,menu.volume,menu.volume_effects)
                         
-                        self.skin = skins0[w]
+                        menu.skin = skins0[w]
 
-                return self.skin
+                return menu.skin
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE :
 
-                return self.skin
+                return menu.skin
 
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                 loop = False
 
-                Write(self)
+                Write(menu)
 
                 pygame.quit()
                 exit(0)
 
-def SongSelect(self) : # definition des maps possibles
+def SongSelect(menu) : # definition des maps possibles
 
-    self.maps  = glob.glob('assets\\songs\\*')
-    self.songs = []
+    menu.maps  = glob.glob('assets\\songs\\*')
+    menu.songs = []
 
-    for i in range(len(self.maps)) :
+    for i in range(len(menu.maps)) :
 
-        audio = glob.glob(f'{self.maps[i]}\\*.mp3')
+        audio = glob.glob(f'{menu.maps[i]}\\*.mp3')
         audio = audio[0]
         
-        self.map_names = []
-        for j in self.maps :
+        menu.map_names = []
+        for j in menu.maps :
 
-            self.map_names.append(os.path.basename(j))
+            menu.map_names.append(os.path.basename(j))
 
         diffs = []
-        diff  = glob.glob(f'{self.maps[i]}\\*.txt')
+        diff  = glob.glob(f'{menu.maps[i]}\\*.txt')
         for v in range(len(diff)) :
             diffs.append(diff[v])
 
@@ -86,128 +86,188 @@ def SongSelect(self) : # definition des maps possibles
 
             diff_names.append(os.path.basename(os.path.splitext(u)[0]))
 
-        bgs = glob.glob(f'{self.maps[i]}\\*.jpg')
+        bgs = glob.glob(f'{menu.maps[i]}\\*.jpg')
         bg  = pygame.image.load(bgs[0]).convert()
-        bg  = pygame.transform.scale(bg,(self.wi,self.he)).convert()
+        bg  = pygame.transform.scale(bg,(menu.wi,menu.he)).convert()
         
-        self.songs.append([bg,audio,diffs,diff_names])
+        menu.songs.append([bg,audio,diffs,diff_names])
 
-    return self.songs
+    return menu.songs
 
-def MenuShowVolume(self) : # affiche le volume dans le menu
+def MenuShowVolume(menu) : # affiche le volume dans le menu
 
-    if self.show_volume :
+    if menu.show_volume :
             
-        pygame.draw.rect(self.my_settings.screen,self.black,self.volume_noir)
+        pygame.draw.rect(menu.my_settings.screen,menu.black,menu.volume_noir)
 
-        if GetTime() >= self.volume_time + 1000 :
-            self.show_volume = False
+        if GetTime() >= menu.volume_time + 1000 :
+            menu.show_volume = False
             return 0
 
-        self.volume_rect.x  = self.wi-self.volume_txt.get_width()
-        self.music_rect.x   = self.wi-self.music_txt.get_width()
-        self.effects_rect.x = self.wi-self.effects_txt.get_width()
+        menu.volume_rect.x  = menu.wi-menu.volume_txt.get_width()
+        menu.music_rect.x   = menu.wi-menu.music_txt.get_width()
+        menu.effects_rect.x = menu.wi-menu.effects_txt.get_width()
 
-        self.my_settings.screen.blit(self.volume_txt,(self.volume_rect.x,self.volume_rect.y))
-        self.my_settings.screen.blit(self.music_txt,(self.music_rect.x,self.music_rect.y))
-        self.my_settings.screen.blit(self.effects_txt,(self.effects_rect.x,self.effects_rect.y))
+        menu.my_settings.screen.blit(menu.volume_txt,(menu.volume_rect.x,menu.volume_rect.y))
+        menu.my_settings.screen.blit(menu.music_txt,(menu.music_rect.x,menu.music_rect.y))
+        menu.my_settings.screen.blit(menu.effects_txt,(menu.effects_rect.x,menu.effects_rect.y))
 
-def SetVolumeOffsetSkin(self) : # recupere et attribut les donnees de settings.txt
+def SetVolumeOffsetSkin(menu) : # recupere et attribut les donnees de settings.txt
 
     with open('assets\\settings.txt','r') as settings_file :
 
         a = 0
 
-        self.lines = settings_file.readlines()
-        for i in self.lines :
+        menu.lines = settings_file.readlines()
+        for i in menu.lines :
 
             if a == 0 :
 
-                self.offset = int(i)
+                menu.offset = int(i)
             
             if a == 1 :
 
-                self.volume = int(i)
+                menu.volume = int(i)
             
             if a == 2 :
 
-                self.volume_music = int(i)
+                menu.volume_music = int(i)
 
             if a == 3 :
 
-                self.volume_effects = int(i)
+                menu.volume_effects = int(i)
 
             if a == 4 :
 
                 skin_t = []
-                for s in self.lines[a] :
+                for s in menu.lines[a] :
                     if s != '\n' :
                         skin_t.append(s)
-                self.skin = ''.join(skin_t)
+                menu.skin = ''.join(skin_t)
 
             a += 1
                     
-    self.volumes = [self.volume,self.volume_music,self.volume_effects]
+    menu.volumes = [menu.volume,menu.volume_music,menu.volume_effects]
 
-def ModifyVolumes(self) : # detecte si besoin et applique changement de volume
+def ModifyVolumes(menu) : # detecte si besoin et applique changement de volume
 
-    rects = [self.volume_rect,self.music_rect,self.effects_rect]
+    rects = [menu.volume_rect,menu.music_rect,menu.effects_rect]
 
     for i in range(len(rects)) :
 
-        if rects[i].collidepoint(self.pos) :
+        if rects[i].collidepoint(menu.pos) :
         
-            if self.event.button == 4 :
+            if menu.event.button == 4 :
 
-                if self.volumes[i] < 100 :
+                if menu.volumes[i] < 100 :
 
-                    self.volumes[i] += 1
+                    menu.volumes[i] += 1
 
-            if self.event.button == 5 :
+            if menu.event.button == 5 :
 
-                if self.volumes[i] > 0 :
+                if menu.volumes[i] > 0 :
 
-                    self.volumes[i] -= 1
+                    menu.volumes[i] -= 1
 
-    self.show_volume = True
+    menu.show_volume = True
 
-    self.volume         = self.volumes[0]
-    self.volume_music   = self.volumes[1]
-    self.volume_effects = self.volumes[2]
+    menu.volume         = menu.volumes[0]
+    menu.volume_music   = menu.volumes[1]
+    menu.volume_effects = menu.volumes[2]
 
-    self.volume_txt  = self.volume_font.render(f'main : {self.volume}%',False,self.white).convert()
-    self.music_txt   = self.music_font.render(f'music : {self.volume_music}%',False,self.white).convert()
-    self.effects_txt = self.music_font.render(f'effects : {self.volume_effects}%',False,self.white).convert()
+    menu.volume_txt  = menu.volume_font.render(f'main : {menu.volume}%',False,menu.white).convert()
+    menu.music_txt   = menu.music_font.render(f'music : {menu.volume_music}%',False,menu.white).convert()
+    menu.effects_txt = menu.music_font.render(f'effects : {menu.volume_effects}%',False,menu.white).convert()
     
-    self.volume_time = GetTime()
+    menu.volume_time = GetTime()
 
-def MapSelect(self) : # selection de la map
+def MapSelect(menu) : # selection de la map
 
-    for self.ii in range(len(self.songs)) :
+    for menu.ii in range(len(menu.songs)) :
 
-        song = self.songs[self.ii][0]
-        song = pygame.transform.scale(song,(self.wi/5,self.he/5)).convert()
+        song = menu.songs[menu.ii][0]
+        song = pygame.transform.scale(song,(menu.wi/5,menu.he/5)).convert()
 
         song_rect   = song.get_rect()
-        song_rect.y = self.my_settings.height/5*self.ii
+        song_rect.y = menu.my_settings.height/5*menu.ii
 
-        if song_rect.collidepoint(self.pos) :
+        if song_rect.collidepoint(menu.pos) :
 
-            self.choosing_diff = True
-            self.map = self.ii
+            menu.choosing_diff = True
+            menu.map = menu.ii
 
-            Play(self.sounds,'click',1,self.volume,self.volume_effects)
+            Play(menu.sounds,'click',1,menu.volume,menu.volume_effects)
 
-def DiffSelect(self) : # selection de la difficulte
+def DiffSelect(menu) : # selection de la difficulte
 
-    diff = self.font.render(self.diffs[self.diff],False,self.white).convert()
+    diff = menu.font.render(menu.diffs[menu.diff],False,menu.white).convert()
 
     diff_rect   = diff.get_rect()
-    diff_rect.x = self.wi/5
-    diff_rect.y = self.he/20*self.diff+self.he/5*self.map
+    diff_rect.x = menu.wi/5
+    diff_rect.y = menu.he/20*menu.diff+menu.he/5*menu.map
 
-    if diff_rect.collidepoint(self.pos) :
-        self.diff_choice = True
+    if diff_rect.collidepoint(menu.pos) :
+        menu.diff_choice = True
 
-        Play(self.sounds,'click',1,self.volume,self.volume_effects)
+        Play(menu.sounds,'click',1,menu.volume,menu.volume_effects)
         pygame.mouse.set_visible(False)
+
+def GetMods(menu) :
+
+    menu.mods = ['easy',    'nofail',     'halftime',
+            'hardrock','suddendeath','doubletime','hidden',  'flashlight',
+            'relax',   'autopilot',  'spunout',   'autoplay','scorev2']
+    
+    w = 0
+    h = 0
+    menu.mods_icons = []
+    for i in range(len(menu.mods)) :
+
+        mod_icon   = Load(f'skins\\{menu.skin}\\mods\\{menu.mods[i]}.jpg',(ReSize(130),ReSize(130)),False)
+        mod_rect   = mod_icon.get_rect()
+        mod_rect.x = ReSize(455+220*w)
+        mod_rect.y = ReSize(255+220*h)
+
+        w += 1
+
+        if i == 2 or i == 7 :
+            h += 1
+            w  = 0
+
+        menu.mods_icons.append([mod_icon,mod_rect])
+
+def ModChoice(menu) :
+
+    loop = True
+    while loop :
+
+        for mod in menu.mods_icons :
+
+            mod_icon = mod[0]
+            mod_rect = mod[1]
+
+            menu.my_settings.screen.blit(mod_icon,mod_rect)
+
+        pygame.display.flip()
+
+        pos = pygame.mouse.get_pos()
+        for menu.event in pygame.event.get() :
+                
+            if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
+
+                for i in range(len(menu.mods_icons)) :
+
+                    mod_icon = menu.mods_icons[i][0]
+                    mod_rect = menu.mods_icons[i][1]
+
+                    if mod_rect.collidepoint(pos) :
+
+                        return menu.mods[i]
+
+            if menu.event.type == pygame.KEYDOWN and (menu.event.key == pygame.K_F1 or menu.event.key == pygame.K_ESCAPE) :
+
+                loop = False
+
+                return menu.mod
+
+            GameQuit(menu)

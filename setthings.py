@@ -1,14 +1,13 @@
-def SetMap(self) : # determination et classage dans des tableau des elements a afficher pendant une partie
-
-    circles0,self.circles = [],[]
+def SetMap(osu) : # determination et classage dans des tableau des elements a afficher pendant une partie
 
     cs_t,ar_t,od_t,hp_t = [],[],[],[]
 
-    spinner_lock       = False
-    spinners0,self.spinners = [],[]
+    spinner_lock           = False
+    spinners0,osu.spinners = [],[]
+    circles0,osu.circles   = [],[]
 
     a   = 0
-    map = self.songs[self.map][2][self.diff]
+    map = osu.songs[osu.map][2][osu.diff]
         
 
     with open(map,'r') as map_file :
@@ -35,42 +34,42 @@ def SetMap(self) : # determination et classage dans des tableau des elements a a
                         if o != '\n' :
                             cs_t.append(o)
 
-                    self.cs = ''.join(cs_t)
-                    self.cs = float(self.cs)
+                    osu.cs = ''.join(cs_t)
+                    osu.cs = float(osu.cs)
 
                 elif a == 2 :
                     for o in i :
                         if o != '\n' :
                             ar_t.append(o)
 
-                    self.ar = ''.join(ar_t)
-                    self.ar = float(self.ar)
+                    osu.ar = ''.join(ar_t)
+                    osu.ar = float(osu.ar)
 
-                    SetAR(self)
+                    SetAR(osu)
 
                 elif a == 3 :
                     for o in i :
                         if o != '\n' :
                             od_t.append(o)
 
-                    self.od = ''.join(od_t)
-                    self.od = float(self.od)
+                    osu.od = ''.join(od_t)
+                    osu.od = float(osu.od)
 
-                    SetOD(self)
+                    SetOD(osu)
                 
                 elif a == 4 :
                     for o in i :
                         if o != '\n' :
                             hp_t.append(o)
 
-                    self.hp = ''.join(hp_t)
-                    self.hp = float(self.hp)
+                    osu.hp = ''.join(hp_t)
+                    osu.hp = float(osu.hp)
 
                 else :
                     circles0.append(i)
 
             else :
-                self.spinners.append(i)
+                osu.spinners.append(i)
 
     cycle = 1
     for c in circles0[0] :
@@ -87,30 +86,30 @@ def SetMap(self) : # determination et classage dans des tableau des elements a a
 
             else :
                 tab = ''.join(tab)
-                self.circles.append(tab)
+                osu.circles.append(tab)
                 tab = []
 
     circles0 = []
-    for m in self.circles :
+    for m in osu.circles :
         circles0.append(int(m))
     
     num = 0
-    self.circles = []
+    osu.circles = []
 
-    self.start_offset = 2500-circles0[2]
+    osu.start_offset = 2500-circles0[2]
 
     for i in range(int(len(circles0)/cycle)) :
-        circles0[i*cycle+2] += self.start_offset
+        circles0[i*cycle+2] += osu.start_offset
 
         for j in range(cycle) :
 
             tab.append(circles0[num])
             num += 1
 
-        self.circles.append(tab)
+        osu.circles.append(tab)
         tab = []
     
-    for j in self.spinners :
+    for j in osu.spinners :
 
         for k in j :
 
@@ -124,52 +123,52 @@ def SetMap(self) : # determination et classage dans des tableau des elements a a
     
     for r in range(len(spinners0)) :
         spinners0[r]  = int(spinners0[r])
-        spinners0[r] += self.start_offset
+        spinners0[r] += osu.start_offset
 
-    self.spinners = []
+    osu.spinners = []
     h = 0
     for r in range(int(len(spinners0)/2)) :
 
-        self.spinners.append([spinners0[h],spinners0[h+1]])
+        osu.spinners.append([spinners0[h],spinners0[h+1]])
         
         h += 2
 
     c = 0
     u = 0
     hit_objects = []
-    for i in range(len(self.circles) + len(self.spinners)) :
+    for i in range(len(osu.circles) + len(osu.spinners)) :
 
-        if self.spinners == [] or u == len(self.spinners) :
-            hit_objects.append([self.circles[c][2],0])
+        if osu.spinners == [] or u == len(osu.spinners) :
+            hit_objects.append([osu.circles[c][2],0])
             c += 1
             continue
 
-        if self.circles == [] or c == len(self.circles) :
-            hit_objects.append([self.spinners[u][0],1])
-            hit_objects.append([self.spinners[u][1],1])
+        if osu.circles == [] or c == len(osu.circles) :
+            hit_objects.append([osu.spinners[u][0],1])
+            hit_objects.append([osu.spinners[u][1],1])
             u += 1
             continue
 
-        if self.circles[c][2] < self.spinners[u][0] :
-            hit_objects.append([self.circles[c][2],0])
+        if osu.circles[c][2] < osu.spinners[u][0] :
+            hit_objects.append([osu.circles[c][2],0])
             
-            if c < len(self.circles) : c += 1
+            if c < len(osu.circles) : c += 1
 
         else :
-            hit_objects.append([self.spinners[u][0],1])
-            hit_objects.append([self.spinners[u][1],1])
+            hit_objects.append([osu.spinners[u][0],1])
+            hit_objects.append([osu.spinners[u][1],1])
             
-            if u < len(self.spinners) : u += 1
+            if u < len(osu.spinners) : u += 1
     
-    self.game_breaks = []
+    osu.game_breaks = []
     for p in range(len(hit_objects)-1) :
         
         if (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p][1] != 1) or\
            (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
            
-            self.game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
+            osu.game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
 
-def SetAR(self) : # reglages correspondants au temps d'approche des objets d'une partie
+def SetAR(osu) : # reglages correspondants au temps d'approche des objets d'une partie
 
     ars = {
         0  : [1800,120],
@@ -186,32 +185,34 @@ def SetAR(self) : # reglages correspondants au temps d'approche des objets d'une
         11 : [300,150],
     }
 
-    self.ar_int  = ars[round(self.ar)][0]
-    self.ar_rest = round(self.ar,1)-round(self.ar)
-    self.ar_time = ars[round(self.ar)][0] - ars[round(self.ar)][1]*self.ar_rest
-    self.ar_time = round(self.ar_time)
+    osu.ar_int  = ars[round(osu.ar)][0]
+    osu.ar_rest = round(osu.ar,1)-round(osu.ar)
+    osu.ar_time = ars[round(osu.ar)][0] - ars[round(osu.ar)][1]*osu.ar_rest
+    osu.ar_time = round(osu.ar_time)
 
-def SetOD(self) : # reglages correspondants a la difficulte des objets d'une partie
+def SetOD(osu) : # reglages correspondants a la difficulte des objets d'une partie
 
-    self.od_time = 79.5 - self.od*6
+    osu.od_time = 79.5 - osu.od*6
 
-def SetHP(self) : # reglages correspondants au gain et perte de points de vie
+def SetHP(osu) : # reglages correspondants au gain et perte de points de vie
 
     pass
 
-def SetMultiplier(self) : # multiplier pris en compte lors du calcul du score
+def SetMultiplier(osu) : # multiplier pris en compte lors du calcul du score
     
-    if self.cs_od_hp < 6 :
-        self.difficulty_multiplier = 2
-    
-    elif self.cs_od_hp >= 6 and self.cs_od_hp < 13 :
-        self.difficulty_multiplier = 3
+    cs_od_hp = osu.cs + osu.od + osu.hp
 
-    elif self.cs_od_hp >= 13 and self.cs_od_hp < 18 :
-        self.difficulty_multiplier = 4
+    if cs_od_hp < 6 :
+        osu.difficulty_multiplier = 2
     
-    elif self.cs_od_hp >= 18 and self.cs_od_hp < 25 :
-        self.difficulty_multiplier = 5
+    elif cs_od_hp >= 6 and cs_od_hp < 13 :
+        osu.difficulty_multiplier = 3
 
-    elif self.cs_od_hp >= 25 :
-        self.difficulty_multiplier = 6
+    elif cs_od_hp >= 13 and cs_od_hp < 18 :
+        osu.difficulty_multiplier = 4
+    
+    elif cs_od_hp >= 18 and cs_od_hp < 25 :
+        osu.difficulty_multiplier = 5
+
+    elif cs_od_hp >= 25 :
+        osu.difficulty_multiplier = 6

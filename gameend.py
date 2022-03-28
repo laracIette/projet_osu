@@ -2,21 +2,21 @@ from datetime import datetime
 import pygame
 from tools import ReSize
 
-def ProposeOffset(self) : # propose un offset au joueur si possible
+def ProposeOffset(osu) : # propose un offset au joueur si possible
 
     pygame.mouse.set_visible(True)
 
     ur_moy = 0
 
-    if self.total_ur != [] :
+    if osu.total_ur != [] :
 
-        noir = pygame.Rect(0,0,self.wi,self.he)
-        pygame.draw.rect(self.my_settings.screen,(0,0,0),noir)
+        noir = pygame.Rect(0,0,osu.wi,osu.he)
+        pygame.draw.rect(osu.my_settings.screen,(0,0,0),noir)
         
-        for u in self.total_ur :
+        for u in osu.total_ur :
             ur_moy += u
 
-        ur_moy /= len(self.total_ur)
+        ur_moy /= len(osu.total_ur)
         ur_moy = round(ur_moy)
 
         if ur_moy < 0 :
@@ -25,36 +25,36 @@ def ProposeOffset(self) : # propose un offset au joueur si possible
         if ur_moy > 0 :
             rep_txt = f'You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?'
 
-        rep_rect        = self.rep_font.get_rect(rep_txt)
-        rep_rect.center = (self.wi/2,self.he/2)
+        rep_rect        = osu.rep_font.get_rect(rep_txt)
+        rep_rect.center = (osu.wi/2,osu.he/2)
 
         yes_txt         = 'Yes'
-        yes_rect        = self.rep_font.get_rect(yes_txt)
-        yes_rect.center = (self.wi/3,self.he/3*2)
+        yes_rect        = osu.rep_font.get_rect(yes_txt)
+        yes_rect.center = (osu.wi/3,osu.he/3*2)
 
         no_txt         = 'No'
-        no_rect        = self.rep_font.get_rect(no_txt)
-        no_rect.center = (self.wi/3*2,self.he/3*2)
+        no_rect        = osu.rep_font.get_rect(no_txt)
+        no_rect.center = (osu.wi/3*2,osu.he/3*2)
         
-        self.rep_font.render_to(self.my_settings.screen,rep_rect,rep_txt,self.white)
-        self.rep_font.render_to(self.my_settings.screen,yes_rect,yes_txt,self.white)
-        self.rep_font.render_to(self.my_settings.screen,no_rect,no_txt,self.white)
+        osu.rep_font.render_to(osu.my_settings.screen,rep_rect,rep_txt,osu.white)
+        osu.rep_font.render_to(osu.my_settings.screen,yes_rect,yes_txt,osu.white)
+        osu.rep_font.render_to(osu.my_settings.screen,no_rect,no_txt,osu.white)
         
         pygame.display.flip()
         
         loop = True
         while loop :
 
-            self.key = pygame.key.get_pressed()
-            for self.event in pygame.event.get() :
+            osu.key = pygame.key.get_pressed()
+            for osu.event in pygame.event.get() :
 
-                GameQuit(self)
+                GameQuit(osu)
 
-                if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F2 :
+                if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_F2 :
 
-                    WriteReplay(self)
+                    WriteReplay(osu)
 
-                if self.event.type == pygame.MOUSEBUTTONDOWN and self.event.button == pygame.BUTTON_LEFT :
+                if osu.event.type == pygame.MOUSEBUTTONDOWN and osu.event.button == pygame.BUTTON_LEFT :
 
                     pos = pygame.mouse.get_pos()
 
@@ -68,49 +68,49 @@ def ProposeOffset(self) : # propose un offset au joueur si possible
 
                         return 0
 
-def Score(self) : # affichage de l'ecran de fin
+def Score(osu) : # affichage de l'ecran de fin
 
-    self.my_settings.screen.blit(self.bg,(0,0))
-    self.my_settings.screen.blit(self.end_screen,(0,0))
+    osu.my_settings.screen.blit(osu.bg,(0,0))
+    osu.my_settings.screen.blit(osu.end_screen,(0,0))
 
-    self.score_font.render_to(self.my_settings.screen,(ReSize(305),ReSize(585)),str(self.t_miss),self.white)
-    self.score_font.render_to(self.my_settings.screen,(ReSize(154),ReSize(175)),str(self.t_300),self.white)
-    self.score_font.render_to(self.my_settings.screen,(ReSize(154),ReSize(307)),str(self.t_100),self.white)
-    self.score_font.render_to(self.my_settings.screen,(ReSize(154),ReSize(439)),str(self.t_50),self.white)
+    osu.score_font.render_to(osu.my_settings.screen,(ReSize(305),ReSize(585)),str(osu.t_miss),osu.white)
+    osu.score_font.render_to(osu.my_settings.screen,(ReSize(154),ReSize(175)),str(osu.t_300),osu.white)
+    osu.score_font.render_to(osu.my_settings.screen,(ReSize(154),ReSize(307)),str(osu.t_100),osu.white)
+    osu.score_font.render_to(osu.my_settings.screen,(ReSize(154),ReSize(439)),str(osu.t_50),osu.white)
 
     pygame.display.flip()
 
     loop = True
     while loop :
 
-        self.key = pygame.key.get_pressed()
-        for self.event in pygame.event.get() :
+        osu.key = pygame.key.get_pressed()
+        for osu.event in pygame.event.get() :
 
-            GameQuit(self)
+            GameQuit(osu)
 
-            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F2 :
+            if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_F2 :
 
-                WriteReplay(self)
+                WriteReplay(osu)
 
-            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_q :
+            if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_q :
                 loop = False
 
-def WriteReplay(self) : # ecriture du replay dans un fichier .txt
+def WriteReplay(osu) : # ecriture du replay dans un fichier .txt
 
     now = datetime.now()
-    replay_name = now.strftime(f'{self.map_name} [{self.diff_name}] (%Y-%m-%d - %H.%M.%S)')
+    replay_name = now.strftime(f'{osu.map_name} [{osu.diff_name}] (%Y-%m-%d - %H.%M.%S)')
 
     with open(f'assets\\replays\\{replay_name}.txt', 'w') as replay :
         
-        replay.write(f'{self.score}\n')
-        replay.write(f'{self.t_300}\n')
-        replay.write(f'{self.t_100}\n')
-        replay.write(f'{self.t_50}\n')
-        replay.write(f'{self.t_miss}\n')
-        replay.write(f'{self.accuracy}\n')
-        replay.write(f'{self.max_combo}\n')
+        replay.write(f'{osu.score}\n')
+        replay.write(f'{osu.t_300}\n')
+        replay.write(f'{osu.t_100}\n')
+        replay.write(f'{osu.t_50}\n')
+        replay.write(f'{osu.t_miss}\n')
+        replay.write(f'{osu.accuracy}\n')
+        replay.write(f'{osu.max_combo}\n')
 
-        for i in self.replay_clicks :
+        for i in osu.replay_clicks :
 
             replay.write(f'{i}\n')
 

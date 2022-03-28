@@ -4,205 +4,205 @@ from sounds import Play
 from tools import GetTime
 from gameend import GameQuit, ProposeOffset, Write
 
-def SetBreak(self) : # determine les pauses dans la partie (pas manuelles)
+def SetBreak(osu) : # determine les pauses dans la partie (pas manuelles)
 
-    for g in self.game_breaks :
+    for g in osu.game_breaks :
 
-        if GetTime() >= self.start_time + g[0] - self.paused_time + 1000 :
-            self.game_break = True
+        if GetTime() >= osu.start_time + g[0] - osu.paused_time + 1000 :
+            osu.game_break = True
         
-        if GetTime() >= self.start_time + g[1] - self.paused_time - 1000 :
-            self.game_break = False
-            self.game_breaks.pop(0)
+        if GetTime() >= osu.start_time + g[1] - osu.paused_time - 1000 :
+            osu.game_break = False
+            osu.game_breaks.pop(0)
 
-def ApplyBreaks(self) : # declenche les pauses dans la partie (pas manuelles)
+def ApplyBreaks(osu) : # declenche les pauses dans la partie (pas manuelles)
     
-    if GetTime() >= self.music_start - self.start_offset/2.5 and self.break_lock == False :
-        self.game_break = False
-        self.break_lock = True
+    if GetTime() >= osu.music_start - osu.start_offset/2.5 and osu.break_lock == False :
+        osu.game_break = False
+        osu.break_lock = True
 
-    if GetTime() >= self.end_time + self.start_offset/2.5 :
-        self.game_break = True
+    if GetTime() >= osu.end_time + osu.start_offset/2.5 :
+        osu.game_break = True
 
-def StartGame(self) : # elements declenchants la partie
+def StartGame(osu) : # elements declenchants la partie
     
     pygame.mixer.music.play()
-    self.playing = True
+    osu.playing = True
     
-def EndGame(self) : # elements pouvants terminer une partie
+def EndGame(osu) : # elements pouvants terminer une partie
 
-    self.running = False
+    osu.running = False
 
     pygame.mixer.music.pause()
 
-    if self.health <= 0 :
-        Play(self.sounds,'fail',1,self.volume,self.volume_effects)
-        self.death = True
+    if osu.health <= 0 :
+        Play(osu.sounds,'fail',1,osu.volume,osu.volume_effects)
+        osu.death = True
 
-    if self.total_ur != [] :
-        self.offset += ProposeOffset(self)
+    if osu.total_ur != [] :
+        osu.offset += ProposeOffset(osu)
 
-    Write(self)
+    Write(osu)
 
-def GetPause(self) : # captation des touches necessaires a la pause de la partie
+def GetPause(osu) : # captation des touches necessaires a la pause de la partie
     
-    if (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_ESCAPE) :
-        self.running = False
+    if (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_ESCAPE) :
+        osu.running = False
         
-        if self.waiting :
-            self.paused_time += GetTime() - self.pause_time
+        if osu.waiting :
+            osu.paused_time += GetTime() - osu.pause_time
 
-        self.pause_time = GetTime()
+        osu.pause_time = GetTime()
 
         pygame.mouse.set_visible(True)
         pygame.mixer.music.pause()
 
-        self.my_settings.screen.blit(self.pause_screen,(0,0))
+        osu.my_settings.screen.blit(osu.pause_screen,(0,0))
         pygame.display.flip()
         
-        Write(self)
+        Write(osu)
 
-        Pause(self)
+        Pause(osu)
 
-def Pause(self) : # declenche la pause manuelle
+def Pause(osu) : # declenche la pause manuelle
 
     loop = True
     while loop :
 
-        for self.event in pygame.event.get() :
+        for osu.event in pygame.event.get() :
 
-            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_ESCAPE :
+            if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_ESCAPE :
                 loop = False
 
-                self.running = True
-                self.waiting = True
+                osu.running = True
+                osu.waiting = True
 
                 pygame.mouse.set_visible(False)
 
-                self.fps_time += GetTime() - self.pause_time
+                osu.fps_time += GetTime() - osu.pause_time
 
-            if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_q :
+            if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_q :
                 loop = False
 
-                self.to_menu = True
+                osu.to_menu = True
 
-            GameQuit(self)
+            GameQuit(osu)
 
-def UnPause(self) : # verifie et si possible quitte la pause
+def UnPause(osu) : # verifie et si possible quitte la pause
 
     pos1 = pygame.mouse.get_pos()
 
-    if (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_x) or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_v) :
+    if (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_x) or (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_v) :
         
-        distance1 = math.hypot(pos1[0]-self.pos[0],pos1[1]-self.pos[1])
+        distance1 = math.hypot(pos1[0]-osu.pos[0],pos1[1]-osu.pos[1])
 
         if distance1 < 5 :
 
-            self.waiting = False
+            osu.waiting = False
 
             pygame.mixer.music.unpause()
                                         
-            self.paused_time += GetTime() - self.pause_time
+            osu.paused_time += GetTime() - osu.pause_time
 
-def ChangeOffset(self) : # detecte si le joueur presse les touche de + ou - d'offset et l'applique
+def ChangeOffset(osu) : # detecte si le joueur presse les touche de + ou - d'offset et l'applique
 
-    if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_EQUALS :
+    if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_EQUALS :
 
-        if self.key[pygame.K_LSHIFT] :
-            self.offset += 1
+        if osu.key[pygame.K_LSHIFT] :
+            osu.offset += 1
         else :
-            self.offset += 5
+            osu.offset += 5
 
-        self.offset_time = GetTime()
-        self.show_offset = True
+        osu.offset_time = GetTime()
+        osu.show_offset = True
 
-    if self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_MINUS :
+    if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_MINUS :
 
-        if self.key[pygame.K_LSHIFT] :
-            self.offset -= 1
+        if osu.key[pygame.K_LSHIFT] :
+            osu.offset -= 1
         else :
-            self.offset -= 5
+            osu.offset -= 5
 
-        self.offset_time = GetTime()
-        self.show_offset = True
+        osu.offset_time = GetTime()
+        osu.show_offset = True
 
-def GetClicks(self) : # capte les touches clavier pouvant interagir avec un objet de la partie
+def GetClicks(osu) : # capte les touches clavier pouvant interagir avec un objet de la partie
 
-    if self.event.type == pygame.KEYDOWN and (self.event.key == pygame.K_x or self.event.key == pygame.K_v) :
+    if osu.event.type == pygame.KEYDOWN and (osu.event.key == pygame.K_x or osu.event.key == pygame.K_v) :
         
-        self.click_check = True
+        osu.click_check = True
         
-        self.replay_clicks.append(self.pos)
+        osu.replay_clicks.append(osu.pos)
         
-        GetAcc(self)
+        GetAcc(osu)
         
-    if self.event.type == pygame.KEYUP and (self.event.key == pygame.K_x or self.event.key == pygame.K_v) :
-        self.click_check = False
+    if osu.event.type == pygame.KEYUP and (osu.event.key == pygame.K_x or osu.event.key == pygame.K_v) :
+        osu.click_check = False
 
-def GetAcc(self) : # detecte et applique le changement d'accuracy du joueur dans la partie
+def GetAcc(osu) : # detecte et applique le changement d'accuracy du joueur dans la partie
 
-    for v in range(len(self.show_circles)) :
+    for v in range(len(osu.show_circles)) :
 
-        if self.acc_check == False and self.show_circles[v][11] == False :
+        if osu.acc_check == False and osu.show_circles[v][11] == False :
 
-            distance = math.hypot(self.show_circles[v][4][0]-self.pos[0],self.show_circles[v][4][1]-self.pos[1])
+            distance = math.hypot(osu.show_circles[v][4][0]-osu.pos[0],osu.show_circles[v][4][1]-osu.pos[1])
 
-            if distance < self.c_s/2*115/121 :
+            if distance < osu.c_s/2*115/121 :
 
-                self.acc_check = True
+                osu.acc_check = True
 
-                difference = GetTime() - (self.start_time + self.show_circles[v][5] + self.paused_time) + self.offset
-                self.total_ur.append(difference)
+                difference = GetTime() - (osu.start_time + osu.show_circles[v][5] + osu.paused_time) + osu.offset
+                osu.total_ur.append(difference)
 
-                if abs(difference) < self.od_time :
+                if abs(difference) < osu.od_time :
 
-                    if abs(difference) < self.od_time/4 :
-                        self.t_300 += 1
+                    if abs(difference) < osu.od_time/4 :
+                        osu.t_300 += 1
 
-                        self.hit_value = 300
-                        self.show_ur.append([self.blue,278*difference/self.od_time/2,GetTime(),0])
+                        osu.hit_value = 300
+                        osu.show_ur.append([osu.blue,278*difference/osu.od_time/2,GetTime(),0])
 
-                    if abs(difference) > self.od_time/4 and abs(difference) < self.od_time/2 :
-                        self.t_100 += 1
+                    if abs(difference) > osu.od_time/4 and abs(difference) < osu.od_time/2 :
+                        osu.t_100 += 1
 
-                        self.hit_value = 100
-                        self.show_ur.append([self.green,278*difference/self.od_time/2,GetTime(),0])
-                        self.show_acc.append([self.acc_100,self.show_circles[v][4],GetTime(),0])
+                        osu.hit_value = 100
+                        osu.show_ur.append([osu.green,278*difference/osu.od_time/2,GetTime(),0])
+                        osu.show_acc.append([osu.acc_100,osu.show_circles[v][4],GetTime(),0])
                     
-                    if abs(difference) > self.od_time/2 :
-                        self.t_50 += 1
+                    if abs(difference) > osu.od_time/2 :
+                        osu.t_50 += 1
 
-                        self.hit_value = 50
-                        self.show_ur.append([self.orange,278*difference/self.od_time/2,GetTime(),0])
-                        self.show_acc.append([self.acc_50,self.show_circles[v][4],GetTime(),0])
+                        osu.hit_value = 50
+                        osu.show_ur.append([osu.orange,278*difference/osu.od_time/2,GetTime(),0])
+                        osu.show_acc.append([osu.acc_50,osu.show_circles[v][4],GetTime(),0])
 
-                    self.acc.append(round(self.hit_value/3,2))
-                    health_bonus = round(self.hit_value/30,2)
+                    osu.acc.append(round(osu.hit_value/3,2))
+                    health_bonus = round(osu.hit_value/30,2)
 
-                    if self.health + health_bonus < self.max_health :
-                        self.health += health_bonus
+                    if osu.health + health_bonus < osu.max_health :
+                        osu.health += health_bonus
                     else :
-                        self.health = self.max_health
+                        osu.health = osu.max_health
 
-                    Play(self.sounds,'hit',0.5,self.volume,self.volume_effects)
+                    Play(osu.sounds,'hit',0.5,osu.volume,osu.volume_effects)
                     
-                    self.combo += 1
-                    if self.combo > self.max_combo : self.max_combo = self.combo
+                    osu.combo += 1
+                    if osu.combo > osu.max_combo : osu.max_combo = osu.combo
 
                 else :
                     
-                    self.t_miss += 1
+                    osu.t_miss += 1
 
-                    self.hit_value = 0
-                    self.show_acc.append([self.acc_miss,self.show_circles[v][4],GetTime(),0])
+                    osu.hit_value = 0
+                    osu.show_acc.append([osu.acc_miss,osu.show_circles[v][4],GetTime(),0])
 
-                    self.acc.append(0)
+                    osu.acc.append(0)
 
-                    self.health -= self.health_minus
+                    osu.health -= osu.health_minus
 
-                    if self.combo >= 20 :
-                        Play(self.sounds,'miss',1,self.volume,self.volume_effects)
-                    self.combo = 0
+                    if osu.combo >= 20 :
+                        Play(osu.sounds,'miss',1,osu.volume,osu.volume_effects)
+                    osu.combo = 0
 
-                self.show_circles[v][8]  = True
-                self.show_circles[v][11] = True
+                osu.show_circles[v][8]  = True
+                osu.show_circles[v][11] = True
