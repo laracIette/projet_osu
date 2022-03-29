@@ -112,7 +112,7 @@ def MenuShowVolume(menu) : # affiche le volume dans le menu
         menu.my_settings.screen.blit(menu.music_txt,(menu.music_rect.x,menu.music_rect.y))
         menu.my_settings.screen.blit(menu.effects_txt,(menu.effects_rect.x,menu.effects_rect.y))
 
-def SetVolumeOffsetSkin(menu) : # recupere et attribut les donnees de settings.txt
+def SetVolumeOffsetSkinMod(menu) : # recupere et attribut les donnees de settings.txt
 
     with open('assets\\settings.txt','r') as settings_file :
 
@@ -215,8 +215,8 @@ def DiffSelect(menu) : # selection de la difficulte
 def GetMods(menu) : # definir les modes de jeu
 
     menu.mods = ['easy',    'nofail',     'halftime',
-            'hardrock','suddendeath','doubletime','hidden',  'flashlight',
-            'relax',   'autopilot',  'spunout',   'autoplay','scorev2']
+                'hardrock','suddendeath','doubletime','hidden',  'flashlight',
+                'relax',   'autopilot',  'spunout',   'autoplay','scorev2']
     
     w = 0
     h = 0
@@ -240,7 +240,11 @@ def ModChoice(menu) : # choisir un mode de jeu
     for mod in menu.mods_icons :
 
         mod_icon = mod[0]
-        mod_rect = mod[1]
+
+        if mod[3] :
+            mod_icon = pygame.transform.rotate(mod[0],-15).convert()
+
+        mod_rect = mod_icon.get_rect(center = mod[2])
 
         menu.my_settings.screen.blit(mod_icon,mod_rect)
 
@@ -249,42 +253,58 @@ def ModChoice(menu) : # choisir un mode de jeu
 
         menu.my_settings.clock.tick(menu.my_settings.frequence)
 
-        pos = pygame.mouse.get_pos()
+        menu.pos = pygame.mouse.get_pos()
         for menu.event in pygame.event.get() :
                 
             if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
 
-                for i in range(len(menu.mods_icons)) :
-
-                    mod_rect = menu.mods_icons[i][1]
-
-                    if mod_rect.collidepoint(pos) :
-
-                        menu.mod = menu.mods[i]
-                        
-                        if menu.mods_icons[i][3] == False :
-                            menu.mods_icons[i][3] = True
-                        else :
-                            menu.mods_icons[i][3] = False
-
-                        for e in range(20) :
-
-                            if menu.mods_icons[i][3] == True :
-                                mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],-e).convert()
-                            else :
-                                mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],0).convert()
-
-                            mod_rect = mod_icon.get_rect(center = menu.mods_icons[i][2])
-
-                            menu.my_settings.screen.blit(mod_icon,mod_rect)
-                            pygame.display.flip()
+                ModSelect(menu)
 
             if menu.event.type == pygame.KEYDOWN and (menu.event.key == pygame.K_F1 or menu.event.key == pygame.K_ESCAPE) :
 
                 loop = False
 
-                return menu.mod
+                return menu.mod_list
 
             GameQuit(menu)
 
         pygame.display.flip()
+
+def ModSelect(menu) :
+
+    mod_lock = False
+
+    for i in range(len(menu.mods_icons)) :
+
+        mod_rect = menu.mods_icons[i][1]
+
+        if mod_rect.collidepoint(menu.pos) :
+
+            for m in range(len(menu.mod_list)) :
+
+                if menu.mod_list[m] == menu.mods[i] :
+                    
+                    menu.mod_list.pop(m)
+                    mod_lock = True
+
+                    break
+            
+            if mod_lock == False :
+                menu.mod_list.append(menu.mods[i])
+
+            if menu.mods_icons[i][3] == False :
+                menu.mods_icons[i][3] = True
+            else :
+                menu.mods_icons[i][3] = False
+
+            for e in range(15) :
+
+                if menu.mods_icons[i][3] :
+                    mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],-e).convert()
+                else :
+                    mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],0).convert()
+
+                mod_rect = mod_icon.get_rect(center = menu.mods_icons[i][2])
+
+                menu.my_settings.screen.blit(mod_icon,mod_rect)
+                pygame.display.flip()

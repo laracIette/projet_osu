@@ -13,11 +13,11 @@ from setthings import SetMultiplier, SetMap
 from interface import DarkenScreen, HideUI, SetFps, SetShowOnScreen, ShowOnScreen, UItextRenders
 from objects import GetCircle, GetFollowPoint, GetSpinner, SetCircles, SetFollowPoints, SetSpinners
 from game import ApplyBreaks, ChangeOffset, EndGame, GetClicks, GetPause, SetBreak, StartGame, UnPause
-from menu import DiffSelect, GetMods, MapSelect, ModChoice, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkin, SkinSelect, SongSelect
+from menu import DiffSelect, GetMods, MapSelect, ModChoice, ModifyVolumes, MenuShowVolume, SetVolumeOffsetSkinMod, SkinSelect, SongSelect
 
 class Osu : # classe correspondante a une partie (une seule map)
 
-    def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines,map_name,diff_name,mod,menu) :
+    def __init__(self,map,diff,songs,skin,sounds,volume,volume_music,volume_effects,offset,lines,map_name,diff_name,mod_list,menu) :
 
         self.my_settings = Settings()
 
@@ -26,13 +26,13 @@ class Osu : # classe correspondante a une partie (une seule map)
 
         self.menu = menu
 
-        self.mod    = mod
-        self.offset = offset
-        self.songs  = songs
-        self.diff   = diff
-        self.map    = map
-        self.lines  = lines
-        self.skin   = skin
+        self.mod_list = mod_list
+        self.offset   = offset
+        self.songs    = songs
+        self.diff     = diff
+        self.map      = map
+        self.lines    = lines
+        self.skin     = skin
 
         self.map_name  = map_name
         self.diff_name = diff_name
@@ -213,7 +213,7 @@ class Osu : # classe correspondante a une partie (une seule map)
                         Score(osu)
         
                     pygame.mixer.music.unpause()
-                    Menu.MenuChoice(osu.menu)
+                    Menu.MenuChoice(osu.menu,osu.mod_list)
 
             SetBreak(osu)
                 
@@ -256,7 +256,7 @@ class Osu : # classe correspondante a une partie (une seule map)
 
                 if osu.to_menu :
 
-                    Menu.MenuChoice(osu.menu)
+                    Menu.MenuChoice(osu.menu,osu.mod_list)
                 
                 GameQuit(osu)
 
@@ -277,7 +277,7 @@ class Menu : # classe correspondante au menu du jeu
         self.noir = pygame.Rect(0,0,self.wi,self.he)
         self.font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(ReSize(45)))
         
-        SetVolumeOffsetSkin(self)
+        SetVolumeOffsetSkinMod(self)
 
         self.songs  = SongSelect(self)
         self.sounds = ImportSounds(self.skin)
@@ -305,15 +305,14 @@ class Menu : # classe correspondante au menu du jeu
 
         self.diff_choice   = False
         self.choosing_diff = False
-
-        self.mod = 'nomod'
         
         GetMods(self)
 
         self.loop = True
 
-    def MenuChoice(menu) : # determine les options a prendre en compte pour le lancement d'une partie
+    def MenuChoice(menu,mod_list) : # determine les options a prendre en compte pour le lancement d'une partie
 
+        menu.mod_list = mod_list
         while menu.loop :
 
             menu.my_settings.clock.tick(menu.my_settings.frequence)
@@ -348,7 +347,7 @@ class Menu : # classe correspondante au menu du jeu
                             menu.diff_choice   = False
                             menu.choosing_diff = False
 
-                            osu = Osu(menu.map,menu.diff,menu.songs,menu.skin,menu.sounds,menu.volume,menu.volume_music,menu.volume_effects,menu.offset,menu.lines,menu.map_names[menu.map],menu.diffs[menu.diff],menu.mod,menu)
+                            osu = Osu(menu.map,menu.diff,menu.songs,menu.skin,menu.sounds,menu.volume,menu.volume_music,menu.volume_effects,menu.offset,menu.lines,menu.map_names[menu.map],menu.diffs[menu.diff],menu.mod_list,menu)
                             osu.OsuRun()
 
             MenuShowVolume(menu)
@@ -372,7 +371,7 @@ class Menu : # classe correspondante au menu du jeu
                     menu.skin = SkinSelect(menu)
 
                 if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_F1 :
-                    menu.mod = ModChoice(menu)
+                    menu.mod_list = ModChoice(menu)
 
                 if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_ESCAPE and menu.choosing_diff :
                     menu.choosing_diff = False

@@ -5,4 +5,4 @@ if __name__ == '__main__' :
     menu = Menu()
 
     # lance la fonction du choix de map de la classe Menu
-    menu.MenuChoice()
+    menu.MenuChoice([])
