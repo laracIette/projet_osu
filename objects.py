@@ -61,7 +61,7 @@ class OsuObjects :
                     osu.spin_x = (osu.pos[0]-osu.pos2[0])/spin_center*60
                     osu.spin_y = (osu.pos[1]-osu.pos2[1])/spin_center*60
                     
-                    osu.spin = OsuObjects.Spinning(osu)
+                    osu.spin = osu.Spinning()
                     
                     for p in osu.show_spinners :
 

@@ -47,7 +47,7 @@ class OsuSetThings :
                         osu.ar = "".join(ar_t)
                         osu.ar = float(osu.ar)
 
-                        OsuSetThings.SetAR(osu)
+                        osu.SetAR()
 
                     elif a == 3 :
                         for o in i :
@@ -57,7 +57,7 @@ class OsuSetThings :
                         osu.od = "".join(od_t)
                         osu.od = float(osu.od)
 
-                        OsuSetThings.SetOD(osu)
+                        osu.SetOD()
                     
                     elif a == 4 :
                         for o in i :

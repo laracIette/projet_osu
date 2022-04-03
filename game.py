@@ -2,7 +2,7 @@ import math
 import pygame
 from sounds import Play
 from tools import GetTime
-from gameend import OsuGameEnd, Write, GameQuit
+from gameend import Write, GameQuit
 
 class OsuGame :
 
@@ -42,7 +42,7 @@ class OsuGame :
             osu.death = True
 
         if osu.total_ur != [] :
-            osu.offset += OsuGameEnd.ProposeOffset(osu)
+            osu.offset += osu.ProposeOffset()
 
         Write(osu)
 
@@ -64,7 +64,7 @@ class OsuGame :
             
             Write(osu)
 
-            OsuGame.Pause(osu)
+            osu.Pause()
 
     def Pause(osu) : # declenche la pause manuelle
 
@@ -136,7 +136,7 @@ class OsuGame :
             
             osu.replay_clicks.append(osu.pos)
             
-            OsuGame.GetAcc(osu)
+            osu.GetAcc()
             
         if osu.event.type == pygame.KEYUP and (osu.event.key == pygame.K_x or osu.event.key == pygame.K_v) :
             osu.click_check = False

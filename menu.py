@@ -260,7 +260,7 @@ class MenuTools :
                     
                 if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
 
-                    MenuTools.ModSelect(menu)
+                    menu.ModSelect()
 
                 if menu.event.type == pygame.KEYDOWN and (menu.event.key == pygame.K_F1 or menu.event.key == pygame.K_ESCAPE) :
 

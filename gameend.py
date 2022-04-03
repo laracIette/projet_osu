@@ -54,7 +54,7 @@ class OsuGameEnd :
 
                     if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_F2 :
 
-                        OsuGameEnd.WriteReplay(osu)
+                        osu.WriteReplay()
 
                     if osu.event.type == pygame.MOUSEBUTTONDOWN and osu.event.button == pygame.BUTTON_LEFT :
 
@@ -92,7 +92,7 @@ class OsuGameEnd :
 
                 if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_F2 :
 
-                    OsuGameEnd.WriteReplay(osu)
+                    osu.WriteReplay()
 
                 if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_q :
                     loop = False
