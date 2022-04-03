@@ -1,4 +1,7 @@
 import pygame
+import sys        
+sys.path.append("C:\\Users\\nicos\\OneDrive\\Random\\projet_osu") 
+
 from settings import Settings
 
 pygame.init()

@@ -10,7 +10,7 @@ def SkinSelect(menu) : # selection du skin
     pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
 
     skins0 = []
-    skins  = glob.glob('assets\\skins\\*')
+    skins  = glob.glob("assets\\skins\\*")
     for i in skins :
         skins0.append(os.path.basename(i))
     
@@ -43,7 +43,7 @@ def SkinSelect(menu) : # selection du skin
                     if skin1_rect.collidepoint(pos) :
                         loop = False
 
-                        Play(menu.sounds,'click',1,menu.volume,menu.volume_effects)
+                        Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
                         
                         menu.skin = skins0[w]
 
@@ -63,12 +63,12 @@ def SkinSelect(menu) : # selection du skin
 
 def SongSelect(menu) : # definition des maps possibles
 
-    menu.maps  = glob.glob('assets\\songs\\*')
+    menu.maps  = glob.glob("assets\\songs\\*")
     menu.songs = []
 
     for i in range(len(menu.maps)) :
 
-        audio = glob.glob(f'{menu.maps[i]}\\*.mp3')
+        audio = glob.glob(f"{menu.maps[i]}\\*.mp3")
         audio = audio[0]
         
         menu.map_names = []
@@ -77,7 +77,7 @@ def SongSelect(menu) : # definition des maps possibles
             menu.map_names.append(os.path.basename(j))
 
         diffs = []
-        diff  = glob.glob(f'{menu.maps[i]}\\*.txt')
+        diff  = glob.glob(f"{menu.maps[i]}\\*.txt")
         for v in range(len(diff)) :
             diffs.append(diff[v])
 
@@ -86,7 +86,7 @@ def SongSelect(menu) : # definition des maps possibles
 
             diff_names.append(os.path.basename(os.path.splitext(u)[0]))
 
-        bgs = glob.glob(f'{menu.maps[i]}\\*.jpg')
+        bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
         bg  = pygame.image.load(bgs[0]).convert()
         bg  = pygame.transform.scale(bg,(menu.wi,menu.he)).convert()
         
@@ -114,7 +114,7 @@ def MenuShowVolume(menu) : # affiche le volume dans le menu
 
 def SetVolumeOffsetSkinMod(menu) : # recupere et attribut les donnees de settings.txt
 
-    with open('assets\\settings.txt','r') as settings_file :
+    with open("assets\\settings.txt","r") as settings_file :
 
         a = 0
 
@@ -141,9 +141,9 @@ def SetVolumeOffsetSkinMod(menu) : # recupere et attribut les donnees de setting
 
                 skin_t = []
                 for s in menu.lines[a] :
-                    if s != '\n' :
+                    if s != "\n" :
                         skin_t.append(s)
-                menu.skin = ''.join(skin_t)
+                menu.skin = "".join(skin_t)
 
             a += 1
                     
@@ -175,9 +175,9 @@ def ModifyVolumes(menu) : # detecte si besoin et applique changement de volume
     menu.volume_music   = menu.volumes[1]
     menu.volume_effects = menu.volumes[2]
 
-    menu.volume_txt  = menu.volume_font.render(f'main : {menu.volume}%',False,menu.white).convert()
-    menu.music_txt   = menu.music_font.render(f'music : {menu.volume_music}%',False,menu.white).convert()
-    menu.effects_txt = menu.music_font.render(f'effects : {menu.volume_effects}%',False,menu.white).convert()
+    menu.volume_txt  = menu.volume_font.render(f"main : {menu.volume}%",False,menu.white).convert()
+    menu.music_txt   = menu.music_font.render(f"music : {menu.volume_music}%",False,menu.white).convert()
+    menu.effects_txt = menu.music_font.render(f"effects : {menu.volume_effects}%",False,menu.white).convert()
     
     menu.volume_time = GetTime()
 
@@ -196,7 +196,7 @@ def MapSelect(menu) : # selection de la map
             menu.choosing_diff = True
             menu.map = menu.ii
 
-            Play(menu.sounds,'click',1,menu.volume,menu.volume_effects)
+            Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
 
 def DiffSelect(menu) : # selection de la difficulte
 
@@ -209,14 +209,14 @@ def DiffSelect(menu) : # selection de la difficulte
     if diff_rect.collidepoint(menu.pos) :
         menu.diff_choice = True
 
-        Play(menu.sounds,'click',1,menu.volume,menu.volume_effects)
+        Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
         pygame.mouse.set_visible(False)
 
 def GetMods(menu) : # definir les modes de jeu
 
-    menu.mods = ['easy',    'nofail',     'halftime',
-                'hardrock','suddendeath','doubletime','hidden',  'flashlight',
-                'relax',   'autopilot',  'spunout',   'autoplay','scorev2']
+    menu.mods = ["easy",    "nofail",     "halftime",
+                "hardrock","suddendeath","doubletime","hidden",  "flashlight",
+                "relax",   "autopilot",  "spunout",   "autoplay","scorev2"]
     
     w = 0
     h = 0
@@ -224,7 +224,7 @@ def GetMods(menu) : # definir les modes de jeu
     for i in range(len(menu.mods)) :
     
         center_rect = (ReSize(505+220*w),ReSize(305+220*h))
-        mod_icon    = Load(f'skins\\{menu.skin}\\mods\\{menu.mods[i]}.png',(ReSize(180),ReSize(180)),False)
+        mod_icon    = Load(f"skins\\{menu.skin}\\mods\\{menu.mods[i]}.png",(ReSize(180),ReSize(180)),False)
         mod_rect    = mod_icon.get_rect(center = center_rect)
 
         w += 1

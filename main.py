@@ -1,6 +1,6 @@
 from run import Menu
 
-if __name__ == '__main__' :
+if __name__ == "__main__" :
     # determine les elements de la classe Menu
     menu = Menu()
 

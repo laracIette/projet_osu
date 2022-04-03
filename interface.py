@@ -61,9 +61,9 @@ def SetShowOnScreen(osu) : # determine des elements a afficher pendant une parti
     if osu.show_offset :
         
         if osu.offset < 0 :
-            osu.offset_txt = osu.fps_font.render(f'Local offset : {osu.offset}ms',False,osu.white).convert()
+            osu.offset_txt = osu.fps_font.render(f"Local offset : {osu.offset}ms",False,osu.white).convert()
         else :
-            osu.offset_txt = osu.fps_font.render(f'Local offset : +{osu.offset}ms',False,osu.white).convert()
+            osu.offset_txt = osu.fps_font.render(f"Local offset : +{osu.offset}ms",False,osu.white).convert()
 
         if GetTime() - osu.offset_time - osu.paused_time >= 1000 :
             osu.show_offset = False
@@ -148,7 +148,7 @@ def SetFps(osu) : # calcule et affiche les fps
 
     osu.fps_time = GetTime()
     osu.avg_fps /= len(osu.fpss)
-    osu.fps_txt  = osu.fps_font.render(f'{round(osu.avg_fps)}fps',False,osu.white).convert()
+    osu.fps_txt  = osu.fps_font.render(f"{round(osu.avg_fps)}fps",False,osu.white).convert()
     osu.avg_fps  = 0
 
 def UItextRenders(osu) : # affiche les elements texte de la partie
@@ -171,8 +171,8 @@ def UItextRenders(osu) : # affiche les elements texte de la partie
 
         osu.score += round(osu.hit_value + (osu.hit_value * ((combo_multiplier * osu.difficulty_multiplier * osu.mod_multiplier) / 25)))
         
-        osu.acc_txt    = osu.acc_font.render(f'{round(osu.accuracy,2)}%',False,osu.white).convert()
-        osu.combo_txt  = osu.combo_font.render(f'{osu.combo}x',False,osu.white).convert()
+        osu.acc_txt    = osu.acc_font.render(f"{round(osu.accuracy,2)}%",False,osu.white).convert()
+        osu.combo_txt  = osu.combo_font.render(f"{osu.combo}x",False,osu.white).convert()
         osu.score_txt  = osu.combo_font.render(str(osu.score),False,osu.white).convert()
 
         osu.acc_check = False

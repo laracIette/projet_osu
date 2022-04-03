@@ -58,9 +58,9 @@ class Osu : # classe correspondante a une partie (une seule map)
 
         SetMap(self)
 
-        self.pause_screen = Load(f'skins\\{self.skin}\\pausescreen.png',(self.wi,self.he),False)
-        self.end_screen   = Load(f'skins\\{self.skin}\\endscreen.png',(self.wi,self.he),False)
-        self.dim          = Load('images\\noir93.png',(self.wi,self.he),False)
+        self.pause_screen = Load(f"skins\\{self.skin}\\pausescreen.png",(self.wi,self.he),False)
+        self.end_screen   = Load(f"skins\\{self.skin}\\endscreen.png",(self.wi,self.he),False)
+        self.dim          = Load("images\\noir93.png",(self.wi,self.he),False)
         self.bg           = pygame.transform.scale(self.songs[self.map][0],(self.wi,self.he)).convert()
         self.noir         = pygame.Rect(0,0,self.wi,self.he)
 
@@ -68,17 +68,17 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.break_lock = False
         
         self.c_s     = round(ReSize(218 - self.cs*18))
-        self.circle  = Load(f'skins\\{self.skin}\\hitcircle.png',(self.c_s,self.c_s),True)
+        self.circle  = Load(f"skins\\{self.skin}\\hitcircle.png",(self.c_s,self.c_s),True)
 
         self.a_c_s    = self.c_s*4
-        self.a_circle = Load(f'skins\\{self.skin}\\approachcircle.png',(self.a_c_s,self.a_c_s),True)
+        self.a_circle = Load(f"skins\\{self.skin}\\approachcircle.png",(self.a_c_s,self.a_c_s),True)
 
-        self.cursor       = Load(f'skins\\{self.skin}\\cursor.png',(self.c_s,self.c_s),True)
-        self.cursor_trail = Load(f'skins\\{self.skin}\\cursortrail.png',(self.c_s/3.3,self.c_s/3.3),True)
+        self.cursor       = Load(f"skins\\{self.skin}\\cursor.png",(self.c_s,self.c_s),True)
+        self.cursor_trail = Load(f"skins\\{self.skin}\\cursortrail.png",(self.c_s/3.3,self.c_s/3.3),True)
         self.trail_pos    = []
         self.trail_count  = 0
 
-        self.spinner      = Load(f'skins\\{self.skin}\\spinner.png',(ReSize(400),ReSize(400)),True)
+        self.spinner      = Load(f"skins\\{self.skin}\\spinner.png",(ReSize(400),ReSize(400)),True)
         self.spin         = 0
         self.show_spinner = False
         self.spin_tot     = 0
@@ -91,21 +91,21 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.fpss     = []
         self.avg_fps  = 0
         self.fps_time = GetTime()
-        self.fps_font = pygame.font.SysFont('arial',round(ReSize(30)))
+        self.fps_font = pygame.font.SysFont("arial",round(ReSize(30)))
 
-        self.number_font = pygame.font.Font('assets\\fonts\\LeagueSpartanBold.ttf',round(self.c_s/2))
-        self.score_font  = pygame.freetype.SysFont('segoeuisemibold',round(75))
+        self.number_font = pygame.font.Font("assets\\fonts\\LeagueSpartanBold.ttf",round(self.c_s/2))
+        self.score_font  = pygame.freetype.SysFont("segoeuisemibold",round(75))
         
         self.acc       = []
         self.acc_check = False
-        self.acc_font  = pygame.font.SysFont('segoeuisemibold',round(ReSize(45)))
+        self.acc_font  = pygame.font.SysFont("segoeuisemibold",round(ReSize(45)))
 
-        self.rep_font = pygame.freetype.SysFont('segoeuisemibold',round(ReSize(45)))
+        self.rep_font = pygame.freetype.SysFont("segoeuisemibold",round(ReSize(45)))
         
         self.show_acc = []
-        self.acc_miss = Load(f'skins\\{self.skin}\\miss.png',(self.c_s/2,self.c_s/2),True)
-        self.acc_100  = Load(f'skins\\{self.skin}\\100.png',(self.c_s/2,self.c_s/2),True)
-        self.acc_50   = Load(f'skins\\{self.skin}\\50.png',(self.c_s/2,self.c_s/2),True)
+        self.acc_miss = Load(f"skins\\{self.skin}\\miss.png",(self.c_s/2,self.c_s/2),True)
+        self.acc_100  = Load(f"skins\\{self.skin}\\100.png",(self.c_s/2,self.c_s/2),True)
+        self.acc_50   = Load(f"skins\\{self.skin}\\50.png",(self.c_s/2,self.c_s/2),True)
 
         self.t_miss = 0
         self.t_300  = 0
@@ -127,7 +127,7 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.score          = 0
         self.combo          = 0
         self.max_combo      = 0
-        self.combo_font     = pygame.font.SysFont('segoeuisemibold',round(ReSize(90)))
+        self.combo_font     = pygame.font.SysFont("segoeuisemibold",round(ReSize(90)))
 
         self.max_health       = 600
         self.health           = self.max_health
@@ -150,16 +150,16 @@ class Osu : # classe correspondante a une partie (une seule map)
         self.show_ur   = []
         self.total_ur  = []
 
-        self.followpoint  = Load(f'skins\\{self.skin}\\followpoint.png',(ReSize(128),ReSize(20)),True)
+        self.followpoint  = Load(f"skins\\{self.skin}\\followpoint.png",(ReSize(128),ReSize(20)),True)
         self.followpoints = []
 
         self.show_circles      = []
         self.show_spinners     = []
         self.show_followpoints = []
 
-        self.score_txt = self.combo_font.render('0',False,self.white).convert()
-        self.combo_txt = self.combo_font.render('0',False,self.white).convert()
-        self.acc_txt   = self.acc_font.render('100.00%',False,self.white).convert()
+        self.score_txt = self.combo_font.render("0",False,self.white).convert()
+        self.combo_txt = self.combo_font.render("0",False,self.white).convert()
+        self.acc_txt   = self.acc_font.render("100.00%",False,self.white).convert()
 
         self.music_start = GetTime() + self.start_offset
         self.playing     = False
@@ -275,7 +275,7 @@ class Menu : # classe correspondante au menu du jeu
         self.white  = (255,255,255)
 
         self.noir = pygame.Rect(0,0,self.wi,self.he)
-        self.font = pygame.font.Font('assets\\fonts\\shippori.ttf',round(ReSize(45)))
+        self.font = pygame.font.Font("assets\\fonts\\shippori.ttf",round(ReSize(45)))
         
         SetVolumeOffsetSkinMod(self)
 
@@ -284,18 +284,18 @@ class Menu : # classe correspondante au menu du jeu
 
         self.show_volume = True
 
-        self.volume_font = pygame.font.SysFont('arial',round(ReSize(60)))
-        self.music_font  = pygame.font.SysFont('arial',round(ReSize(40)))
+        self.volume_font = pygame.font.SysFont("arial",round(ReSize(60)))
+        self.music_font  = pygame.font.SysFont("arial",round(ReSize(40)))
 
-        self.volume_txt    = self.volume_font.render(f'main : {self.volume}%',False,self.white).convert()
+        self.volume_txt    = self.volume_font.render(f"main : {self.volume}%",False,self.white).convert()
         self.volume_rect   = self.volume_txt.get_rect()
         self.volume_rect.y = self.he-2*self.volume_txt.get_height()-ReSize(15)
 
-        self.music_txt    = self.music_font.render(f'music : {self.volume_music}%',False,self.white).convert()
+        self.music_txt    = self.music_font.render(f"music : {self.volume_music}%",False,self.white).convert()
         self.music_rect   = self.music_txt.get_rect()
         self.music_rect.y = self.he-2*self.music_txt.get_height()
 
-        self.effects_txt    = self.music_font.render(f'effects : {self.volume_effects}%',False,self.white).convert()
+        self.effects_txt    = self.music_font.render(f"effects : {self.volume_effects}%",False,self.white).convert()
         self.effects_rect   = self.effects_txt.get_rect()
         self.effects_rect.y = self.he-self.effects_txt.get_height()
 
@@ -322,7 +322,7 @@ class Menu : # classe correspondante au menu du jeu
             
             for i in range(len(menu.maps)) :
 
-                bgs = glob.glob(f'{menu.maps[i]}\\*.jpg')
+                bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
                 bg  = pygame.image.load(bgs[0]).convert()
                 bg  = pygame.transform.scale(bg,(menu.wi/5,menu.he/5)).convert()
 

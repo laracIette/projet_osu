@@ -76,14 +76,14 @@ def SetSpinners(osu) : # affiche et modifie le/les spinners si mouvement
                             else :
                                 osu.health = osu.max_health
                             
-                            Play(osu.sounds,'spinnerspin',0.5,osu.volume,osu.volume_effects)
+                            Play(osu.sounds,"spinnerspin",0.5,osu.volume,osu.volume_effects)
                             
                         if abs(osu.spin - osu.spin_tot) > 330 :
 
                             osu.spin_tot = osu.spin
                             osu.score   += 950
                             
-                            Play(osu.sounds,'spinnerbonus',1,osu.volume,osu.volume_effects)
+                            Play(osu.sounds,"spinnerbonus",1,osu.volume,osu.volume_effects)
 
                             osu.spin_score_bonus_time = GetTime()
                             osu.spin_score_bonus     += 1
@@ -155,7 +155,7 @@ def GetCircle(osu) : # verifie si doit afficher un cercle, si oui le cree
             else :
                 osu.numbers += 1
 
-            number = osu.number_font.render(f'{osu.numbers}',False,osu.white).convert()
+            number = osu.number_font.render(f"{osu.numbers}",False,osu.white).convert()
 
             osu.show_circles.append([GetTime()-osu.paused_time,0,1,osu.a_circle,coor,osu.circles[osu.c_num][2],number,osu.circle,osu.fade,1,osu.acc_check,osu.faded,1])
 
@@ -228,7 +228,7 @@ def SetCircles(osu) : # affiche et modifie le/les cercles
                 osu.health -= osu.health_minus
 
                 if osu.combo >= 20 :
-                    Play(osu.sounds,'miss',1,osu.volume,osu.volume_effects)
+                    Play(osu.sounds,"miss",1,osu.volume,osu.volume_effects)
                 osu.combo = 0
 
 def GetFollowPoint(osu) : # verifie si doit afficher un followpoint, si oui le cree

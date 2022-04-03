@@ -10,7 +10,7 @@ def SetMap(osu) : # determination et classage dans des tableau des elements a af
     map = osu.songs[osu.map][2][osu.diff]
         
 
-    with open(map,'r') as map_file :
+    with open(map,"r") as map_file :
 
         for i in map_file :
 
@@ -18,7 +18,7 @@ def SetMap(osu) : # determination et classage dans des tableau des elements a af
                 
                 for o in i:
 
-                    if o == 's' :
+                    if o == "s" :
 
                         spinner_lock = True
 
@@ -26,43 +26,43 @@ def SetMap(osu) : # determination et classage dans des tableau des elements a af
 
                 a += 1
 
-                if i == '\n' :
+                if i == "\n" :
                     continue
 
                 elif a == 1 :
                     for o in i :
-                        if o != '\n' :
+                        if o != "\n" :
                             cs_t.append(o)
 
-                    osu.cs = ''.join(cs_t)
+                    osu.cs = "".join(cs_t)
                     osu.cs = float(osu.cs)
 
                 elif a == 2 :
                     for o in i :
-                        if o != '\n' :
+                        if o != "\n" :
                             ar_t.append(o)
 
-                    osu.ar = ''.join(ar_t)
+                    osu.ar = "".join(ar_t)
                     osu.ar = float(osu.ar)
 
                     SetAR(osu)
 
                 elif a == 3 :
                     for o in i :
-                        if o != '\n' :
+                        if o != "\n" :
                             od_t.append(o)
 
-                    osu.od = ''.join(od_t)
+                    osu.od = "".join(od_t)
                     osu.od = float(osu.od)
 
                     SetOD(osu)
                 
                 elif a == 4 :
                     for o in i :
-                        if o != '\n' :
+                        if o != "\n" :
                             hp_t.append(o)
 
-                    osu.hp = ''.join(hp_t)
+                    osu.hp = "".join(hp_t)
                     osu.hp = float(osu.hp)
 
                 else :
@@ -73,7 +73,7 @@ def SetMap(osu) : # determination et classage dans des tableau des elements a af
 
     cycle = 1
     for c in circles0[0] :
-        if c == ',' :
+        if c == "," :
                 cycle += 1
 
     tab = []
@@ -81,11 +81,11 @@ def SetMap(osu) : # determination et classage dans des tableau des elements a af
 
         for k in j :
 
-            if k != ',' and k != '\n' :
+            if k != "," and k != "\n" :
                 tab.append(k)
 
             else :
-                tab = ''.join(tab)
+                tab = "".join(tab)
                 osu.circles.append(tab)
                 tab = []
 
@@ -113,11 +113,11 @@ def SetMap(osu) : # determination et classage dans des tableau des elements a af
 
         for k in j :
 
-            if k != ',' and k != 's' and k != '\n' :
+            if k != "," and k != "s" and k != "\n" :
                 tab.append(k)
 
             elif tab != [] :
-                tab = ''.join(tab)
+                tab = "".join(tab)
                 spinners0.append(tab)
                 tab = []
     
@@ -198,7 +198,7 @@ def SetHP(osu) : # reglages correspondants au gain et perte de points de vie
 
     pass
 
-def SetMultiplier(osu) : # multiplier pris en compte lors du calcul du score
+def SetMultiplier(osu) : # multiplicateur pris en compte lors du calcul du score
     
     cs_od_hp = osu.cs + osu.od + osu.hp
 

@@ -36,7 +36,7 @@ def EndGame(osu) : # elements pouvants terminer une partie
     pygame.mixer.music.pause()
 
     if osu.health <= 0 :
-        Play(osu.sounds,'fail',1,osu.volume,osu.volume_effects)
+        Play(osu.sounds,"fail",1,osu.volume,osu.volume_effects)
         osu.death = True
 
     if osu.total_ur != [] :
@@ -184,7 +184,7 @@ def GetAcc(osu) : # detecte et applique le changement d'accuracy du joueur dans 
                     else :
                         osu.health = osu.max_health
 
-                    Play(osu.sounds,'hit',0.5,osu.volume,osu.volume_effects)
+                    Play(osu.sounds,"hit",0.5,osu.volume,osu.volume_effects)
                     
                     osu.combo += 1
                     if osu.combo > osu.max_combo : osu.max_combo = osu.combo
@@ -201,7 +201,7 @@ def GetAcc(osu) : # detecte et applique le changement d'accuracy du joueur dans 
                     osu.health -= osu.health_minus
 
                     if osu.combo >= 20 :
-                        Play(osu.sounds,'miss',1,osu.volume,osu.volume_effects)
+                        Play(osu.sounds,"miss",1,osu.volume,osu.volume_effects)
                     osu.combo = 0
 
                 osu.show_circles[v][8]  = True

@@ -20,19 +20,19 @@ def ProposeOffset(osu) : # propose un offset au joueur si possible
         ur_moy = round(ur_moy)
 
         if ur_moy < 0 :
-            rep_txt = f'You are tapping {abs(ur_moy)}ms earlier, do you want to apply a negative offset of {abs(ur_moy)}ms ?'
+            rep_txt = f"You are tapping {abs(ur_moy)}ms earlier, do you want to apply a negative offset of {abs(ur_moy)}ms ?"
         
         if ur_moy > 0 :
-            rep_txt = f'You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?'
+            rep_txt = f"You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?"
 
         rep_rect        = osu.rep_font.get_rect(rep_txt)
         rep_rect.center = (osu.wi/2,osu.he/2)
 
-        yes_txt         = 'Yes'
+        yes_txt         = "Yes"
         yes_rect        = osu.rep_font.get_rect(yes_txt)
         yes_rect.center = (osu.wi/3,osu.he/3*2)
 
-        no_txt         = 'No'
+        no_txt         = "No"
         no_rect        = osu.rep_font.get_rect(no_txt)
         no_rect.center = (osu.wi/3*2,osu.he/3*2)
         
@@ -98,31 +98,31 @@ def Score(osu) : # affichage de l'ecran de fin
 def WriteReplay(osu) : # ecriture du replay dans un fichier .txt
 
     now = datetime.now()
-    replay_name = now.strftime(f'{osu.map_name} [{osu.diff_name}] (%Y-%m-%d - %H.%M.%S)')
+    replay_name = now.strftime(f"{osu.map_name} [{osu.diff_name}] (%Y-%m-%d - %H.%M.%S)")
 
-    with open(f'assets\\replays\\{replay_name}.txt', 'w') as replay :
+    with open(f"assets\\replays\\{replay_name}.txt", "w") as replay :
         
-        replay.write(f'{osu.score}\n')
-        replay.write(f'{osu.t_300}\n')
-        replay.write(f'{osu.t_100}\n')
-        replay.write(f'{osu.t_50}\n')
-        replay.write(f'{osu.t_miss}\n')
-        replay.write(f'{osu.accuracy}\n')
-        replay.write(f'{osu.max_combo}\n')
+        replay.write(f"{osu.score}\n")
+        replay.write(f"{osu.t_300}\n")
+        replay.write(f"{osu.t_100}\n")
+        replay.write(f"{osu.t_50}\n")
+        replay.write(f"{osu.t_miss}\n")
+        replay.write(f"{osu.accuracy}\n")
+        replay.write(f"{osu.max_combo}\n")
 
         for i in osu.replay_clicks :
 
-            replay.write(f'{i}\n')
+            replay.write(f"{i}\n")
 
 def Write(self) : # ecriture et modification des parametres du jeu sauvegardes dans settings.txt
 
-    with open('assets\\settings.txt','w') as settings_file :
+    with open("assets\\settings.txt","w") as settings_file :
 
         modifs = [self.offset,self.volume,self.volume_music,self.volume_effects,self.skin]
 
         for a in range(len(self.lines)) :
 
-            settings_file.write(self.lines[a].replace(self.lines[a],f'{modifs[a]}\n'))
+            settings_file.write(self.lines[a].replace(self.lines[a],f"{modifs[a]}\n"))
 
 
 def GameQuit(self) : # quitte la partie/menu et le programme
