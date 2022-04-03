@@ -3,8 +3,6 @@ import pygame
 from settings import Settings
 
 my_settings = Settings()
-wi = my_settings.width
-he = my_settings.height
 
 def Load(name,size,smooth) : # charge une image
 
@@ -26,4 +24,4 @@ def GetTime() : # retourne le temps actuel de la demande en millisecondes
 
 def ReSize(number): # adapte les images a toutes les resolutions
     
-    return number/1920*wi
+    return number/1920*my_settings.width
