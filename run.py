@@ -4,22 +4,22 @@ import pygame
 from math import inf
 import pygame.freetype
 
-# mes bibliotheques
+# mes classes
 
-# class Osu
+# Osu
 from game import OsuGame
 from objects import OsuObjects
 from gameend import OsuGameEnd
 from setthings import OsuSetThings
 from interface import OsuInterface
 
-# class Menu
+# Menu
 from menu import MenuTools
-from sounds import ImportSounds
 
-# general
+# mes fonctions
 from gameend import GameQuit
 from settings import Settings
+from sounds import ImportSounds
 from tools import GetTime, Load, ReSize
 
 class Osu(OsuGame,OsuObjects,OsuGameEnd,OsuInterface,OsuSetThings) : # classe correspondante a une partie
