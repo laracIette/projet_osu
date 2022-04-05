@@ -96,6 +96,20 @@ class MenuTools :
 
         return menu.songs
 
+    def ShowOnScreen(menu) :
+        
+        pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
+            
+        for i in range(len(menu.maps)) :
+
+            bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
+            bg  = pygame.image.load(bgs[0]).convert()
+            bg  = pygame.transform.scale(bg,(menu.wi/5,menu.he/5)).convert()
+
+            menu.my_settings.screen.blit(bg,(0,menu.he/5*i))
+        
+        menu.ShowVolume()
+
     def ShowVolume(menu) : # affiche le volume dans le menu
 
         if menu.show_volume :
@@ -201,18 +215,34 @@ class MenuTools :
                 Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
 
     def DiffSelect(menu) : # selection de la difficulte
+        
+        menu.diffs = menu.songs[menu.map][3]
+        for i in range(len(menu.diffs)) :
+    
+            diff = menu.font.render(menu.diffs[i],False,menu.white).convert()
+            menu.my_settings.screen.blit(diff,(menu.wi/5,menu.he/20*i+menu.he/5*menu.map))
 
-        diff = menu.font.render(menu.diffs[menu.diff],False,menu.white).convert()
+        if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
 
-        diff_rect   = diff.get_rect()
-        diff_rect.x = menu.wi/5
-        diff_rect.y = menu.he/20*menu.diff+menu.he/5*menu.map
+            for menu.diff in range(len(menu.diffs)) :
 
-        if diff_rect.collidepoint(menu.pos) :
-            menu.diff_choice = True
+                diff = menu.font.render(menu.diffs[menu.diff],False,menu.white).convert()
 
-            Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
-            pygame.mouse.set_visible(False)
+                diff_rect   = diff.get_rect()
+                diff_rect.x = menu.wi/5
+                diff_rect.y = menu.he/20*menu.diff+menu.he/5*menu.map
+
+                if diff_rect.collidepoint(menu.pos) :
+                    menu.diff_choice   = True
+                    menu.choosing_diff = False
+                    
+                    menu.map_name  = menu.map_names[menu.map]
+                    menu.diff_name = menu.diffs[menu.diff]
+
+                    pygame.mouse.set_visible(False)
+                    Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
+                    
+                    break
 
     def GetMods(menu) : # definir les modes de jeu
 

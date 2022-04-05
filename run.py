@@ -1,5 +1,4 @@
 # bibliotheques systeme
-import glob
 import pygame
 from math import inf
 import pygame.freetype
@@ -43,8 +42,8 @@ class Osu(OsuGame,OsuObjects,OsuGameEnd,OsuInterface,OsuSetThings) : # classe co
         self.diff     = menu.diff
         self.map      = menu.map
 
-        self.map_name  = menu.map_names[menu.map]
-        self.diff_name = menu.diffs[menu.diff]
+        self.map_name  = menu.map_name
+        self.diff_name = menu.diff_name
 
         self.sounds         = menu.sounds
         self.volume         = menu.volume
@@ -177,7 +176,6 @@ class Osu(OsuGame,OsuObjects,OsuGameEnd,OsuInterface,OsuSetThings) : # classe co
         self.replay_clicks = []
 
         self.death   = False
-        self.to_menu = False
 
         self.numbers = 0
 
@@ -200,7 +198,7 @@ class Osu(OsuGame,OsuObjects,OsuGameEnd,OsuInterface,OsuSetThings) : # classe co
             osu.my_settings.clock.tick(osu.my_settings.frequence)
 
             if osu.waiting == False :
-
+    
                 if GetTime() - osu.paused_time >= osu.music_start and osu.playing == False :
                 
                     osu.StartGame()
@@ -216,13 +214,6 @@ class Osu(OsuGame,OsuObjects,OsuGameEnd,OsuInterface,OsuSetThings) : # classe co
                 if GetTime() >= osu.end_time + osu.start_offset or osu.health <= 0 :
 
                     osu.EndGame()
-                    pygame.mixer.music.unpause()
-
-                    if osu.death == False :
-
-                        osu.Score()
-        
-                    Menu.MenuChoice(osu.menu,osu.mod_list)
 
             osu.SetBreak()
                 
@@ -244,10 +235,9 @@ class Osu(OsuGame,OsuObjects,OsuGameEnd,OsuInterface,OsuSetThings) : # classe co
 
             osu.ShowOnScreen()
 
-            osu.pos = pygame.mouse.get_pos()
-
             pygame.display.flip()
             
+            osu.pos = pygame.mouse.get_pos()
             osu.key = pygame.key.get_pressed()
             for osu.event in pygame.event.get() :
 
@@ -262,10 +252,6 @@ class Osu(OsuGame,OsuObjects,OsuGameEnd,OsuInterface,OsuSetThings) : # classe co
                 osu.ChangeOffset()
 
                 osu.GetPause()
-
-                if osu.to_menu :
-
-                    Menu.MenuChoice(osu.menu,osu.mod_list)
                 
                 GameQuit(osu)
 
@@ -311,7 +297,7 @@ class Menu(MenuTools) : # classe correspondante au menu du jeu
         self.volume_noir = pygame.Rect(self.wi/3*2,self.he/3*2,self.wi/3,self.he/3)
         
         self.volume_time = GetTime()
-
+        
         self.diff_choice   = False
         self.choosing_diff = False
         
@@ -322,44 +308,23 @@ class Menu(MenuTools) : # classe correspondante au menu du jeu
     def MenuChoice(menu,mod_list) : # determine les options a prendre en compte pour le lancement d'une partie
 
         menu.mod_list = mod_list
+        
         while menu.loop :
 
             menu.my_settings.clock.tick(menu.my_settings.frequence)
-            pygame.display.flip()
 
-            pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
-            
-            for i in range(len(menu.maps)) :
-
-                bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
-                bg  = pygame.image.load(bgs[0]).convert()
-                bg  = pygame.transform.scale(bg,(menu.wi/5,menu.he/5)).convert()
-
-                menu.my_settings.screen.blit(bg,(0,menu.he/5*i))
-
+            menu.ShowOnScreen()
+                
             if menu.choosing_diff :
 
-                menu.diffs = menu.songs[menu.map][3]
-                for i in range(len(menu.diffs)) :
-            
-                    diff = menu.font.render(menu.diffs[i],False,menu.white).convert()
-                    menu.my_settings.screen.blit(diff,(menu.wi/5,menu.he/20*i+menu.he/5*menu.map))
+                menu.DiffSelect()
 
-                if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
+                if menu.diff_choice :
+                    menu.diff_choice = False
 
-                    for menu.diff in range(len(menu.diffs)) :
+                    Osu(menu).OsuRun()
                     
-                        menu.DiffSelect()
-
-                        if menu.diff_choice == True :
-
-                            menu.diff_choice   = False
-                            menu.choosing_diff = False
-
-                            osu = Osu(menu)
-                            osu.OsuRun()
-
-            menu.ShowVolume()
+            pygame.display.flip()
 
             menu.key = pygame.key.get_pressed()
             for menu.event in pygame.event.get() :

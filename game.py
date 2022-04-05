@@ -45,6 +45,13 @@ class OsuGame :
             osu.offset += osu.ProposeOffset()
 
         Write(osu)
+        pygame.mixer.music.unpause()
+
+        if osu.death == False :
+
+            osu.Score()
+            
+        osu.menu.MenuChoice(osu.mod_list)
 
     def GetPause(osu) : # captation des touches necessaires a la pause de la partie
         
@@ -86,7 +93,7 @@ class OsuGame :
                 if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_q :
                     loop = False
 
-                    osu.to_menu = True
+                    osu.menu.MenuChoice(osu.mod_list)
 
                 GameQuit(osu)
 
