@@ -1,6 +1,6 @@
 class OsuSetThings :
 
-    def SetMap(osu) : # determination et classage dans des tableau des elements a afficher pendant une partie
+    def SetMap(osu) : # determine et classe dans des tableau les elements a afficher pendant une partie
 
         cs_t,ar_t,od_t,hp_t = [],[],[],[]
 

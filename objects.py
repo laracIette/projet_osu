@@ -1,7 +1,5 @@
 import math
 import pygame
-from sounds import Play
-from tools import GetTime, ReSize
 
 class OsuObjects :
         
@@ -9,9 +7,9 @@ class OsuObjects :
 
         if osu.s_num < len(osu.spinners) :
 
-            if GetTime() - osu.paused_time  >=  osu.start_time + osu.spinners[osu.s_num][0] - osu.ar_time :
+            if osu.GetTime() - osu.paused_time  >=  osu.start_time + osu.spinners[osu.s_num][0] - osu.ar_time :
 
-                osu.show_spinners.append([GetTime()-osu.paused_time,0,osu.spinners[osu.s_num][1]-osu.spinners[osu.s_num][0],osu.spinner,0])
+                osu.show_spinners.append([osu.GetTime()-osu.paused_time,0,osu.spinners[osu.s_num][1]-osu.spinners[osu.s_num][0],osu.spinner,0])
 
                 osu.show_spinner     = True
                 osu.spinner_fade     = True
@@ -28,7 +26,7 @@ class OsuObjects :
                 
                 for p in osu.show_spinners :
 
-                    p[1] = GetTime() - p[0] - osu.paused_time
+                    p[1] = osu.GetTime() - p[0] - osu.paused_time
                     if p[1] >= p[2] :
 
                         osu.spinner_fade = True
@@ -53,11 +51,11 @@ class OsuObjects :
                     if osu.click_time_check == False :
                         osu.click_time_check = True
 
-                        osu.click_time = GetTime()
+                        osu.click_time = osu.GetTime()
 
                     osu.pos2 = pygame.mouse.get_pos()
 
-                    spin_center = math.hypot(osu.wi/2-osu.pos[0],osu.he/2-osu.pos[1])
+                    spin_center = math.hypot(osu.width/2-osu.pos[0],osu.height/2-osu.pos[1])
                     osu.spin_x = (osu.pos[0]-osu.pos2[0])/spin_center*60
                     osu.spin_y = (osu.pos[1]-osu.pos2[1])/spin_center*60
                     
@@ -65,7 +63,7 @@ class OsuObjects :
                     
                     for p in osu.show_spinners :
 
-                        if GetTime() - osu.click_time >= p[2] / 2 :
+                        if osu.GetTime() - osu.click_time >= p[2] / 2 :
 
                             if abs(osu.spin - osu.spin_tot2) > 66 :
                                 osu.spin_tot2 = osu.spin
@@ -76,21 +74,21 @@ class OsuObjects :
                                 else :
                                     osu.health = osu.max_health
                                 
-                                Play(osu.sounds,"spinnerspin",0.5,osu.volume,osu.volume_effects)
+                                osu.PlaySound("spinnerspin",0.5,osu.volume_effects)
                                 
                             if abs(osu.spin - osu.spin_tot) > 330 :
 
                                 osu.spin_tot = osu.spin
                                 osu.score   += 950
                                 
-                                Play(osu.sounds,"spinnerbonus",1,osu.volume,osu.volume_effects)
+                                osu.PlaySound("spinnerbonus",1,osu.volume_effects)
 
-                                osu.spin_score_bonus_time = GetTime()
+                                osu.spin_score_bonus_time = osu.GetTime()
                                 osu.spin_score_bonus     += 1
 
                                 osu.spin_score = osu.combo_font.render(str(osu.spin_score_bonus*1000),False,osu.white).convert()
 
-            if GetTime() < osu.spin_score_bonus_time + 1000 :
+            if osu.GetTime() < osu.spin_score_bonus_time + 1000 :
 
                 if osu.spin_score_bonus_alpha < 1 :
 
@@ -105,38 +103,38 @@ class OsuObjects :
         for p in osu.show_spinners :
 
             spinner_spin = pygame.transform.rotate(p[3],osu.spin).convert_alpha()
-            spinner_rect = spinner_spin.get_rect(center = (osu.wi/2,osu.he/2))
+            spinner_rect = spinner_spin.get_rect(center = (osu.width/2,osu.height/2))
             
-            osu.my_settings.screen.blit(spinner_spin,spinner_rect)
+            osu.screen.blit(spinner_spin,spinner_rect)
 
     def Spinning(osu) : # mouvement de rotation du spinner
         
         if osu.spin_x >= 0 and osu.spin_y >= 0 :
 
-            if osu.pos2[0] < osu.wi/2 and osu.pos2[1] >= osu.he/2 :
+            if osu.pos2[0] < osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.wi/2 and osu.pos2[1] < osu.he/2 :
+            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
 
         if osu.spin_x >= 0 and osu.spin_y < 0 :
 
-            if osu.pos2[0] < osu.wi/2 and osu.pos2[1] < osu.he/2 :
+            if osu.pos2[0] < osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.wi/2 and osu.pos2[1] >= osu.he/2 :
+            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
 
         if osu.spin_x < 0 and osu.spin_y >= 0 :
 
-            if osu.pos2[0] < osu.wi/2 and osu.pos2[1] < osu.he/2 :
+            if osu.pos2[0] < osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.wi/2 and osu.pos2[1] >= osu.he/2 :
+            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
 
         if osu.spin_x < 0 and osu.spin_y < 0 :
 
-            if osu.pos2[0] < osu.wi/2 and osu.pos2[1] >= osu.he/2 :
+            if osu.pos2[0] < osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.wi/2 and osu.pos2[1] < osu.he/2 :
+            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
 
         return osu.spin
@@ -145,10 +143,10 @@ class OsuObjects :
 
         if osu.c_num < len(osu.circles) :
 
-            if GetTime() - osu.paused_time  >=  osu.start_time + osu.circles[osu.c_num][2] - osu.ar_time :
+            if osu.GetTime() - osu.paused_time  >=  osu.start_time + osu.circles[osu.c_num][2] - osu.ar_time :
 
-                coor = [round(osu.circles[osu.c_num][0] / 512 * osu.wi * 3/4 * 0.86 + ReSize(360),2),
-                        round(osu.circles[osu.c_num][1] / 384 * osu.he       * 0.86 + ReSize(75), 2)]
+                coor = [round(osu.circles[osu.c_num][0] / 512 * osu.width * 3/4 * 0.86 + osu.ReSize(360),2),
+                        round(osu.circles[osu.c_num][1] / 384 * osu.height      * 0.86 + osu.ReSize(75), 2)]
 
                 if osu.circles[osu.c_num][3] == 1 :
                     osu.numbers = 1
@@ -157,13 +155,13 @@ class OsuObjects :
 
                 number = osu.number_font.render(f"{osu.numbers}",False,osu.white).convert()
 
-                osu.show_circles.append([GetTime()-osu.paused_time,0,1,osu.a_circle,coor,osu.circles[osu.c_num][2],number,osu.circle,osu.fade,1,osu.acc_check,osu.faded,1])
+                osu.show_circles.append([osu.GetTime()-osu.paused_time,0,1,osu.a_circle,coor,osu.circles[osu.c_num][2],number,osu.circle,osu.fade,1,osu.acc_check,osu.faded,1])
 
                 osu.c_num += 1
 
         elif osu.c_num == len(osu.circles) :
 
-            osu.end_time = GetTime()
+            osu.end_time = osu.GetTime()
 
             osu.c_num += 1
 
@@ -173,7 +171,7 @@ class OsuObjects :
 
             if osu.waiting == False :
             
-                u[1] = GetTime() - u[0] - osu.paused_time
+                u[1] = osu.GetTime() - u[0] - osu.paused_time
 
                 if u[1] >= osu.ar_time and u[8] == False :
                     u[8] = True
@@ -209,9 +207,9 @@ class OsuObjects :
             circle_rect = u[7].get_rect(center = u[4])
             number_rect = u[6].get_rect(center = u[4])
 
-            osu.my_settings.screen.blit(u[3],a_c_rect)
-            osu.my_settings.screen.blit(u[7],circle_rect)
-            osu.my_settings.screen.blit(u[6],(number_rect[0]+ReSize(1),number_rect[1]+ReSize(8)))
+            osu.screen.blit(u[3],a_c_rect)
+            osu.screen.blit(u[7],circle_rect)
+            osu.screen.blit(u[6],(number_rect[0]+osu.ReSize(1),number_rect[1]+osu.ReSize(8)))
         
             if u[1] >= osu.ar_time + osu.od_time :
                 osu.show_circles.pop(0)
@@ -221,26 +219,26 @@ class OsuObjects :
                     osu.t_miss += 1
 
                     osu.acc.append(0)
-                    osu.show_acc.append([osu.acc_miss,u[4],GetTime(),0])
+                    osu.show_acc.append([osu.acc_miss,u[4],osu.GetTime(),0])
 
                     osu.acc_check = True
 
                     osu.health -= osu.health_minus
 
                     if osu.combo >= 20 :
-                        Play(osu.sounds,"miss",1,osu.volume,osu.volume_effects)
+                        osu.PlaySound("miss",1,osu.volume_effects)
                     osu.combo = 0
 
     def GetFollowPoint(osu) : # verifie si doit afficher un followpoint, si oui le cree
 
         if osu.f_num < len(osu.circles) - 1 :
 
-            if GetTime() - osu.paused_time  >=  osu.start_time + osu.circles[osu.f_num][2] - osu.ar_time :
+            if osu.GetTime() - osu.paused_time  >=  osu.start_time + osu.circles[osu.f_num][2] - osu.ar_time :
 
-                coor1 = [round(osu.circles[osu.f_num][0]   / 512 * osu.wi * 3/4 * 0.86 + ReSize(360),2),
-                        round(osu.circles[osu.f_num][1]   / 384 * osu.he       * 0.86 + ReSize(75), 2)]
-                coor2 = [round(osu.circles[osu.f_num+1][0] / 512 * osu.wi * 3/4 * 0.86 + ReSize(360),2),
-                        round(osu.circles[osu.f_num+1][1] / 384 * osu.he       * 0.86 + ReSize(75), 2)]
+                coor1 = [round(osu.circles[osu.f_num][0]   / 512 * osu.width * 3/4 * 0.86 + osu.ReSize(360),2),
+                        round(osu.circles[osu.f_num][1]   / 384 * osu.height       * 0.86 + osu.ReSize(75), 2)]
+                coor2 = [round(osu.circles[osu.f_num+1][0] / 512 * osu.width * 3/4 * 0.86 + osu.ReSize(360),2),
+                        round(osu.circles[osu.f_num+1][1] / 384 * osu.height       * 0.86 + osu.ReSize(75), 2)]
 
                 if coor1 != coor2 and osu.circles[osu.f_num+1][3] != 1 :
 
@@ -271,7 +269,7 @@ class OsuObjects :
 
                     followpoint_rect = followpoint.get_rect(center = center_rect)
                 
-                    osu.show_followpoints.append([GetTime()-osu.paused_time,0,followpoint_rect,followpoint,0,osu.circles[osu.f_num+1][2]-osu.circles[osu.f_num][2]])
+                    osu.show_followpoints.append([osu.GetTime()-osu.paused_time,0,followpoint_rect,followpoint,0,osu.circles[osu.f_num+1][2]-osu.circles[osu.f_num][2]])
 
                 osu.f_num += 1
 
@@ -281,7 +279,7 @@ class OsuObjects :
 
             if osu.waiting == False :
             
-                f[1] = GetTime() - f[0] - osu.paused_time
+                f[1] = osu.GetTime() - f[0] - osu.paused_time
 
                 if f[4] < 1 and f[1] < f[5] :
 
@@ -298,4 +296,4 @@ class OsuObjects :
                     if f[1] > f[5] + osu.ar_time + osu.od_time :
                         osu.show_followpoints.pop(0)
 
-            osu.my_settings.screen.blit(f[3],f[2])
+            osu.screen.blit(f[3],f[2])

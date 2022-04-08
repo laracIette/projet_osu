@@ -1,17 +1,16 @@
 import pygame
-from tools import GetTime, ReSize
 
 class OsuInterface :
     
     def DarkenScreen(osu) : # assombri/eclairci l'ecran en fonction des pauses
 
         if osu.game_break == False :
-            pygame.draw.rect(osu.my_settings.screen,(0,0,0),osu.noir)
+            pygame.draw.rect(osu.screen,(0,0,0),osu.noir)
             #osu.UI = True
 
         else :
-            osu.my_settings.screen.blit(osu.bg,(0,0))
-            osu.my_settings.screen.blit(osu.dim,(0,0))
+            osu.screen.blit(osu.bg,(0,0))
+            osu.screen.blit(osu.dim,(0,0))
             #osu.UI = False
 
     def SetShowOnScreen(osu) : # determine des elements a afficher pendant une partie
@@ -28,17 +27,17 @@ class OsuInterface :
                 osu.trail_pos.pop(0)
             
             osu.health    -= osu.passive_health*160/osu.fps
-            osu.health_bar = pygame.Rect(ReSize(20),ReSize(20),ReSize(600*osu.health/600),ReSize(20))
+            osu.health_bar = pygame.Rect(osu.ReSize(20),osu.ReSize(20),osu.ReSize(600*osu.health/600),osu.ReSize(20))
 
         for s in osu.show_ur :
-            s[3] = GetTime() - s[2] - osu.paused_time
+            s[3] = osu.GetTime() - s[2] - osu.paused_time
 
         if osu.show_ur != [] and (len(osu.show_ur) > 20 or osu.show_ur[0][3] >= 8000) :
             osu.show_ur.pop(0)
 
         for s in range(len(osu.show_acc)) :
 
-            showed_time = GetTime() - osu.show_acc[s][2]
+            showed_time = osu.GetTime() - osu.show_acc[s][2]
 
             if showed_time < 300 :
 
@@ -67,10 +66,10 @@ class OsuInterface :
             else :
                 osu.offset_txt = osu.fps_font.render(f"Local offset : +{osu.offset}ms",False,osu.white).convert()
 
-            if GetTime() - osu.offset_time - osu.paused_time >= 1000 :
+            if osu.GetTime() - osu.offset_time - osu.paused_time >= 1000 :
                 osu.show_offset = False
 
-    def ShowOnScreen(osu) : # affichage des elements
+    def ShowOnScreen(osu) : # affichage des elements de la partie
 
         if osu.UI == False and osu.UI_alpha > 0 :
                 
@@ -83,38 +82,38 @@ class OsuInterface :
             osu.acc_txt.set_alpha(osu.UI_alpha)
             osu.fps_txt.set_alpha(osu.UI_alpha)
 
-            osu.my_settings.screen.blit(osu.combo_txt,(ReSize(20),ReSize(960)))
-            osu.my_settings.screen.blit(osu.score_txt,(ReSize(1910)-osu.score_txt.get_width(),ReSize(-20)))
-            osu.my_settings.screen.blit(osu.acc_txt,(ReSize(1910)-osu.acc_txt.get_width(),ReSize(80)))
-            osu.my_settings.screen.blit(osu.fps_txt,(ReSize(1910)-osu.fps_txt.get_width(),ReSize(1075)-osu.fps_txt.get_height()))
+            osu.screen.blit(osu.combo_txt,(osu.ReSize(20),osu.ReSize(960)))
+            osu.screen.blit(osu.score_txt,(osu.ReSize(1910)-osu.score_txt.get_width(),osu.ReSize(-20)))
+            osu.screen.blit(osu.acc_txt,(osu.ReSize(1910)-osu.acc_txt.get_width(),osu.ReSize(80)))
+            osu.screen.blit(osu.fps_txt,(osu.ReSize(1910)-osu.fps_txt.get_width(),osu.ReSize(1075)-osu.fps_txt.get_height()))
 
-            pygame.draw.rect(osu.my_settings.screen,osu.grey,osu.health_bar_bg)
-            pygame.draw.rect(osu.my_settings.screen,osu.white,osu.health_bar)
+            pygame.draw.rect(osu.screen,osu.grey,osu.health_bar_bg)
+            pygame.draw.rect(osu.screen,osu.white,osu.health_bar)
 
-        pygame.draw.rect(osu.my_settings.screen,osu.orange,osu.ur_50)
-        pygame.draw.rect(osu.my_settings.screen,osu.green,osu.ur_100)
-        pygame.draw.rect(osu.my_settings.screen,osu.blue,osu.ur_300)
-        pygame.draw.rect(osu.my_settings.screen,osu.white,osu.ur_middle)
+        pygame.draw.rect(osu.screen,osu.orange,osu.ur_50)
+        pygame.draw.rect(osu.screen,osu.green,osu.ur_100)
+        pygame.draw.rect(osu.screen,osu.blue,osu.ur_300)
+        pygame.draw.rect(osu.screen,osu.white,osu.ur_middle)
 
         for u in osu.show_ur :
             
-            ur_hit = pygame.Rect(ReSize(961+u[1]),ReSize(1039),ReSize(2),ReSize(30))
-            pygame.draw.rect(osu.my_settings.screen,u[0],ur_hit)
+            ur_hit = pygame.Rect(osu.ReSize(961+u[1]),osu.ReSize(1039),osu.ReSize(2),osu.ReSize(30))
+            pygame.draw.rect(osu.screen,u[0],ur_hit)
 
         for s in osu.show_acc :
 
-            show_acc_rect = s[0].get_rect(center = (s[1][0],s[1][1]-ReSize(60)))
-            osu.my_settings.screen.blit(s[0],show_acc_rect)
+            show_acc_rect = s[0].get_rect(center = (s[1][0],s[1][1]-osu.ReSize(60)))
+            osu.screen.blit(s[0],show_acc_rect)
         
         if osu.show_offset :
 
-            offset_txt_rect = osu.offset_txt.get_rect(center = (osu.wi/2,ReSize(20)))
-            osu.my_settings.screen.blit(osu.offset_txt,offset_txt_rect)
+            offset_txt_rect = osu.offset_txt.get_rect(center = (osu.width/2,osu.ReSize(20)))
+            osu.screen.blit(osu.offset_txt,offset_txt_rect)
 
         if osu.spin_score_bonus_alpha > 0 :
 
-            spin_score_rect = osu.spin_score.get_rect(center = (osu.wi/2,osu.he/4*3))
-            osu.my_settings.screen.blit(osu.spin_score,spin_score_rect)
+            spin_score_rect = osu.spin_score.get_rect(center = (osu.width/2,osu.height/4*3))
+            osu.screen.blit(osu.spin_score,spin_score_rect)
 
         for t in osu.trail_pos :
 
@@ -124,22 +123,22 @@ class OsuInterface :
             t[1].set_alpha(t[2])
 
             trail_rect = t[1].get_rect(center = t[0])
-            osu.my_settings.screen.blit(t[1],trail_rect)
+            osu.screen.blit(t[1],trail_rect)
 
         if osu.waiting == False :
             osu.pos3 = pygame.mouse.get_pos()
         
         cursor_rect = osu.cursor.get_rect(center = osu.pos3)
-        osu.my_settings.screen.blit(osu.cursor,cursor_rect)
+        osu.screen.blit(osu.cursor,cursor_rect)
 
         if osu.waiting :
 
             waiting_cursor_rect = osu.cursor.get_rect(center = osu.pos)
-            osu.my_settings.screen.blit(osu.cursor,waiting_cursor_rect)
+            osu.screen.blit(osu.cursor,waiting_cursor_rect)
 
     def SetFps(osu) : # calcule et affiche les fps
 
-        osu.fps = round(1000 / (GetTime() - osu.fps_time),2)
+        osu.fps = round(1000 / (osu.GetTime() - osu.fps_time),2)
 
         osu.fpss.append(osu.fps)
         if len(osu.fpss) > 40 :
@@ -148,7 +147,7 @@ class OsuInterface :
         for i in osu.fpss :
             osu.avg_fps += i
 
-        osu.fps_time = GetTime()
+        osu.fps_time = osu.GetTime()
         osu.avg_fps /= len(osu.fpss)
         osu.fps_txt  = osu.fps_font.render(f"{round(osu.avg_fps)}fps",False,osu.white).convert()
         osu.avg_fps  = 0

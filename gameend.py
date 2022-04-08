@@ -1,8 +1,7 @@
 import pygame
 from datetime import datetime
-from tools import ReSize
 
-class OsuGameEnd :
+class GameEnd :
 
     def ProposeOffset(osu) : # propose un offset au joueur si possible
 
@@ -12,8 +11,8 @@ class OsuGameEnd :
 
         if osu.total_ur != [] :
 
-            noir = pygame.Rect(0,0,osu.wi,osu.he)
-            pygame.draw.rect(osu.my_settings.screen,(0,0,0),noir)
+            noir = pygame.Rect(0,0,osu.width,osu.height)
+            pygame.draw.rect(osu.screen,(0,0,0),noir)
             
             for u in osu.total_ur :
                 ur_moy += u
@@ -28,19 +27,19 @@ class OsuGameEnd :
                 rep_txt = f"You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?"
 
             rep_rect        = osu.rep_font.get_rect(rep_txt)
-            rep_rect.center = (osu.wi/2,osu.he/2)
+            rep_rect.center = (osu.width/2,osu.height/2)
 
             yes_txt         = "Yes"
             yes_rect        = osu.rep_font.get_rect(yes_txt)
-            yes_rect.center = (osu.wi/3,osu.he/3*2)
+            yes_rect.center = (osu.width/3,osu.height/3*2)
 
             no_txt         = "No"
             no_rect        = osu.rep_font.get_rect(no_txt)
-            no_rect.center = (osu.wi/3*2,osu.he/3*2)
+            no_rect.center = (osu.width/3*2,osu.height/3*2)
             
-            osu.rep_font.render_to(osu.my_settings.screen,rep_rect,rep_txt,osu.white)
-            osu.rep_font.render_to(osu.my_settings.screen,yes_rect,yes_txt,osu.white)
-            osu.rep_font.render_to(osu.my_settings.screen,no_rect,no_txt,osu.white)
+            osu.rep_font.render_to(osu.screen,rep_rect,rep_txt,osu.white)
+            osu.rep_font.render_to(osu.screen,yes_rect,yes_txt,osu.white)
+            osu.rep_font.render_to(osu.screen,no_rect,no_txt,osu.white)
             
             pygame.display.flip()
             
@@ -50,7 +49,7 @@ class OsuGameEnd :
                 osu.key = pygame.key.get_pressed()
                 for osu.event in pygame.event.get() :
 
-                    GameQuit(osu)
+                    osu.GameQuit()
 
                     if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_F2 :
 
@@ -72,13 +71,13 @@ class OsuGameEnd :
 
     def Score(osu) : # affichage de l'ecran de fin
 
-        osu.my_settings.screen.blit(osu.bg,(0,0))
-        osu.my_settings.screen.blit(osu.end_screen,(0,0))
+        osu.screen.blit(osu.bg,(0,0))
+        osu.screen.blit(osu.end_screen,(0,0))
 
-        osu.score_font.render_to(osu.my_settings.screen,(ReSize(305),ReSize(585)),str(osu.t_miss),osu.white)
-        osu.score_font.render_to(osu.my_settings.screen,(ReSize(154),ReSize(175)),str(osu.t_300),osu.white)
-        osu.score_font.render_to(osu.my_settings.screen,(ReSize(154),ReSize(307)),str(osu.t_100),osu.white)
-        osu.score_font.render_to(osu.my_settings.screen,(ReSize(154),ReSize(439)),str(osu.t_50),osu.white)
+        osu.score_font.render_to(osu.screen,(osu.ReSize(305),osu.ReSize(585)),str(osu.t_miss),osu.white)
+        osu.score_font.render_to(osu.screen,(osu.ReSize(154),osu.ReSize(175)),str(osu.t_300),osu.white)
+        osu.score_font.render_to(osu.screen,(osu.ReSize(154),osu.ReSize(307)),str(osu.t_100),osu.white)
+        osu.score_font.render_to(osu.screen,(osu.ReSize(154),osu.ReSize(439)),str(osu.t_50),osu.white)
 
         pygame.display.flip()
 
@@ -88,7 +87,7 @@ class OsuGameEnd :
             osu.key = pygame.key.get_pressed()
             for osu.event in pygame.event.get() :
 
-                GameQuit(osu)
+                osu.GameQuit()
 
                 if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_F2 :
 
@@ -116,22 +115,22 @@ class OsuGameEnd :
 
                 replay.write(f"{i}\n")
 
-def Write(self) : # ecriture et modification des parametres du jeu sauvegardes dans settings.txt
+    def Write(self) : # ecriture et modification des parametres du jeu sauvegardes dans settings.txt
 
-    with open("assets\\settings.txt","w") as settings_file :
+        with open("assets\\settings.txt","w") as settings_file :
 
-        modifs = [self.offset,self.volume,self.volume_music,self.volume_effects,self.skin]
+            modifs = [self.offset,self.volume,self.volume_music,self.volume_effects,self.skin]
 
-        for a in range(len(self.lines)) :
+            for a in range(len(self.lines)) :
 
-            settings_file.write(self.lines[a].replace(self.lines[a],f"{modifs[a]}\n"))
+                settings_file.write(self.lines[a].replace(self.lines[a],f"{modifs[a]}\n"))
 
 
-def GameQuit(self) : # quitte la partie/menu et le programme
+    def GameQuit(self) : # quitte la partie/menu et le programme
 
-    if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
+        if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
 
-        Write(self)
-        
-        pygame.quit()
-        exit(0)
+            self.Write()
+            
+            pygame.quit()
+            exit(0)

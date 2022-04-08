@@ -1,29 +1,26 @@
 import math
 import pygame
-from sounds import Play
-from tools import GetTime
-from gameend import Write, GameQuit
 
 class OsuGame :
 
-    def SetBreak(osu) : # determine les pauses dans la partie (pas manuelles)
+    def SetBreak(osu) : # determine les pauses manuelles dans la partie
 
         for g in osu.game_breaks :
 
-            if GetTime() >= osu.start_time + g[0] - osu.paused_time + 1000 :
+            if osu.GetTime() >= osu.start_time + g[0] - osu.paused_time + 1000 :
                 osu.game_break = True
             
-            if GetTime() >= osu.start_time + g[1] - osu.paused_time - 1000 :
+            if osu.GetTime() >= osu.start_time + g[1] - osu.paused_time - 1000 :
                 osu.game_break = False
                 osu.game_breaks.pop(0)
 
-    def ApplyBreaks(osu) : # declenche les pauses dans la partie (pas manuelles)
+    def ApplyBreaks(osu) : # declenche les pauses automatiques dans la partie
         
-        if GetTime() >= osu.music_start - osu.start_offset/2.5 and osu.break_lock == False :
+        if osu.GetTime() >= osu.music_start - osu.start_offset/2.5 and osu.break_lock == False :
             osu.game_break = False
             osu.break_lock = True
 
-        if GetTime() >= osu.end_time + osu.start_offset/2.5 :
+        if osu.GetTime() >= osu.end_time + osu.start_offset/2.5 :
             osu.game_break = True
 
     def StartGame(osu) : # elements declenchants la partie
@@ -38,13 +35,13 @@ class OsuGame :
         pygame.mixer.music.pause()
 
         if osu.health <= 0 :
-            Play(osu.sounds,"fail",1,osu.volume,osu.volume_effects)
+            osu.PlaySound("fail",1,osu.volume_effects)
             osu.death = True
 
         if osu.total_ur != [] :
             osu.offset += osu.ProposeOffset()
 
-        Write(osu)
+        osu.Write()
         pygame.mixer.music.unpause()
 
         if osu.death == False :
@@ -59,17 +56,17 @@ class OsuGame :
             osu.running = False
             
             if osu.waiting :
-                osu.paused_time += GetTime() - osu.pause_time
+                osu.paused_time += osu.GetTime() - osu.pause_time
 
-            osu.pause_time = GetTime()
+            osu.pause_time = osu.GetTime()
 
             pygame.mouse.set_visible(True)
             pygame.mixer.music.pause()
 
-            osu.my_settings.screen.blit(osu.pause_screen,(0,0))
+            osu.screen.blit(osu.pause_screen,(0,0))
             pygame.display.flip()
             
-            Write(osu)
+            osu.Write()
 
             osu.Pause()
 
@@ -88,14 +85,14 @@ class OsuGame :
 
                     pygame.mouse.set_visible(False)
 
-                    osu.fps_time += GetTime() - osu.pause_time
+                    osu.fps_time += osu.GetTime() - osu.pause_time
 
                 if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_q :
                     loop = False
 
                     osu.menu.MenuChoice(osu.mod_list)
 
-                GameQuit(osu)
+                osu.GameQuit()
 
     def UnPause(osu) : # verifie et si possible quitte la pause
 
@@ -111,7 +108,7 @@ class OsuGame :
 
                 pygame.mixer.music.unpause()
                                             
-                osu.paused_time += GetTime() - osu.pause_time
+                osu.paused_time += osu.GetTime() - osu.pause_time
 
     def ChangeOffset(osu) : # detecte si le joueur presse les touche de + ou - d'offset et l'applique
 
@@ -122,7 +119,7 @@ class OsuGame :
             else :
                 osu.offset += 5
 
-            osu.offset_time = GetTime()
+            osu.offset_time = osu.GetTime()
             osu.show_offset = True
 
         if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_MINUS :
@@ -132,7 +129,7 @@ class OsuGame :
             else :
                 osu.offset -= 5
 
-            osu.offset_time = GetTime()
+            osu.offset_time = osu.GetTime()
             osu.show_offset = True
 
     def GetClicks(osu) : # capte les touches clavier pouvant interagir avec un objet de la partie
@@ -160,7 +157,7 @@ class OsuGame :
 
                     osu.acc_check = True
 
-                    difference = GetTime() - (osu.start_time + osu.show_circles[v][5] + osu.paused_time) + osu.offset
+                    difference = osu.GetTime() - (osu.start_time + osu.show_circles[v][5] + osu.paused_time) + osu.offset
                     osu.total_ur.append(difference)
 
                     if abs(difference) < osu.od_time :
@@ -169,21 +166,21 @@ class OsuGame :
                             osu.t_300 += 1
 
                             osu.hit_value = 300
-                            osu.show_ur.append([osu.blue,278*difference/osu.od_time/2,GetTime(),0])
+                            osu.show_ur.append([osu.blue,278*difference/osu.od_time/2,osu.GetTime(),0])
 
                         if abs(difference) > osu.od_time/4 and abs(difference) < osu.od_time/2 :
                             osu.t_100 += 1
 
                             osu.hit_value = 100
-                            osu.show_ur.append([osu.green,278*difference/osu.od_time/2,GetTime(),0])
-                            osu.show_acc.append([osu.acc_100,osu.show_circles[v][4],GetTime(),0])
+                            osu.show_ur.append([osu.green,278*difference/osu.od_time/2,osu.GetTime(),0])
+                            osu.show_acc.append([osu.acc_100,osu.show_circles[v][4],osu.GetTime(),0])
                         
                         if abs(difference) > osu.od_time/2 :
                             osu.t_50 += 1
 
                             osu.hit_value = 50
-                            osu.show_ur.append([osu.orange,278*difference/osu.od_time/2,GetTime(),0])
-                            osu.show_acc.append([osu.acc_50,osu.show_circles[v][4],GetTime(),0])
+                            osu.show_ur.append([osu.orange,278*difference/osu.od_time/2,osu.GetTime(),0])
+                            osu.show_acc.append([osu.acc_50,osu.show_circles[v][4],osu.GetTime(),0])
 
                         osu.acc.append(round(osu.hit_value/3,2))
                         health_bonus = round(osu.hit_value/30,2)
@@ -193,7 +190,7 @@ class OsuGame :
                         else :
                             osu.health = osu.max_health
 
-                        Play(osu.sounds,"hit",0.5,osu.volume,osu.volume_effects)
+                        osu.PlaySound("hit",0.5,osu.volume_effects)
                         
                         osu.combo += 1
                         if osu.combo > osu.max_combo : osu.max_combo = osu.combo
@@ -203,14 +200,14 @@ class OsuGame :
                         osu.t_miss += 1
 
                         osu.hit_value = 0
-                        osu.show_acc.append([osu.acc_miss,osu.show_circles[v][4],GetTime(),0])
+                        osu.show_acc.append([osu.acc_miss,osu.show_circles[v][4],osu.GetTime(),0])
 
                         osu.acc.append(0)
 
                         osu.health -= osu.health_minus
 
                         if osu.combo >= 20 :
-                            Play(osu.sounds,"miss",1,osu.volume,osu.volume_effects)
+                            osu.PlaySound("miss",1,osu.volume_effects)
                         osu.combo = 0
 
                     osu.show_circles[v][8]  = True

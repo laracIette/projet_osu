@@ -1,15 +1,12 @@
 import os
 import glob
 import pygame
-from sounds import Play
-from gameend import GameQuit, Write
-from tools import GetTime, Load, ReSize
 
 class MenuTools :
 
     def SkinSelect(menu) : # selection du skin
 
-        pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
+        pygame.draw.rect(menu.screen,menu.black,menu.noir)
 
         skins0 = []
         skins  = glob.glob("assets\\skins\\*")
@@ -20,7 +17,7 @@ class MenuTools :
         for z in range(len(skins0)) :
 
             text = menu.font.render(skins0[z],False,menu.white)
-            menu.my_settings.screen.blit(text,(0,menu.he/15*z))
+            menu.screen.blit(text,(0,menu.height/15*z))
 
             skins.append(text)
 
@@ -40,12 +37,12 @@ class MenuTools :
                         skin1 = skins[w]
 
                         skin1_rect   = skin1.get_rect()
-                        skin1_rect.y = menu.he/15*w
+                        skin1_rect.y = menu.height/15*w
 
                         if skin1_rect.collidepoint(pos) :
                             loop = False
 
-                            Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
+                            menu.PlaySound("click",1,menu.volume_effects)
                             
                             menu.skin = skins0[w]
 
@@ -58,7 +55,7 @@ class MenuTools :
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_F4 and key[pygame.K_LALT]) :
                     loop = False
 
-                    Write(menu)
+                    menu.Write()
 
                     pygame.quit()
                     exit(0)
@@ -90,23 +87,23 @@ class MenuTools :
 
             bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
             bg  = pygame.image.load(bgs[0]).convert()
-            bg  = pygame.transform.scale(bg,(menu.wi,menu.he)).convert()
+            bg  = pygame.transform.scale(bg,(menu.width,menu.height)).convert()
             
             menu.songs.append([bg,audio,diffs,diff_names])
 
         return menu.songs
 
-    def ShowOnScreen(menu) :
+    def ShowOnScreen(menu) : # affichage des elements du menu
         
-        pygame.draw.rect(menu.my_settings.screen,menu.black,menu.noir)
+        pygame.draw.rect(menu.screen,menu.black,menu.noir)
             
         for i in range(len(menu.maps)) :
 
             bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
             bg  = pygame.image.load(bgs[0]).convert()
-            bg  = pygame.transform.scale(bg,(menu.wi/5,menu.he/5)).convert()
+            bg  = pygame.transform.scale(bg,(menu.width/5,menu.height/5)).convert()
 
-            menu.my_settings.screen.blit(bg,(0,menu.he/5*i))
+            menu.screen.blit(bg,(0,menu.height/5*i))
         
         menu.ShowVolume()
 
@@ -114,19 +111,19 @@ class MenuTools :
 
         if menu.show_volume :
                 
-            pygame.draw.rect(menu.my_settings.screen,menu.black,menu.volume_noir)
+            pygame.draw.rect(menu.screen,menu.black,menu.volume_noir)
 
-            if GetTime() >= menu.volume_time + 1000 :
+            if menu.GetTime() >= menu.volume_time + 1000 :
                 menu.show_volume = False
                 return 0
 
-            menu.volume_rect.x  = menu.wi-menu.volume_txt.get_width()
-            menu.music_rect.x   = menu.wi-menu.music_txt.get_width()
-            menu.effects_rect.x = menu.wi-menu.effects_txt.get_width()
+            menu.volume_rect.x  = menu.width-menu.volume_txt.get_width()
+            menu.music_rect.x   = menu.width-menu.music_txt.get_width()
+            menu.effects_rect.x = menu.width-menu.effects_txt.get_width()
 
-            menu.my_settings.screen.blit(menu.volume_txt,(menu.volume_rect.x,menu.volume_rect.y))
-            menu.my_settings.screen.blit(menu.music_txt,(menu.music_rect.x,menu.music_rect.y))
-            menu.my_settings.screen.blit(menu.effects_txt,(menu.effects_rect.x,menu.effects_rect.y))
+            menu.screen.blit(menu.volume_txt,(menu.volume_rect.x,menu.volume_rect.y))
+            menu.screen.blit(menu.music_txt,(menu.music_rect.x,menu.music_rect.y))
+            menu.screen.blit(menu.effects_txt,(menu.effects_rect.x,menu.effects_rect.y))
 
     def SetVolumeOffsetSkinMod(menu) : # recupere et attribut les donnees de settings.txt
 
@@ -195,24 +192,24 @@ class MenuTools :
         menu.music_txt   = menu.music_font.render(f"music : {menu.volume_music}%",False,menu.white).convert()
         menu.effects_txt = menu.music_font.render(f"effects : {menu.volume_effects}%",False,menu.white).convert()
         
-        menu.volume_time = GetTime()
+        menu.volume_time = menu.GetTime()
 
     def MapSelect(menu) : # selection de la map
 
         for menu.ii in range(len(menu.songs)) :
 
             song = menu.songs[menu.ii][0]
-            song = pygame.transform.scale(song,(menu.wi/5,menu.he/5)).convert()
+            song = pygame.transform.scale(song,(menu.width/5,menu.height/5)).convert()
 
             song_rect   = song.get_rect()
-            song_rect.y = menu.my_settings.height/5*menu.ii
+            song_rect.y = menu.height/5*menu.ii
 
             if song_rect.collidepoint(menu.pos) :
 
                 menu.choosing_diff = True
                 menu.map = menu.ii
 
-                Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
+                menu.PlaySound("click",1,menu.volume_effects)
 
     def DiffSelect(menu) : # selection de la difficulte
         
@@ -220,7 +217,7 @@ class MenuTools :
         for i in range(len(menu.diffs)) :
     
             diff = menu.font.render(menu.diffs[i],False,menu.white).convert()
-            menu.my_settings.screen.blit(diff,(menu.wi/5,menu.he/20*i+menu.he/5*menu.map))
+            menu.screen.blit(diff,(menu.width/5,menu.height/20*i+menu.height/5*menu.map))
 
         if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
 
@@ -229,8 +226,8 @@ class MenuTools :
                 diff = menu.font.render(menu.diffs[menu.diff],False,menu.white).convert()
 
                 diff_rect   = diff.get_rect()
-                diff_rect.x = menu.wi/5
-                diff_rect.y = menu.he/20*menu.diff+menu.he/5*menu.map
+                diff_rect.x = menu.width/5
+                diff_rect.y = menu.height/20*menu.diff+menu.height/5*menu.map
 
                 if diff_rect.collidepoint(menu.pos) :
                     menu.diff_choice   = True
@@ -240,7 +237,7 @@ class MenuTools :
                     menu.diff_name = menu.diffs[menu.diff]
 
                     pygame.mouse.set_visible(False)
-                    Play(menu.sounds,"click",1,menu.volume,menu.volume_effects)
+                    menu.PlaySound("click",1,menu.volume_effects)
                     
                     break
 
@@ -255,8 +252,8 @@ class MenuTools :
         menu.mods_icons = []
         for i in range(len(menu.mods)) :
         
-            center_rect = (ReSize(505+220*w),ReSize(305+220*h))
-            mod_icon    = Load(f"skins\\{menu.skin}\\mods\\{menu.mods[i]}.png",(ReSize(180),ReSize(180)),False)
+            center_rect = (menu.ReSize(505+220*w),menu.ReSize(305+220*h))
+            mod_icon    = menu.Load(f"skins\\{menu.skin}\\mods\\{menu.mods[i]}.png",(menu.ReSize(180),menu.ReSize(180)),False)
             mod_rect    = mod_icon.get_rect(center = center_rect)
 
             w += 1
@@ -278,12 +275,12 @@ class MenuTools :
 
             mod_rect = mod_icon.get_rect(center = mod[2])
 
-            menu.my_settings.screen.blit(mod_icon,mod_rect)
+            menu.screen.blit(mod_icon,mod_rect)
 
         loop = True
         while loop :
 
-            menu.my_settings.clock.tick(menu.my_settings.frequence)
+            menu.clock.tick(menu.frequence)
 
             menu.pos = pygame.mouse.get_pos()
             for menu.event in pygame.event.get() :
@@ -298,7 +295,7 @@ class MenuTools :
 
                     return menu.mod_list
 
-                GameQuit(menu)
+                menu.GameQuit()
 
             pygame.display.flip()
 
@@ -338,5 +335,5 @@ class MenuTools :
 
                     mod_rect = mod_icon.get_rect(center = menu.mods_icons[i][2])
 
-                    menu.my_settings.screen.blit(mod_icon,mod_rect)
+                    menu.screen.blit(mod_icon,mod_rect)
                     pygame.display.flip()
