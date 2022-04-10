@@ -58,7 +58,9 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
 
         self.offset_time = self.GetTime() # temps actuel en millisecondes
 
-        self.SetMap() # determine et classe dans des tableau les elements a afficher pendant une partie
+        self.SetMap()         # determine et classe dans des tableau les elements a afficher pendant une partie
+        self.SetMultiplier()  # multiplicateur pris en compte lors du calcul du score
+        self.SetMods()        # active les mods necessaires
 
         self.pause_screen = self.Load(f"skins\\{self.skin}\\pausescreen.png",(self.width,self.height),False)
         self.end_screen   = self.Load(f"skins\\{self.skin}\\endscreen.png",(self.width,self.height),False)
@@ -121,8 +123,6 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
         self.paused_time = 0
         self.pause_time  = 0
         self.end_time    = inf
-
-        self.SetMultiplier() # multiplicateur pris en compte lors du calcul du score
 
         self.mod_multiplier = 1
         self.hit_value      = 0

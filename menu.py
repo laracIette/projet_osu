@@ -138,19 +138,19 @@ class MenuTools :
 
                     menu.offset = int(i)
                 
-                if a == 1 :
+                elif a == 1 :
 
                     menu.volume = int(i)
                 
-                if a == 2 :
+                elif a == 2 :
 
                     menu.volume_music = int(i)
 
-                if a == 3 :
+                elif a == 3 :
 
                     menu.volume_effects = int(i)
 
-                if a == 4 :
+                elif a == 4 :
 
                     skin_t = []
                     for s in menu.lines[a] :
@@ -176,7 +176,7 @@ class MenuTools :
 
                         menu.volumes[i] += 1
 
-                if menu.event.button == 5 :
+                elif menu.event.button == 5 :
 
                     if menu.volumes[i] > 0 :
 

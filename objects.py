@@ -113,28 +113,28 @@ class OsuObjects :
 
             if osu.pos2[0] < osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] < osu.height/2 :
+            elif osu.pos2[0] >= osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
 
         if osu.spin_x >= 0 and osu.spin_y < 0 :
 
             if osu.pos2[0] < osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] >= osu.height/2 :
+            elif osu.pos2[0] >= osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
 
         if osu.spin_x < 0 and osu.spin_y >= 0 :
 
             if osu.pos2[0] < osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] >= osu.height/2 :
+            elif osu.pos2[0] >= osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
 
         if osu.spin_x < 0 and osu.spin_y < 0 :
 
             if osu.pos2[0] < osu.width/2 and osu.pos2[1] >= osu.height/2 :
                 osu.spin += math.hypot(osu.spin_x,osu.spin_y)
-            if osu.pos2[0] >= osu.width/2 and osu.pos2[1] < osu.height/2 :
+            elif osu.pos2[0] >= osu.width/2 and osu.pos2[1] < osu.height/2 :
                 osu.spin -= math.hypot(osu.spin_x,osu.spin_y)
 
         return osu.spin
@@ -259,10 +259,10 @@ class OsuObjects :
                     followpoint = pygame.transform.smoothscale(osu.followpoint,(hypot*0.9,osu.followpoint.get_height())).convert_alpha()
                     followpoint = pygame.transform.rotate(followpoint,followpoint_angle).convert_alpha()
 
-                    if coor1[0] >= coor2[0] : x = coor2[0]
-                    if coor1[1] >= coor2[1] : y = coor2[1]
-                    if coor1[0] <  coor2[0] : x = coor1[0]
-                    if coor1[1] <  coor2[1] : y = coor1[1]
+                    if   coor1[0] >= coor2[0] : x = coor2[0]
+                    elif coor1[0] <  coor2[0] : x = coor1[0]
+                    if   coor1[1] >= coor2[1] : y = coor2[1]
+                    elif coor1[1] <  coor2[1] : y = coor1[1]
 
                     center_rect      = (abs((coor2[0]-coor1[0])/2) + x,
                                         abs((coor2[1]-coor1[1])/2) + y)

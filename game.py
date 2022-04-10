@@ -168,14 +168,14 @@ class OsuGame :
                             osu.hit_value = 300
                             osu.show_ur.append([osu.blue,278*difference/osu.od_time/2,osu.GetTime(),0])
 
-                        if abs(difference) > osu.od_time/4 and abs(difference) < osu.od_time/2 :
+                        elif abs(difference) > osu.od_time/4 and abs(difference) < osu.od_time/2 :
                             osu.t_100 += 1
 
                             osu.hit_value = 100
                             osu.show_ur.append([osu.green,278*difference/osu.od_time/2,osu.GetTime(),0])
                             osu.show_acc.append([osu.acc_100,osu.show_circles[v][4],osu.GetTime(),0])
                         
-                        if abs(difference) > osu.od_time/2 :
+                        elif abs(difference) > osu.od_time/2 :
                             osu.t_50 += 1
 
                             osu.hit_value = 50

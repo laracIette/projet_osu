@@ -42,14 +42,14 @@ class OsuInterface :
             if showed_time < 300 :
 
                 osu.show_acc[s][3] += 255/300*1000/osu.fps
+            
+            elif showed_time > 400 :
+
+                osu.show_acc[s][3] -= 255/100*1000/osu.fps
 
             if showed_time >= 300 :
 
                 osu.show_acc[s][1][1] += 0.5*160/osu.fps
-
-            if showed_time > 400 :
-
-                osu.show_acc[s][3] -= 255/100*1000/osu.fps
 
             osu.show_acc[s][0].set_alpha(osu.show_acc[s][3])
             osu.show_acc[s][0].convert_alpha()

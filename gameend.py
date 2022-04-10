@@ -23,7 +23,7 @@ class GameEnd :
             if ur_moy < 0 :
                 rep_txt = f"You are tapping {abs(ur_moy)}ms earlier, do you want to apply a negative offset of {abs(ur_moy)}ms ?"
             
-            if ur_moy > 0 :
+            elif ur_moy > 0 :
                 rep_txt = f"You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?"
 
             rep_rect        = osu.rep_font.get_rect(rep_txt)

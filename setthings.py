@@ -218,3 +218,35 @@ class OsuSetThings :
 
         elif cs_od_hp >= 25 :
             osu.difficulty_multiplier = 6
+            
+    def SetMods(self) : # active les mods necessaires
+        
+        self.ez          = False
+        self.nofail      = False
+        self.halftime    = False
+        self.hardrock    = False
+        self.suddendeath = False
+        self.doubletime  = False
+        self.hidden      = False
+        self.flashlight  = False
+        self.relax       = False
+        self.autopilot   = False
+        self.spunout     = False
+        self.auto        = False
+        self.scorev2     = False
+        
+        for i in self.mod_list :
+            
+            if i == "easy"        : self.ez          = True
+            if i == "nofail"      : self.nofail      = True
+            if i == "halftime"    : self.halftime    = True
+            if i == "hardrock"    : self.hardrock    = True
+            if i == "suddendeath" : self.suddendeath = True
+            if i == "doubletime"  : self.doubletime  = True
+            if i == "hidden"      : self.hidden      = True
+            if i == "flashlight"  : self.flashlight  = True
+            if i == "relax"       : self.relax       = True
+            if i == "autopilot"   : self.autopilot   = True
+            if i == "spunout"     : self.spunout     = True
+            if i == "auto"        : self.auto        = True
+            if i == "scorev2"     : self.scorev2     = True
