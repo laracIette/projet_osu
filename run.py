@@ -12,6 +12,7 @@ from setthings import OsuSetThings
 from interface import OsuInterface
 
 # Menu
+from mods import MenuMods
 from menu import MenuTools
 
 # general
@@ -249,7 +250,7 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
                 
                 osu.GameQuit()         # quitte la partie et le programme
 
-class Menu(MenuTools,Settings,Tools,Sounds,GameEnd) : # classe correspondante au menu du jeu
+class Menu(MenuTools,Settings,Tools,Sounds,GameEnd,MenuMods) : # classe correspondante au menu du jeu
 
     def __init__(self) :
         
@@ -261,9 +262,8 @@ class Menu(MenuTools,Settings,Tools,Sounds,GameEnd) : # classe correspondante au
         self.noir = pygame.Rect(0,0,self.width,self.height)
         self.font = pygame.font.Font("assets\\fonts\\shippori.ttf",round(self.ReSize(45)))
         
-        self.SetVolumeOffsetSkinMod()              # recupere et attribut les donnees de settings.txt
-
-        self.songs  = self.SongSelect()   # definition des maps possibles
+        self.SetVolumeOffsetSkinMod()     # recupere et attribut les donnees de settings.txt
+        self.SongSelect()                 # definition des maps possibles
         self.ImportSounds()               # importe les sons selon le skin
 
         self.show_volume = True
@@ -313,6 +313,8 @@ class Menu(MenuTools,Settings,Tools,Sounds,GameEnd) : # classe correspondante au
 
                 if menu.diff_choice :
                     menu.diff_choice = False
+                    
+                    menu.SetModList()
 
                     Osu(menu).OsuRun() # lance la partie en envoyant les elements de l'instance de Menu
                     

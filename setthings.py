@@ -219,34 +219,34 @@ class OsuSetThings :
         elif cs_od_hp >= 25 :
             osu.difficulty_multiplier = 6
             
-    def SetMods(self) : # active les mods necessaires
+    def SetMods(osu) : # active les mods necessaires
         
-        self.ez          = False
-        self.nofail      = False
-        self.halftime    = False
-        self.hardrock    = False
-        self.suddendeath = False
-        self.doubletime  = False
-        self.hidden      = False
-        self.flashlight  = False
-        self.relax       = False
-        self.autopilot   = False
-        self.spunout     = False
-        self.auto        = False
-        self.scorev2     = False
+        osu.ez          = False
+        osu.nofail      = False
+        osu.halftime    = False
+        osu.hardrock    = False
+        osu.suddendeath = False
+        osu.doubletime  = False
+        osu.hidden      = False
+        osu.flashlight  = False
+        osu.relax       = False
+        osu.autopilot   = False
+        osu.spunout     = False
+        osu.auto        = False
+        osu.scorev2     = False
         
-        for i in self.mod_list :
+        for i in osu.mod_list :
             
-            if i == "easy"        : self.ez          = True
-            if i == "nofail"      : self.nofail      = True
-            if i == "halftime"    : self.halftime    = True
-            if i == "hardrock"    : self.hardrock    = True
-            if i == "suddendeath" : self.suddendeath = True
-            if i == "doubletime"  : self.doubletime  = True
-            if i == "hidden"      : self.hidden      = True
-            if i == "flashlight"  : self.flashlight  = True
-            if i == "relax"       : self.relax       = True
-            if i == "autopilot"   : self.autopilot   = True
-            if i == "spunout"     : self.spunout     = True
-            if i == "auto"        : self.auto        = True
-            if i == "scorev2"     : self.scorev2     = True
+            if i == "easy"        : osu.ez          = True
+            if i == "nofail"      : osu.nofail      = True
+            if i == "halftime"    : osu.halftime    = True
+            if i == "hardrock"    : osu.hardrock    = True
+            if i == "suddendeath" : osu.suddendeath = True
+            if i == "doubletime"  : osu.doubletime  = True
+            if i == "hidden"      : osu.hidden      = True
+            if i == "flashlight"  : osu.flashlight  = True
+            if i == "relax"       : osu.relax       = True
+            if i == "autopilot"   : osu.autopilot   = True
+            if i == "spunout"     : osu.spunout     = True
+            if i == "auto"        : osu.auto        = True
+            if i == "scorev2"     : osu.scorev2     = True

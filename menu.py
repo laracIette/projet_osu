@@ -91,8 +91,6 @@ class MenuTools :
             
             menu.songs.append([bg,audio,diffs,diff_names])
 
-        return menu.songs
-
     def ShowOnScreen(menu) : # affichage des elements du menu
         
         pygame.draw.rect(menu.screen,menu.black,menu.noir)
@@ -240,100 +238,3 @@ class MenuTools :
                     menu.PlaySound("click",1,menu.volume_effects)
                     
                     break
-
-    def GetMods(menu) : # definir les modes de jeu
-
-        menu.mods = ["easy",    "nofail",     "halftime",
-                    "hardrock","suddendeath","doubletime","hidden",  "flashlight",
-                    "relax",   "autopilot",  "spunout",   "autoplay","scorev2"]
-        
-        w = 0
-        h = 0
-        menu.mods_icons = []
-        for i in range(len(menu.mods)) :
-        
-            center_rect = (menu.ReSize(505+220*w),menu.ReSize(305+220*h))
-            mod_icon    = menu.Load(f"skins\\{menu.skin}\\mods\\{menu.mods[i]}.png",(menu.ReSize(180),menu.ReSize(180)),False)
-            mod_rect    = mod_icon.get_rect(center = center_rect)
-
-            w += 1
-
-            if i == 2 or i == 7 :
-                h += 1
-                w  = 0
-
-            menu.mods_icons.append([mod_icon,mod_rect,center_rect,False])
-
-    def ModChoice(menu) : # choisir un mode de jeu
-
-        for mod in menu.mods_icons :
-
-            mod_icon = mod[0]
-
-            if mod[3] :
-                mod_icon = pygame.transform.rotate(mod[0],-15).convert()
-
-            mod_rect = mod_icon.get_rect(center = mod[2])
-
-            menu.screen.blit(mod_icon,mod_rect)
-
-        loop = True
-        while loop :
-
-            menu.clock.tick(menu.frequence)
-
-            menu.pos = pygame.mouse.get_pos()
-            for menu.event in pygame.event.get() :
-                    
-                if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
-
-                    menu.ModSelect()
-
-                if menu.event.type == pygame.KEYDOWN and (menu.event.key == pygame.K_F1 or menu.event.key == pygame.K_ESCAPE) :
-
-                    loop = False
-
-                    return menu.mod_list
-
-                menu.GameQuit()
-
-            pygame.display.flip()
-
-    def ModSelect(menu) :
-
-        mod_lock = False
-
-        for i in range(len(menu.mods_icons)) :
-
-            mod_rect = menu.mods_icons[i][1]
-
-            if mod_rect.collidepoint(menu.pos) :
-
-                for m in range(len(menu.mod_list)) :
-
-                    if menu.mod_list[m] == menu.mods[i] :
-                        
-                        menu.mod_list.pop(m)
-                        mod_lock = True
-
-                        break
-                
-                if mod_lock == False :
-                    menu.mod_list.append(menu.mods[i])
-
-                if menu.mods_icons[i][3] == False :
-                    menu.mods_icons[i][3] = True
-                else :
-                    menu.mods_icons[i][3] = False
-
-                for e in range(15) :
-
-                    if menu.mods_icons[i][3] :
-                        mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],-e).convert()
-                    else :
-                        mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],0).convert()
-
-                    mod_rect = mod_icon.get_rect(center = menu.mods_icons[i][2])
-
-                    menu.screen.blit(mod_icon,mod_rect)
-                    pygame.display.flip()
