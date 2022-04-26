@@ -1,9 +1,9 @@
 import pygame
 
 class Sounds :
-    
+
     def ImportSounds(menu) : # cree un dictionnaire des sons
-        
+
         menu.sounds = {
                 "click" : pygame.mixer.Sound(f"assets\\skins\\{menu.skin}\\click.ogg"),
                  "fail" : pygame.mixer.Sound(f"assets\\skins\\{menu.skin}\\fail.ogg"),

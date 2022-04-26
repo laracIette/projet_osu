@@ -9,13 +9,13 @@ class OsuGame :
 
             if osu.GetTime() >= osu.start_time + g[0] - osu.paused_time + 1000 :
                 osu.game_break = True
-            
+
             if osu.GetTime() >= osu.start_time + g[1] - osu.paused_time - 1000 :
                 osu.game_break = False
                 osu.game_breaks.pop(0)
 
     def ApplyBreaks(osu) : # declenche les pauses automatiques dans la partie
-        
+
         if osu.GetTime() >= osu.music_start - osu.start_offset/2.5 and osu.break_lock == False :
             osu.game_break = False
             osu.break_lock = True
@@ -24,10 +24,10 @@ class OsuGame :
             osu.game_break = True
 
     def StartGame(osu) : # elements declenchants la partie
-        
+
         pygame.mixer.music.play()
         osu.playing = True
-        
+
     def EndGame(osu) : # elements pouvants terminer une partie
 
         osu.running = False
@@ -47,14 +47,14 @@ class OsuGame :
         if osu.death == False :
 
             osu.Score()
-            
+
         osu.menu.MenuChoice(osu.mod_list)
 
     def GetPause(osu) : # captation des touches necessaires a la pause de la partie
-        
+
         if (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_ESCAPE) :
             osu.running = False
-            
+
             if osu.waiting :
                 osu.paused_time += osu.GetTime() - osu.pause_time
 
@@ -65,7 +65,7 @@ class OsuGame :
 
             osu.screen.blit(osu.pause_screen,(0,0))
             pygame.display.flip()
-            
+
             osu.Write()
 
             osu.Pause()
@@ -99,7 +99,7 @@ class OsuGame :
         pos1 = pygame.mouse.get_pos()
 
         if (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_x) or (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_v) :
-            
+
             distance1 = math.hypot(pos1[0]-osu.pos[0],pos1[1]-osu.pos[1])
 
             if distance1 < 5 :
@@ -107,7 +107,7 @@ class OsuGame :
                 osu.waiting = False
 
                 pygame.mixer.music.unpause()
-                                            
+
                 osu.paused_time += osu.GetTime() - osu.pause_time
 
     def ChangeOffset(osu) : # detecte si le joueur presse les touche de + ou - d'offset et l'applique
@@ -135,13 +135,13 @@ class OsuGame :
     def GetClicks(osu) : # capte les touches clavier pouvant interagir avec un objet de la partie
 
         if osu.event.type == pygame.KEYDOWN and (osu.event.key == pygame.K_x or osu.event.key == pygame.K_v) :
-            
+
             osu.click_check = True
-            
+
             osu.replay_clicks.append(osu.pos)
-            
+
             osu.GetAcc()
-            
+
         if osu.event.type == pygame.KEYUP and (osu.event.key == pygame.K_x or osu.event.key == pygame.K_v) :
             osu.click_check = False
 
@@ -174,7 +174,7 @@ class OsuGame :
                             osu.hit_value = 100
                             osu.show_ur.append([osu.green,278*difference/osu.od_time/2,osu.GetTime(),0])
                             osu.show_acc.append([osu.acc_100,osu.show_circles[v][4],osu.GetTime(),0])
-                        
+
                         elif abs(difference) > osu.od_time/2 :
                             osu.t_50 += 1
 
@@ -191,12 +191,12 @@ class OsuGame :
                             osu.health = osu.max_health
 
                         osu.PlaySound("hit",0.5,osu.volume_effects)
-                        
+
                         osu.combo += 1
                         if osu.combo > osu.max_combo : osu.max_combo = osu.combo
 
                     else :
-                        
+
                         osu.t_miss += 1
 
                         osu.hit_value = 0

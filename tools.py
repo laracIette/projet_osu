@@ -2,7 +2,7 @@ import time
 import pygame
 
 class Tools :
-    
+
     def Load(self,name,size,smooth) : # charge une image
 
         image = pygame.image.load(f"assets\\{name}").convert_alpha()
@@ -18,9 +18,9 @@ class Tools :
         return image
 
     def GetTime(self) : # retourne le temps actuel de la demande en millisecondes
-        
+
         return int(round(time.time() * 1000))
 
     def ReSize(self,number): # adapte les images a toutes les resolutions
-        
+
         return number/1920*self.width

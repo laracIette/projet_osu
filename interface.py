@@ -1,7 +1,7 @@
 import pygame
 
 class OsuInterface :
-    
+
     def DarkenScreen(osu) : # assombri/eclairci l'ecran en fonction des pauses
 
         if osu.game_break == False :
@@ -22,10 +22,10 @@ class OsuInterface :
 
                 osu.trail_pos.append([osu.pos,osu.cursor_trail,255])
                 osu.trail_count = 0
-            
+
             if len(osu.trail_pos) > 8 :
                 osu.trail_pos.pop(0)
-            
+
             osu.health    -= osu.passive_health*160/osu.fps
             osu.health_bar = pygame.Rect(osu.ReSize(20),osu.ReSize(20),osu.ReSize(600*osu.health/600),osu.ReSize(20))
 
@@ -42,7 +42,7 @@ class OsuInterface :
             if showed_time < 300 :
 
                 osu.show_acc[s][3] += 255/300*1000/osu.fps
-            
+
             elif showed_time > 400 :
 
                 osu.show_acc[s][3] -= 255/100*1000/osu.fps
@@ -60,7 +60,7 @@ class OsuInterface :
                 break
 
         if osu.show_offset :
-            
+
             if osu.offset < 0 :
                 osu.offset_txt = osu.fps_font.render(f"Local offset : {osu.offset}ms",False,osu.white).convert()
             else :
@@ -72,7 +72,7 @@ class OsuInterface :
     def ShowOnScreen(osu) : # affichage des elements de la partie
 
         if osu.UI == False and osu.UI_alpha > 0 :
-                
+
             osu.UI_alpha -= 20*160/osu.fps
 
         if osu.UI_alpha > 0 :
@@ -96,7 +96,7 @@ class OsuInterface :
         pygame.draw.rect(osu.screen,osu.white,osu.ur_middle)
 
         for u in osu.show_ur :
-            
+
             ur_hit = pygame.Rect(osu.ReSize(961+u[1]),osu.ReSize(1039),osu.ReSize(2),osu.ReSize(30))
             pygame.draw.rect(osu.screen,u[0],ur_hit)
 
@@ -104,7 +104,7 @@ class OsuInterface :
 
             show_acc_rect = s[0].get_rect(center = (s[1][0],s[1][1]-osu.ReSize(60)))
             osu.screen.blit(s[0],show_acc_rect)
-        
+
         if osu.show_offset :
 
             offset_txt_rect = osu.offset_txt.get_rect(center = (osu.width/2,osu.ReSize(20)))
@@ -127,7 +127,7 @@ class OsuInterface :
 
         if osu.waiting == False :
             osu.pos3 = pygame.mouse.get_pos()
-        
+
         cursor_rect = osu.cursor.get_rect(center = osu.pos3)
         osu.screen.blit(osu.cursor,cursor_rect)
 
@@ -171,7 +171,7 @@ class OsuInterface :
                 combo_multiplier = 0
 
             osu.score += round(osu.hit_value + (osu.hit_value * ((combo_multiplier * osu.difficulty_multiplier * osu.mod_multiplier) / 25)))
-            
+
             osu.acc_txt    = osu.acc_font.render(f"{round(osu.accuracy,2)}%",False,osu.white).convert()
             osu.combo_txt  = osu.combo_font.render(f"{osu.combo}x",False,osu.white).convert()
             osu.score_txt  = osu.combo_font.render(str(osu.score),False,osu.white).convert()
@@ -182,7 +182,7 @@ class OsuInterface :
 
         if (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_TAB and osu.key[pygame.K_LSHIFT]) or\
         (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_LSHIFT and osu.key[pygame.K_TAB]) :
-            
+
             if osu.UI :
                 osu.UI = False
             else :

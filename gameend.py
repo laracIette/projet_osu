@@ -13,7 +13,7 @@ class GameEnd :
 
             noir = pygame.Rect(0,0,osu.width,osu.height)
             pygame.draw.rect(osu.screen,(0,0,0),noir)
-            
+
             for u in osu.total_ur :
                 ur_moy += u
 
@@ -22,7 +22,7 @@ class GameEnd :
 
             if ur_moy < 0 :
                 rep_txt = f"You are tapping {abs(ur_moy)}ms earlier, do you want to apply a negative offset of {abs(ur_moy)}ms ?"
-            
+
             elif ur_moy > 0 :
                 rep_txt = f"You are tapping {abs(ur_moy)}ms too late, do you want to apply a positive offset of {abs(ur_moy)}ms ?"
 
@@ -36,13 +36,13 @@ class GameEnd :
             no_txt         = "No"
             no_rect        = osu.rep_font.get_rect(no_txt)
             no_rect.center = (osu.width/3*2,osu.height/3*2)
-            
+
             osu.rep_font.render_to(osu.screen,rep_rect,rep_txt,osu.white)
             osu.rep_font.render_to(osu.screen,yes_rect,yes_txt,osu.white)
             osu.rep_font.render_to(osu.screen,no_rect,no_txt,osu.white)
-            
+
             pygame.display.flip()
-            
+
             loop = True
             while loop :
 
@@ -60,11 +60,11 @@ class GameEnd :
                         pos = pygame.mouse.get_pos()
 
                         if yes_rect.collidepoint(pos) :
-                            
+
                             offset = - ur_moy
 
                             return offset
-                        
+
                         if no_rect.collidepoint(pos) :
 
                             return 0
@@ -102,7 +102,7 @@ class GameEnd :
         replay_name = now.strftime(f"{osu.map_name} [{osu.diff_name}] (%Y-%m-%d - %H.%M.%S)")
 
         with open(f"assets\\replays\\{replay_name}.txt", "w") as replay :
-            
+
             replay.write(f"{osu.score}\n")
             replay.write(f"{osu.t_300}\n")
             replay.write(f"{osu.t_100}\n")
@@ -131,6 +131,6 @@ class GameEnd :
         if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
 
             self.Write()
-            
+
             pygame.quit()
             exit(0)

@@ -24,7 +24,7 @@ from settings import Settings
 class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,Sounds) : # classe correspondante a une partie
 
     def __init__(self,menu) :
-        
+
         super().__init__()
 
         self.menu = menu
@@ -44,7 +44,7 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
         self.volume         = menu.volume
         self.volume_music   = menu.volume_music
         self.volume_effects = menu.volume_effects
-        
+
         self.black  = (  0,  0,  0)
         self.white  = (255,255,255)
         self.grey   = ( 48, 48, 48)
@@ -71,7 +71,7 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
 
         self.game_break = True
         self.break_lock = False
-        
+
         self.c_s     = round(self.ReSize(218 - self.cs*18))
         self.circle  = self.Load(f"skins\\{self.skin}\\hitcircle.png",(self.c_s,self.c_s),True)
 
@@ -100,13 +100,13 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
 
         self.number_font = pygame.font.Font("assets\\fonts\\LeagueSpartanBold.ttf",round(self.c_s/2))
         self.score_font  = pygame.freetype.SysFont("segoeuisemibold",round(75))
-        
+
         self.acc       = []
         self.acc_check = False
         self.acc_font  = pygame.font.SysFont("segoeuisemibold",round(self.ReSize(45)))
 
         self.rep_font = pygame.freetype.SysFont("segoeuisemibold",round(self.ReSize(45)))
-        
+
         self.show_acc = []
         self.acc_miss = self.Load(f"skins\\{self.skin}\\miss.png",(self.c_s/2,self.c_s/2),True)
         self.acc_100  = self.Load(f"skins\\{self.skin}\\100.png",(self.c_s/2,self.c_s/2),True)
@@ -141,7 +141,7 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
         self.health_bar_bg    = pygame.Rect(self.ReSize(20),self.ReSize(20),self.ReSize(600),self.ReSize(20))
         self.click_time       = 0
         self.click_time_check = False
-        
+
         self.spin_score_bonus       = 0
         self.spin_score_bonus_time  = 0
         self.spin_score_bonus_alpha = 0
@@ -189,17 +189,17 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
     def OsuRun(osu) : # deroulement de la partie, osu est l'instance de la classe Osu
 
         while osu.running :
-            
+
             osu.clock.tick(osu.frequence)
 
             if osu.waiting == False :
-    
+
                 if osu.GetTime() - osu.paused_time >= osu.music_start and osu.playing == False :
-                
+
                     osu.StartGame()    # demarrage de la partie
 
                 osu.GetSpinner()       # verifie si doit afficher un spinner, si oui le cree
-                
+
                 osu.GetCircle()        # verifie si doit afficher un cercle, si oui le cree
 
                 osu.GetFollowPoint()   # verifie si doit afficher un followpoint, si oui le cree
@@ -212,19 +212,19 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
                     osu.EndGame()      # terminer la partie
 
             osu.SetBreak()             # determine les pauses manuelles dans la partie
-                
+
             osu.DarkenScreen()         # assombri/eclairci l'ecran en fonction des pauses
-            
+
             osu.SetFollowPoints()      # affiche et modifie le/les followpoints
 
             osu.SetCircles()           # affiche et modifie le/les cercles
-            
+
             osu.UItextRenders()        # affiche les elements texte de la partie
-            
+
             osu.SetFps()               # calcule et affiche les fps
-            
+
             osu.SetShowOnScreen()      # determine des elements a afficher pendant une partie
-            
+
             osu.SetSpinners()          # affiche et modifie le/les spinners si mouvement
 
             osu.score_txt = osu.combo_font.render(str(osu.score),False,osu.white).convert()
@@ -232,7 +232,7 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
             osu.ShowOnScreen()         # affichage des elements de la partie
 
             pygame.display.flip()      # met a jour les elements affiches sur l'ecran
-            
+
             osu.pos = pygame.mouse.get_pos()
             osu.key = pygame.key.get_pressed()
             for osu.event in pygame.event.get() :
@@ -241,19 +241,19 @@ class Osu(OsuGame,OsuObjects,GameEnd,OsuInterface,OsuSetThings,Settings,Tools,So
                     osu.GetClicks()    # capte les touches clavier pouvant interagir avec un objet de la partie
                 else :
                     osu.UnPause()      # verifie et si possible quitte la pause
-                        
+
                 osu.HideUI()           # cache/montre l'interface
 
                 osu.ChangeOffset()     # detecte si le joueur presse les touche de + ou - d'offset et l'applique
 
                 osu.GetPause()         # captation des touches necessaires a la pause de la partie
-                
+
                 osu.GameQuit()         # quitte la partie et le programme
 
 class Menu(MenuTools,Settings,Tools,Sounds,GameEnd,MenuMods) : # classe correspondante au menu du jeu
 
     def __init__(self) :
-        
+
         super().__init__()
 
         self.black  = (  0,  0,  0)
@@ -261,7 +261,7 @@ class Menu(MenuTools,Settings,Tools,Sounds,GameEnd,MenuMods) : # classe correspo
 
         self.noir = pygame.Rect(0,0,self.width,self.height)
         self.font = pygame.font.Font("assets\\fonts\\shippori.ttf",round(self.ReSize(45)))
-        
+
         self.SetVolumeOffsetSkinMod()     # recupere et attribut les donnees de settings.txt
         self.SongSelect()                 # definition des maps possibles
         self.ImportSounds()               # importe les sons selon le skin
@@ -284,15 +284,15 @@ class Menu(MenuTools,Settings,Tools,Sounds,GameEnd,MenuMods) : # classe correspo
         self.effects_rect.y = self.height-self.effects_txt.get_height()
 
         self.volume_noir = pygame.Rect(self.width/3*2,self.height/3*2,self.width/3,self.height/3)
-        
+
         self.volume_time = self.GetTime() # temps actuel en millisecondes
-        
+
         self.diff_choice   = False
         self.choosing_diff = False
-        
+
         self.GetMods() # definit les modes de jeu
 
-        self.loop = True
+        self.running = True
 
     def MenuChoice(menu,mod_list) : # determine les options a prendre en compte pour le lancement d'une partie
                                     # menu est l'instance de la classe Menu
@@ -300,24 +300,24 @@ class Menu(MenuTools,Settings,Tools,Sounds,GameEnd,MenuMods) : # classe correspo
         pygame.mouse.set_visible(True)
 
         menu.mod_list = mod_list
-        
-        while menu.loop :
+
+        while menu.running :
 
             menu.clock.tick(menu.frequence)
 
             menu.ShowOnScreen()   # affichage des elements du menu
-                
+
             if menu.choosing_diff :
 
                 menu.DiffSelect() # selection de la difficulte
 
                 if menu.diff_choice :
                     menu.diff_choice = False
-                    
+
                     menu.SetModList()
 
                     Osu(menu).OsuRun() # lance la partie en envoyant les elements de l'instance de Menu
-                    
+
             pygame.display.flip()
 
             menu.key = pygame.key.get_pressed()
@@ -334,17 +334,17 @@ class Menu(MenuTools,Settings,Tools,Sounds,GameEnd,MenuMods) : # classe correspo
                     if menu.event.button == pygame.BUTTON_LEFT :
 
                         menu.MapSelect()               # selection de la map
-                    
+
                 if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_s :
-                    
+
                     menu.skin = menu.SkinSelect()      # selection du skin
 
                 if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_F1 :
-                    
+
                     menu.mod_list = menu.ModChoice()   # choisir un mode de jeu
 
                 if menu.event.type == pygame.KEYDOWN and menu.event.key == pygame.K_ESCAPE and menu.choosing_diff :
-                    
+
                     menu.choosing_diff = False
-                    
+
                 menu.GameQuit() # quitte le menu et le programme

@@ -10,14 +10,14 @@ class OsuSetThings :
 
         a   = 0
         map = osu.songs[osu.map][2][osu.diff]
-            
+
 
         with open(map,"r") as map_file :
 
             for i in map_file :
 
                 if spinner_lock == False :
-                    
+
                     for o in i:
 
                         if o == "s" :
@@ -58,7 +58,7 @@ class OsuSetThings :
                         osu.od = float(osu.od)
 
                         osu.SetOD()
-                    
+
                     elif a == 4 :
                         for o in i :
                             if o != "\n" :
@@ -94,7 +94,7 @@ class OsuSetThings :
         circles0 = []
         for m in osu.circles :
             circles0.append(int(m))
-        
+
         num = 0
         osu.circles = []
 
@@ -110,7 +110,7 @@ class OsuSetThings :
 
             osu.circles.append(tab)
             tab = []
-        
+
         for j in osu.spinners :
 
             for k in j :
@@ -122,7 +122,7 @@ class OsuSetThings :
                     tab = "".join(tab)
                     spinners0.append(tab)
                     tab = []
-        
+
         for r in range(len(spinners0)) :
             spinners0[r]  = int(spinners0[r])
             spinners0[r] += osu.start_offset
@@ -132,7 +132,7 @@ class OsuSetThings :
         for r in range(int(len(spinners0)/2)) :
 
             osu.spinners.append([spinners0[h],spinners0[h+1]])
-            
+
             h += 2
 
         c = 0
@@ -153,21 +153,21 @@ class OsuSetThings :
 
             if osu.circles[c][2] < osu.spinners[u][0] :
                 hit_objects.append([osu.circles[c][2],0])
-                
+
                 if c < len(osu.circles) : c += 1
 
             else :
                 hit_objects.append([osu.spinners[u][0],1])
                 hit_objects.append([osu.spinners[u][1],1])
-                
+
                 if u < len(osu.spinners) : u += 1
-        
+
         osu.game_breaks = []
         for p in range(len(hit_objects)-1) :
-            
+
             if (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p][1] != 1) or\
             (hit_objects[p+1][0] - hit_objects[p][0] >= 5000 and hit_objects[p+1][1] != 1) :
-            
+
                 osu.game_breaks.append([hit_objects[p][0],hit_objects[p+1][0]])
 
     def SetAR(osu) : # reglages correspondants au temps d'approche des objets d'une partie
@@ -201,26 +201,26 @@ class OsuSetThings :
         pass
 
     def SetMultiplier(osu) : # multiplicateur pris en compte lors du calcul du score
-        
+
         cs_od_hp = osu.cs + osu.od + osu.hp
 
         if cs_od_hp < 6 :
             osu.difficulty_multiplier = 2
-        
+
         elif cs_od_hp >= 6 and cs_od_hp < 13 :
             osu.difficulty_multiplier = 3
 
         elif cs_od_hp >= 13 and cs_od_hp < 18 :
             osu.difficulty_multiplier = 4
-        
+
         elif cs_od_hp >= 18 and cs_od_hp < 25 :
             osu.difficulty_multiplier = 5
 
         elif cs_od_hp >= 25 :
             osu.difficulty_multiplier = 6
-            
+
     def SetMods(osu) : # active les mods necessaires
-        
+
         osu.ez          = False
         osu.nofail      = False
         osu.halftime    = False
@@ -234,9 +234,9 @@ class OsuSetThings :
         osu.spunout     = False
         osu.auto        = False
         osu.scorev2     = False
-        
+
         for i in osu.mod_list :
-            
+
             if i == "easy"        : osu.ez          = True
             if i == "nofail"      : osu.nofail      = True
             if i == "halftime"    : osu.halftime    = True

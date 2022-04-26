@@ -1,18 +1,18 @@
 import pygame
 
 class MenuMods :
-    
+
     def GetMods(menu) : # definir les modes de jeu
 
         menu.mods = ["easy",    "nofail",     "halftime",
                     "hardrock","suddendeath","doubletime","hidden",  "flashlight",
                     "relax",   "autopilot",  "spunout",   "autoplay","scorev2"]
-        
+
         w = 0
         h = 0
         menu.mods_icons = []
         for i in range(len(menu.mods)) :
-        
+
             center_rect = (menu.ReSize(505+220*w),menu.ReSize(305+220*h))
             mod_icon    = menu.Load(f"skins\\{menu.skin}\\mods\\{menu.mods[i]}.png",(menu.ReSize(180),menu.ReSize(180)),False)
             mod_rect    = mod_icon.get_rect(center = center_rect)
@@ -35,7 +35,7 @@ class MenuMods :
 
             menu.pos = pygame.mouse.get_pos()
             for menu.event in pygame.event.get() :
-                    
+
                 if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
 
                     menu.ModSelect()
@@ -60,7 +60,7 @@ class MenuMods :
 
                 if menu.mods_icons[i][3] == False :
                     menu.mods_icons[i][3] = True
-                    
+
                     if i == 0 :
                         if menu.mods_icons[3][3]  : menu.mods_icons[3][3]  = False
                     elif i == 1 :
@@ -97,18 +97,18 @@ class MenuMods :
                         if menu.mods_icons[8][3]  : menu.mods_icons[8][3]  = False
                         if menu.mods_icons[9][3]  : menu.mods_icons[9][3]  = False
                         if menu.mods_icons[10][3] : menu.mods_icons[10][3] = False
-                        
+
                 else :
                     menu.mods_icons[i][3] = False
-                    
+
     def UpdateShowMods(menu) :
-        
+
         for i in range(len(menu.mods_icons)) :
-    
+
             if menu.mods_icons[i][3] == False :
                 if menu.mods_icons[i][4] > 0 :
                     menu.mods_icons[i][4] -= 1
-                    
+
             elif menu.mods_icons[i][4] < 15 :
                 menu.mods_icons[i][4] += 1
 
@@ -116,13 +116,13 @@ class MenuMods :
             mod_rect = mod_icon.get_rect(center = menu.mods_icons[i][2])
 
             menu.screen.blit(mod_icon,mod_rect)
-            
+
     def SetModList(menu) :
-        
+
         menu.mod_list = []
-        
+
         for i in range(len(menu.mods_icons)) :
-            
+
             if menu.mods_icons[i][3] :
-                
+
                 menu.mod_list.append(menu.mods[i])

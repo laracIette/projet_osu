@@ -12,7 +12,7 @@ class MenuTools :
         skins  = glob.glob("assets\\skins\\*")
         for i in skins :
             skins0.append(os.path.basename(i))
-        
+
         skins = []
         for z in range(len(skins0)) :
 
@@ -22,7 +22,7 @@ class MenuTools :
             skins.append(text)
 
         pygame.display.flip()
-        
+
         loop = True
         while loop :
 
@@ -43,7 +43,7 @@ class MenuTools :
                             loop = False
 
                             menu.PlaySound("click",1,menu.volume_effects)
-                            
+
                             menu.skin = skins0[w]
 
                     return menu.skin
@@ -69,7 +69,7 @@ class MenuTools :
 
             audio = glob.glob(f"{menu.maps[i]}\\*.mp3")
             audio = audio[0]
-            
+
             menu.map_names = []
             for j in menu.maps :
 
@@ -88,13 +88,13 @@ class MenuTools :
             bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
             bg  = pygame.image.load(bgs[0]).convert()
             bg  = pygame.transform.scale(bg,(menu.width,menu.height)).convert()
-            
+
             menu.songs.append([bg,audio,diffs,diff_names])
 
     def ShowOnScreen(menu) : # affichage des elements du menu
-        
+
         pygame.draw.rect(menu.screen,menu.black,menu.noir)
-            
+
         for i in range(len(menu.maps)) :
 
             bgs = glob.glob(f"{menu.maps[i]}\\*.jpg")
@@ -102,13 +102,13 @@ class MenuTools :
             bg  = pygame.transform.scale(bg,(menu.width/5,menu.height/5)).convert()
 
             menu.screen.blit(bg,(0,menu.height/5*i))
-        
+
         menu.ShowVolume()
 
     def ShowVolume(menu) : # affiche le volume dans le menu
 
         if menu.show_volume :
-                
+
             pygame.draw.rect(menu.screen,menu.black,menu.volume_noir)
 
             if menu.GetTime() >= menu.volume_time + 1000 :
@@ -135,11 +135,11 @@ class MenuTools :
                 if a == 0 :
 
                     menu.offset = int(i)
-                
+
                 elif a == 1 :
 
                     menu.volume = int(i)
-                
+
                 elif a == 2 :
 
                     menu.volume_music = int(i)
@@ -157,7 +157,7 @@ class MenuTools :
                     menu.skin = "".join(skin_t)
 
                 a += 1
-                        
+
         menu.volumes = [menu.volume,menu.volume_music,menu.volume_effects]
 
     def ModifyVolumes(menu) : # detecte si besoin et applique changement de volume
@@ -167,7 +167,7 @@ class MenuTools :
         for i in range(len(rects)) :
 
             if rects[i].collidepoint(menu.pos) :
-            
+
                 if menu.event.button == 4 :
 
                     if menu.volumes[i] < 100 :
@@ -189,7 +189,7 @@ class MenuTools :
         menu.volume_txt  = menu.volume_font.render(f"main : {menu.volume}%",False,menu.white).convert()
         menu.music_txt   = menu.music_font.render(f"music : {menu.volume_music}%",False,menu.white).convert()
         menu.effects_txt = menu.music_font.render(f"effects : {menu.volume_effects}%",False,menu.white).convert()
-        
+
         menu.volume_time = menu.GetTime()
 
     def MapSelect(menu) : # selection de la map
@@ -210,10 +210,10 @@ class MenuTools :
                 menu.PlaySound("click",1,menu.volume_effects)
 
     def DiffSelect(menu) : # selection de la difficulte
-        
+
         menu.diffs = menu.songs[menu.map][3]
         for i in range(len(menu.diffs)) :
-    
+
             diff = menu.font.render(menu.diffs[i],False,menu.white).convert()
             menu.screen.blit(diff,(menu.width/5,menu.height/20*i+menu.height/5*menu.map))
 
@@ -230,11 +230,11 @@ class MenuTools :
                 if diff_rect.collidepoint(menu.pos) :
                     menu.diff_choice   = True
                     menu.choosing_diff = False
-                    
+
                     menu.map_name  = menu.map_names[menu.map]
                     menu.diff_name = menu.diffs[menu.diff]
 
                     pygame.mouse.set_visible(False)
                     menu.PlaySound("click",1,menu.volume_effects)
-                    
+
                     break
