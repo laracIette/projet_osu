@@ -2,20 +2,20 @@ import pygame
 
 class MenuMods :
 
-    def GetMods(menu) : # definir les modes de jeu
+    def getMods( menu: classmethod ) -> None : # definir les modes de jeu
 
-        menu.mods = ["easy",    "nofail",     "halftime",
-                    "hardrock","suddendeath","doubletime","hidden",  "flashlight",
-                    "relax",   "autopilot",  "spunout",   "autoplay","scorev2"]
+        menu.mods = ["easy",    "nofail",      "halftime",
+                    "hardrock", "suddendeath", "doubletime", "hidden",   "flashlight",
+                    "relax",    "autopilot",   "spunout",    "autoplay", "scorev2"]
 
         w = 0
         h = 0
         menu.mods_icons = []
-        for i in range(len(menu.mods)) :
+        for i in range( len( menu.mods ) ) :
 
-            center_rect = (menu.ReSize(505+220*w),menu.ReSize(305+220*h))
-            mod_icon    = menu.Load(f"skins\\{menu.skin}\\mods\\{menu.mods[i]}.png",(menu.ReSize(180),menu.ReSize(180)),False)
-            mod_rect    = mod_icon.get_rect(center = center_rect)
+            center_rect = ( menu.reSize( 505 + 220*w ), menu.reSize( 305 + 220*h ) )
+            mod_icon    = menu.load( f"skins\\{menu.skin}\\mods\\{menu.mods[i]}.png", (menu.reSize( 180 ), menu.reSize( 180 )), False )
+            mod_rect    = mod_icon.get_rect( center = center_rect )
 
             w += 1
 
@@ -23,22 +23,22 @@ class MenuMods :
                 h += 1
                 w  = 0
 
-            menu.mods_icons.append([mod_icon,mod_rect,center_rect,False,0])
+            menu.mods_icons.append( [mod_icon, mod_rect, center_rect, False, 0] )
 
-    def ModChoice(menu) : # choisir un mode de jeu
+    def modChoice( menu: classmethod ) -> list : # choisir un mode de jeu
 
         loop = True
         while loop :
 
-            menu.clock.tick(menu.frequence)
-            menu.UpdateShowMods()
+            menu.clock.tick( menu.frequence )
+            menu.updateShowMods()
 
             menu.pos = pygame.mouse.get_pos()
             for menu.event in pygame.event.get() :
 
                 if menu.event.type == pygame.MOUSEBUTTONDOWN and menu.event.button == pygame.BUTTON_LEFT :
 
-                    menu.ModSelect()
+                    menu.modSelect()
 
                 if menu.event.type == pygame.KEYDOWN and (menu.event.key == pygame.K_F1 or menu.event.key == pygame.K_ESCAPE) :
 
@@ -46,17 +46,17 @@ class MenuMods :
 
                     return menu.mod_list
 
-                menu.GameQuit()
+                menu.gameQuit()
 
             pygame.display.flip()
 
-    def ModSelect(menu) :
+    def modSelect( menu: classmethod ) -> None :
 
-        for i in range(len(menu.mods_icons)) :
+        for i in range( len( menu.mods_icons ) ) :
 
             mod_rect = menu.mods_icons[i][1]
 
-            if mod_rect.collidepoint(menu.pos) :
+            if mod_rect.collidepoint( menu.pos ) :
 
                 if menu.mods_icons[i][3] == False :
                     menu.mods_icons[i][3] = True
@@ -101,9 +101,9 @@ class MenuMods :
                 else :
                     menu.mods_icons[i][3] = False
 
-    def UpdateShowMods(menu) :
+    def updateShowMods( menu: classmethod ) -> None :
 
-        for i in range(len(menu.mods_icons)) :
+        for i in range( len( menu.mods_icons ) ) :
 
             if menu.mods_icons[i][3] == False :
                 if menu.mods_icons[i][4] > 0 :
@@ -112,17 +112,17 @@ class MenuMods :
             elif menu.mods_icons[i][4] < 15 :
                 menu.mods_icons[i][4] += 1
 
-            mod_icon = pygame.transform.rotate(menu.mods_icons[i][0],-menu.mods_icons[i][4]).convert()
-            mod_rect = mod_icon.get_rect(center = menu.mods_icons[i][2])
+            mod_icon = pygame.transform.rotate( menu.mods_icons[i][0], - menu.mods_icons[i][4] ).convert()
+            mod_rect = mod_icon.get_rect( center = menu.mods_icons[i][2] )
 
-            menu.screen.blit(mod_icon,mod_rect)
+            menu.screen.blit( mod_icon, mod_rect )
 
-    def SetModList(menu) :
+    def setModList( menu: classmethod ) -> None :
 
         menu.mod_list = []
 
-        for i in range(len(menu.mods_icons)) :
+        for i in range( len( menu.mods_icons ) ) :
 
             if menu.mods_icons[i][3] :
 
-                menu.mod_list.append(menu.mods[i])
+                menu.mod_list.append( menu.mods[i] )
