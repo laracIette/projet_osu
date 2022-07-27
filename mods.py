@@ -2,7 +2,7 @@ import pygame
 
 class MenuMods :
 
-    def getMods( menu: classmethod ) -> None : # definir les modes de jeu
+    def getMods( menu ) -> None : # definir les modes de jeu
 
         menu.mods = ["easy",    "nofail",      "halftime",
                     "hardrock", "suddendeath", "doubletime", "hidden",   "flashlight",
@@ -25,7 +25,7 @@ class MenuMods :
 
             menu.mods_icons.append( [mod_icon, mod_rect, center_rect, False, 0] )
 
-    def modChoice( menu: classmethod ) -> list : # choisir un mode de jeu
+    def modChoice( menu ) -> list : # choisir un mode de jeu
 
         loop = True
         while loop :
@@ -50,7 +50,7 @@ class MenuMods :
 
             pygame.display.flip()
 
-    def modSelect( menu: classmethod ) -> None :
+    def modSelect( menu ) -> None :
 
         for i in range( len( menu.mods_icons ) ) :
 
@@ -101,7 +101,7 @@ class MenuMods :
                 else :
                     menu.mods_icons[i][3] = False
 
-    def updateShowMods( menu: classmethod ) -> None :
+    def updateShowMods( menu ) -> None :
 
         for i in range( len( menu.mods_icons ) ) :
 
@@ -117,7 +117,7 @@ class MenuMods :
 
             menu.screen.blit( mod_icon, mod_rect )
 
-    def setModList( menu: classmethod ) -> None :
+    def setModList( menu ) -> None :
 
         menu.mod_list = []
 

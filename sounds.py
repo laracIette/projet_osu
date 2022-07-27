@@ -2,7 +2,7 @@ import pygame
 
 class Sounds :
 
-    def importSounds( menu: classmethod ) -> None : # cree un dictionnaire des sons
+    def importSounds( menu ) -> None : # cree un dictionnaire des sons
 
         menu.sounds = {
                 "click" : pygame.mixer.Sound( f"assets\\skins\\{menu.skin}\\click.ogg" ),
@@ -13,7 +13,7 @@ class Sounds :
          "spinnerbonus" : pygame.mixer.Sound( f"assets\\skins\\{menu.skin}\\spinnerbonus.ogg" )
         }
 
-    def playSound( self: classmethod, name: str, volume: int, type: int ) -> None : # joue un son
+    def playSound( self, name: str, volume: int, type: int ) -> None : # joue un son
 
         self.sounds[name].set_volume( volume*self.volume/100*type/100 )
         self.sounds[name].play()

@@ -4,7 +4,7 @@ import pygame
 
 class MenuTools :
 
-    def skinSelect( menu: classmethod ) -> str : # selection du skin
+    def skinSelect( menu ) -> str : # selection du skin
 
         pygame.draw.rect( menu.screen, menu.black, menu.noir )
 
@@ -54,7 +54,7 @@ class MenuTools :
 
                 menu.gameQuit()
 
-    def songSelect( menu: classmethod ) -> None : # definition des maps possibles
+    def songSelect( menu ) -> None : # definition des maps possibles
 
         menu.maps  = glob.glob( "assets\\songs\\*" )
         menu.songs = []
@@ -85,7 +85,7 @@ class MenuTools :
 
             menu.songs.append( [bg, audio, diffs, diff_names] )
 
-    def showOnScreen( menu: classmethod ) -> None : # affichage des elements du menu
+    def showOnScreen( menu ) -> None : # affichage des elements du menu
 
         pygame.draw.rect( menu.screen, menu.black, menu.noir )
 
@@ -99,7 +99,7 @@ class MenuTools :
 
         menu.showVolume()
 
-    def showVolume( menu: classmethod ) -> None : # affiche le volume dans le menu
+    def showVolume( menu ) -> None : # affiche le volume dans le menu
 
         if menu.show_volume :
 
@@ -117,7 +117,7 @@ class MenuTools :
             menu.screen.blit( menu.music_txt, (menu.music_rect.x, menu.music_rect.y) )
             menu.screen.blit( menu.effects_txt, (menu.effects_rect.x, menu.effects_rect.y) )
 
-    def setVolumeOffsetSkinMod( menu: classmethod ) -> None : # recupere et attribut les donnees de settings.txt
+    def setVolumeOffsetSkinMod( menu ) -> None : # recupere et attribut les donnees de settings.txt
 
         with open( "assets\\settings.txt", "r" ) as settings_file :
 
@@ -154,7 +154,7 @@ class MenuTools :
 
         menu.volumes = [menu.volume, menu.volume_music, menu.volume_effects]
 
-    def modifyVolumes( menu: classmethod ) -> None : # detecte si besoin et applique changement de volume
+    def modifyVolumes( menu ) -> None : # detecte si besoin et applique changement de volume
 
         rects = [menu.volume_rect, menu.music_rect, menu.effects_rect]
 
@@ -186,7 +186,7 @@ class MenuTools :
 
         menu.volume_time = menu.getTime()
 
-    def mapSelect( menu: classmethod ) -> None : # selection de la map
+    def mapSelect( menu ) -> None : # selection de la map
 
         for menu.ii in range( len( menu.songs ) ) :
 
@@ -203,7 +203,7 @@ class MenuTools :
 
                 menu.playSound( "click", 1, menu.volume_effects )
 
-    def diffSelect( menu: classmethod ) -> None : # selection de la difficulte
+    def diffSelect( menu ) -> None : # selection de la difficulte
 
         menu.diffs = menu.songs[menu.map][3]
         for i in range( len( menu.diffs ) ) :

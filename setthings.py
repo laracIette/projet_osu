@@ -1,6 +1,6 @@
 class OsuSetThings :
 
-    def setMap( osu: classmethod ) -> None : # determine et classe dans des tableau les elements a afficher pendant une partie
+    def setMap( osu ) -> None : # determine et classe dans des tableau les elements a afficher pendant une partie
 
         cs_t, ar_t, od_t, hp_t = [], [], [], []
 
@@ -170,7 +170,7 @@ class OsuSetThings :
 
                 osu.game_breaks.append( [hit_objects[p][0], hit_objects[p+1][0]] )
 
-    def setAR( osu: classmethod ) -> None : # reglages correspondants au temps d'approche des objets d'une partie
+    def setAR( osu ) -> None : # reglages correspondants au temps d'approche des objets d'une partie
 
         ars = {
             0  : [1800,120],
@@ -192,15 +192,15 @@ class OsuSetThings :
         osu.ar_time = ars[round( osu.ar )][0] - ars[round( osu.ar )][1]*osu.ar_rest
         osu.ar_time = round( osu.ar_time )
 
-    def setOD( osu: classmethod ) -> None : # reglages correspondants a la difficulte des objets d'une partie
+    def setOD( osu ) -> None : # reglages correspondants a la difficulte des objets d'une partie
 
         osu.od_time = 79.5 - osu.od*6
 
-    def setHP( osu: classmethod ) -> None : # reglages correspondants au gain et perte de points de vie
+    def setHP( osu ) -> None : # reglages correspondants au gain et perte de points de vie
 
         pass
 
-    def setMultiplier( osu: classmethod ) -> None : # multiplicateur pris en compte lors du calcul du score
+    def setMultiplier( osu ) -> None : # multiplicateur pris en compte lors du calcul du score
 
         cs_od_hp = osu.cs + osu.od + osu.hp
 
@@ -219,7 +219,7 @@ class OsuSetThings :
         elif cs_od_hp >= 25 :
             osu.difficulty_multiplier = 6
 
-    def setMods( osu: classmethod ) -> None : # active les mods necessaires
+    def setMods( osu ) -> None : # active les mods necessaires
 
         osu.ez          = False
         osu.nofail      = False

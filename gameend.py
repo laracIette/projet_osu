@@ -3,7 +3,7 @@ from datetime import datetime
 
 class GameEnd :
 
-    def proposeOffset( osu: classmethod ) -> int : # propose un offset au joueur si possible
+    def proposeOffset( osu ) -> int : # propose un offset au joueur si possible
 
         pygame.mouse.set_visible( True )
 
@@ -69,7 +69,7 @@ class GameEnd :
 
                             return 0
 
-    def showScore( osu: classmethod ) -> None : # affichage de l'ecran de fin
+    def showScore( osu ) -> None : # affichage de l'ecran de fin
 
         osu.screen.blit( osu.bg, (0, 0) )
         osu.screen.blit( osu.end_screen, (0, 0) )
@@ -96,7 +96,7 @@ class GameEnd :
                 if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_q :
                     loop = False
 
-    def writeReplay( osu: classmethod ) -> None : # ecriture du replay dans un fichier .txt
+    def writeReplay( osu ) -> None : # ecriture du replay dans un fichier .txt
 
         now = datetime.now()
         replay_name = now.strftime( f"{osu.map_name} [{osu.diff_name}] (%Y-%m-%d - %H.%M.%S)" )
@@ -115,7 +115,7 @@ class GameEnd :
 
                 replay.write( f"{i}\n" )
 
-    def writeSettings( self: classmethod ) -> None : # ecriture et modification des parametres du jeu sauvegardes dans settings.txt
+    def writeSettings( self ) -> None : # ecriture et modification des parametres du jeu sauvegardes dans settings.txt
 
         with open( "assets\\settings.txt", "w" ) as settings_file :
 
@@ -125,7 +125,7 @@ class GameEnd :
 
                 settings_file.write( self.lines[a].replace( self.lines[a], f"{modifs[a]}\n" ) )
 
-    def gameQuit( self: classmethod ) -> None : # quitte la partie/menu et le programme
+    def gameQuit( self ) -> None : # quitte la partie/menu et le programme
 
         if self.event.type == pygame.QUIT or (self.event.type == pygame.KEYDOWN and self.event.key == pygame.K_F4 and self.key[pygame.K_LALT]) :
 

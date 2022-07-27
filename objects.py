@@ -1,9 +1,11 @@
 import math
 import pygame
 
+from circle import Circle
+
 class OsuObjects :
 
-    def getSpinner( osu: classmethod ) -> None : # verifie si doit afficher un spinner, si oui le cree
+    def getSpinner( osu ) -> None : # verifie si doit afficher un spinner, si oui le cree
 
         if osu.s_num < len( osu.spinners ) :
 
@@ -18,7 +20,7 @@ class OsuObjects :
 
                 osu.s_num += 1
 
-    def setSpinners( osu: classmethod ) -> None : # affiche et modifie le/les spinners si mouvement
+    def setSpinners( osu ) -> None : # affiche et modifie le/les spinners si mouvement
 
         if osu.waiting == False :
 
@@ -107,7 +109,7 @@ class OsuObjects :
 
             osu.screen.blit( spinner_spin, spinner_rect )
 
-    def spinning( osu: classmethod ) -> float : # mouvement de rotation du spinner
+    def spinning( osu ) -> float : # mouvement de rotation du spinner
 
         if osu.spin_x >= 0 and osu.spin_y >= 0 :
 
@@ -139,7 +141,7 @@ class OsuObjects :
 
         return osu.spin
 
-    def getCircle( osu: classmethod ) -> None : # verifie si doit afficher un cercle, si oui le cree
+    def getCircle( osu ) -> None : # verifie si doit afficher un cercle, si oui le cree
 
         if osu.c_num < len( osu.circles ) :
 
@@ -155,7 +157,7 @@ class OsuObjects :
 
                 number = osu.number_font.render( f"{osu.numbers}", False, osu.white ).convert()
 
-                osu.show_circles.append( [osu.getTime() - osu.paused_time, 0, 1, osu.a_circle, coor, osu.circles[osu.c_num][2], number, osu.circle, osu.fade, 1, osu.acc_check, osu.faded, 1] )
+                osu.show_circles.append( Circle( osu.getTime() - osu.paused_time, coor, osu.circles[osu.c_num][2], number, osu.fade, osu.faded, osu.c_s, osu.a_c_s, osu.skin ) )
 
                 osu.c_num += 1
 
@@ -165,61 +167,61 @@ class OsuObjects :
 
             osu.c_num += 1
 
-    def setCircles( osu: classmethod ) -> None : # affiche et modifie le/les cercles
+    def setCircles( osu ) -> None : # affiche et modifie le/les cercles
 
         for u in osu.show_circles :
 
             if osu.waiting == False :
 
-                u[1] = osu.getTime() - u[0] - osu.paused_time
+                u.time_shown = osu.getTime() - u.time - osu.paused_time
 
-                if u[1] >= osu.ar_time and u[8] == False :
-                    u[8] = True
+                if u.time_shown >= osu.ar_time and u.fade == False :
+                    u.fade = True
 
-                if u[2] < 4 :
+                if u.alpha < 4 :
 
-                    a_c_rescale = osu.a_c_s/u[2]
-                    u[3]        = pygame.transform.smoothscale( osu.a_circle, (a_c_rescale, a_c_rescale) ).convert_alpha()
+                    a_c_rescale = osu.a_c_s/u.alpha
+                    u.a_circle        = pygame.transform.smoothscale( osu.a_circle, (a_c_rescale, a_c_rescale) ).convert_alpha()
 
-                if u[8] == False :
+                if u.fade == False :
 
-                    u[3].set_alpha( 255*u[2]/2 - 255/2 )
-                    u[7].set_alpha( 255*u[2]   - 255 )
-                    u[6].set_alpha( 255*u[2]   - 255 )
+                    u.a_circle.set_alpha( 255*u.alpha/2 - 255/2 )
+                    u.circle.set_alpha( 255*u.alpha   - 255 )
+                    u.number.set_alpha( 255*u.alpha   - 255 )
 
-                    u[2] += 6*450/osu.ar_time/osu.fps
-                    u[2]  = round( u[2], 2 )
+                    u.alpha += 6*450/osu.ar_time/osu.fps
+                    u.alpha  = round( u.alpha, 2 )
 
                 else :
 
-                    u[12]    += 1/osu.fps
-                    c_rescale = osu.c_s*u[12]
-                    u[7]      = pygame.transform.smoothscale( osu.circle, (c_rescale, c_rescale) ).convert_alpha()
+                    u.scale    += 1/osu.fps
+                    c_rescale = osu.c_s*u.scale
+                    u.circle      = pygame.transform.smoothscale( osu.circle, (c_rescale, c_rescale) ).convert_alpha()
 
-                    u[3].set_alpha( 255*u[9] )
-                    u[7].set_alpha( 255*u[9] )
-                    u[6].set_alpha( 255*u[9] )
+                    u.a_circle.set_alpha( 255*u.a_alpha )
+                    u.circle.set_alpha( 255*u.a_alpha )
+                    u.number.set_alpha( 255*u.a_alpha )
 
-                    u[9] -= 18/osu.fps
-                    u[9]  = round( u[9], 2 )
+                    u.a_alpha -= 18/osu.fps
+                    u.a_alpha  = round( u.a_alpha, 2 )
 
-            a_c_rect    = u[3].get_rect( center = u[4] )
-            circle_rect = u[7].get_rect( center = u[4] )
-            number_rect = u[6].get_rect( center = u[4] )
+            a_c_rect    = u.a_circle.get_rect( center = u.coor )
+            circle_rect = u.circle.get_rect( center = u.coor )
+            number_rect = u.number.get_rect( center = u.coor )
 
-            osu.screen.blit( u[3], a_c_rect )
-            osu.screen.blit( u[7], circle_rect )
-            osu.screen.blit( u[6], (number_rect[0] + osu.reSize( 1 ), number_rect[1] + osu.reSize( 8 )) )
+            osu.screen.blit( u.a_circle, a_c_rect )
+            osu.screen.blit( u.circle, circle_rect )
+            osu.screen.blit( u.number, (number_rect[0] + osu.reSize( 1 ), number_rect[1] + osu.reSize( 8 )) )
 
-            if u[1] >= osu.ar_time + osu.od_time :
+            if u.time_shown >= osu.ar_time + osu.od_time :
                 osu.show_circles.pop( 0 )
 
-                if u[11] == False :
+                if u.faded == False :
 
                     osu.t_miss += 1
 
                     osu.acc.append( 0 )
-                    osu.show_acc.append( [osu.acc_miss, u[4], osu.getTime(), 0] )
+                    osu.show_acc.append( [osu.acc_miss, u.coor, osu.getTime(), 0] )
 
                     osu.acc_check = True
 
@@ -229,7 +231,7 @@ class OsuObjects :
                         osu.playSound( "miss", 1, osu.volume_effects )
                     osu.combo = 0
 
-    def getFollowPoint( osu: classmethod ) -> None : # verifie si doit afficher un followpoint, si oui le cree
+    def getFollowPoint( osu ) -> None : # verifie si doit afficher un followpoint, si oui le cree
 
         if osu.f_num < len( osu.circles ) - 1 :
 
@@ -273,7 +275,7 @@ class OsuObjects :
 
                 osu.f_num += 1
 
-    def setFollowPoints( osu: classmethod ) -> None : # affiche et modifie le/les followpoints
+    def setFollowPoints( osu ) -> None : # affiche et modifie le/les followpoints
 
         for f in osu.show_followpoints :
 

@@ -3,7 +3,7 @@ import pygame
 
 class Tools :
 
-    def load( self: classmethod, name: str, size: tuple, smooth: bool ) -> pygame.Surface : # charge une image
+    def load( self, name: str, size: tuple, smooth: bool ) -> pygame.Surface : # charge une image
 
         image = pygame.image.load( f"assets\\{name}" ).convert_alpha()
 
@@ -17,10 +17,10 @@ class Tools :
 
         return image
 
-    def getTime( self: classmethod ) -> int : # retourne le temps actuel de la demande en millisecondes
+    def getTime( self ) -> int : # retourne le temps actuel de la demande en millisecondes
 
         return int(round( time.time() * 1000 ))
 
-    def reSize( self: classmethod, number: float ) -> float : # adapte les images a toutes les resolutions
+    def reSize( self, number: float ) -> float : # adapte les images a toutes les resolutions
 
         return number/1920*self.width

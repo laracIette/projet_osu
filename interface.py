@@ -2,7 +2,7 @@ import pygame
 
 class OsuInterface :
 
-    def darkenScreen( osu: classmethod ) -> None : # assombri/eclairci l'ecran en fonction des pauses
+    def darkenScreen( osu ) -> None : # assombri/eclairci l'ecran en fonction des pauses
 
         if osu.game_break == False :
             pygame.draw.rect( osu.screen, (0, 0, 0), osu.noir )
@@ -13,7 +13,7 @@ class OsuInterface :
             osu.screen.blit( osu.dim, (0, 0) )
             #osu.UI = False
 
-    def setShowOnScreen( osu: classmethod ) -> None : # determine des elements a afficher pendant une partie
+    def setShowOnScreen( osu ) -> None : # determine des elements a afficher pendant une partie
 
         if osu.waiting == False :
 
@@ -69,7 +69,7 @@ class OsuInterface :
             if osu.getTime() - osu.offset_time - osu.paused_time >= 1000 :
                 osu.show_offset = False
 
-    def showOnScreen( osu: classmethod ) -> None : # affichage des elements de la partie
+    def showOnScreen( osu ) -> None : # affichage des elements de la partie
 
         if osu.UI == False and osu.UI_alpha > 0 :
 
@@ -136,7 +136,7 @@ class OsuInterface :
             waiting_cursor_rect = osu.cursor.get_rect( center = osu.pos )
             osu.screen.blit( osu.cursor, waiting_cursor_rect )
 
-    def setFps( osu: classmethod ) -> None : # calcule et affiche les fps
+    def setFps( osu ) -> None : # calcule et affiche les fps
 
         osu.fps = round( 1000 / (osu.getTime() - osu.fps_time), 2 )
 
@@ -152,7 +152,7 @@ class OsuInterface :
         osu.fps_txt  = osu.fps_font.render( f"{round(osu.avg_fps)}fps", False, osu.white ).convert()
         osu.avg_fps  = 0
 
-    def UItextRenders( osu: classmethod ) -> None : # affiche les elements texte de la partie
+    def UItextRenders( osu ) -> None : # affiche les elements texte de la partie
 
         if osu.acc_check :
 
@@ -178,7 +178,7 @@ class OsuInterface :
 
             osu.acc_check = False
 
-    def hideUI( osu: classmethod ) -> None : # cache/montre l'interface
+    def hideUI( osu ) -> None : # cache/montre l'interface
 
         if (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_TAB and osu.key[pygame.K_LSHIFT]) or\
            (osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_LSHIFT and osu.key[pygame.K_TAB]) :

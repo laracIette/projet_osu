@@ -3,7 +3,7 @@ import pygame
 
 class OsuGame :
 
-    def setBreak( osu: classmethod ) -> None : # determine les pauses manuelles dans la partie
+    def setBreak( osu ) -> None : # determine les pauses manuelles dans la partie
 
         for g in osu.game_breaks :
 
@@ -14,7 +14,7 @@ class OsuGame :
                 osu.game_break = False
                 osu.game_breaks.pop( 0 )
 
-    def applyBreaks( osu: classmethod ) -> None : # declenche les pauses automatiques dans la partie
+    def applyBreaks( osu ) -> None : # declenche les pauses automatiques dans la partie
 
         if osu.getTime() >= osu.music_start - osu.start_offset/2.5 and osu.break_lock == False :
             osu.game_break = False
@@ -23,12 +23,12 @@ class OsuGame :
         if osu.getTime() >= osu.end_time + osu.start_offset/2.5 :
             osu.game_break = True
 
-    def startGame( osu: classmethod ) -> None : # elements declenchants la partie
+    def startGame( osu ) -> None : # elements declenchants la partie
 
         pygame.mixer.music.play()
         osu.playing = True
 
-    def endGame( osu: classmethod ) -> None : # elements pouvants terminer une partie
+    def endGame( osu ) -> None : # elements pouvants terminer une partie
 
         osu.running = False
 
@@ -50,7 +50,7 @@ class OsuGame :
 
         osu.menu.menuChoice( osu.mod_list )
 
-    def getpause( osu: classmethod ) -> None : # captation des touches necessaires a la pause de la partie
+    def getpause( osu ) -> None : # captation des touches necessaires a la pause de la partie
 
         if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_ESCAPE :
             osu.running = False
@@ -70,7 +70,7 @@ class OsuGame :
 
             osu.pause()
 
-    def pause( osu: classmethod ) -> None : # declenche la pause manuelle
+    def pause( osu ) -> None : # declenche la pause manuelle
 
         loop = True
         while loop :
@@ -94,7 +94,7 @@ class OsuGame :
 
                 osu.gameQuit()
 
-    def unpause( osu: classmethod ) -> None : # verifie et si possible quitte la pause
+    def unpause( osu ) -> None : # verifie et si possible quitte la pause
 
         pos1 = pygame.mouse.get_pos()
 
@@ -110,7 +110,7 @@ class OsuGame :
 
                 osu.paused_time += osu.getTime() - osu.pause_time
 
-    def changeOffset( osu: classmethod ) -> None : # detecte si le joueur presse les touche de + ou - d'offset et l'applique
+    def changeOffset( osu ) -> None : # detecte si le joueur presse les touche de + ou - d'offset et l'applique
 
         if osu.event.type == pygame.KEYDOWN and osu.event.key == pygame.K_EQUALS :
 
@@ -132,7 +132,7 @@ class OsuGame :
             osu.offset_time = osu.getTime()
             osu.show_offset = True
 
-    def getClicks( osu: classmethod ) -> None : # capte les touches clavier pouvant interagir avec un objet de la partie
+    def getClicks( osu ) -> None : # capte les touches clavier pouvant interagir avec un objet de la partie
 
         if osu.event.type == pygame.KEYDOWN and (osu.event.key == pygame.K_x or osu.event.key == pygame.K_v) :
 
@@ -145,19 +145,19 @@ class OsuGame :
         if osu.event.type == pygame.KEYUP and (osu.event.key == pygame.K_x or osu.event.key == pygame.K_v) :
             osu.click_check = False
 
-    def getAcc( osu: classmethod ) -> None : # detecte et applique le changement d'accuracy du joueur dans la partie
+    def getAcc( osu ) -> None : # detecte et applique le changement d'accuracy du joueur dans la partie
 
         for v in range( len( osu.show_circles ) ) :
 
-            if osu.acc_check == False and osu.show_circles[v][11] == False :
+            if osu.acc_check == False and osu.show_circles[v].faded == False :
 
-                distance = math.hypot( osu.show_circles[v][4][0] - osu.pos[0], osu.show_circles[v][4][1] - osu.pos[1] )
+                distance = math.hypot( osu.show_circles[v].coor[0] - osu.pos[0], osu.show_circles[v].coor[1] - osu.pos[1] )
 
                 if distance < osu.c_s/2*115/121 :
 
                     osu.acc_check = True
 
-                    difference = osu.getTime() - (osu.start_time + osu.show_circles[v][5] + osu.paused_time) + osu.offset
+                    difference = osu.getTime() - (osu.start_time + osu.show_circles[v].start_time + osu.paused_time) + osu.offset
                     osu.total_ur.append( difference )
 
                     if abs( difference ) < osu.od_time :
@@ -173,14 +173,14 @@ class OsuGame :
 
                             osu.hit_value = 100
                             osu.show_ur.append( [osu.green, 278*difference/osu.od_time/2, osu.getTime(), 0] )
-                            osu.show_acc.append( [osu.acc_100, osu.show_circles[v][4], osu.getTime(), 0] )
+                            osu.show_acc.append( [osu.acc_100, osu.show_circles[v].coor, osu.getTime(), 0] )
 
                         elif abs( difference ) > osu.od_time/2 :
                             osu.t_50 += 1
 
                             osu.hit_value = 50
                             osu.show_ur.append( [osu.orange, 278*difference/osu.od_time/2, osu.getTime(), 0] )
-                            osu.show_acc.append( [osu.acc_50, osu.show_circles[v][4], osu.getTime(), 0] )
+                            osu.show_acc.append( [osu.acc_50, osu.show_circles[v].coor, osu.getTime(), 0] )
 
                         osu.acc.append( round( osu.hit_value/3, 2) )
                         health_bonus = round( osu.hit_value/30, 2 )
@@ -201,7 +201,7 @@ class OsuGame :
                         osu.t_miss += 1
 
                         osu.hit_value = 0
-                        osu.show_acc.append( [osu.acc_miss, osu.show_circles[v][4], osu.getTime(), 0] )
+                        osu.show_acc.append( [osu.acc_miss, osu.show_circles[v].coor, osu.getTime(), 0] )
 
                         osu.acc.append( 0 )
 
@@ -211,5 +211,5 @@ class OsuGame :
                             osu.playSound( "miss", 1, osu.volume_effects )
                         osu.combo = 0
 
-                    osu.show_circles[v][8]  = True
-                    osu.show_circles[v][11] = True
+                    osu.show_circles[v].fade  = True
+                    osu.show_circles[v].faded = True

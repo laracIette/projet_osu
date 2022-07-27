@@ -186,7 +186,7 @@ class Osu( OsuGame, OsuObjects, GameEnd, OsuInterface, OsuSetThings, Settings, T
 
         self.running = True
 
-    def osuRun( osu: classmethod ) -> None : # deroulement de la partie, osu est l'instance de la classe Osu
+    def osuRun( osu ) -> None : # deroulement de la partie, osu est l'instance de la classe Osu
 
         while osu.running :
 
@@ -252,7 +252,7 @@ class Osu( OsuGame, OsuObjects, GameEnd, OsuInterface, OsuSetThings, Settings, T
 
 class Menu( MenuTools, Settings, Tools, Sounds, GameEnd, MenuMods ) : # classe correspondante au menu du jeu
 
-    def __init__( self: classmethod ) -> None :
+    def __init__( self ) -> None :
 
         super().__init__()
 
@@ -294,8 +294,8 @@ class Menu( MenuTools, Settings, Tools, Sounds, GameEnd, MenuMods ) : # classe c
 
         self.running = True
 
-    def menuChoice( menu: classmethod, mod_list: list ) -> None : # determine les options a prendre en compte pour le lancement d'une partie
-                                            # menu est l'instance de la classe Menu
+    def menuChoice( menu, mod_list = [] ) -> None : # determine les options a prendre en compte pour le lancement d'une partie
+                                                    # menu est l'instance de la classe Menu
 
         pygame.mouse.set_visible( True )
 
